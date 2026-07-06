@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://5ouahpp03mnv"]
+
+[ext_resource type="Script" uid="uid://5gslet04piah" path="res://scripts/monkey.gd" id="1_1uot1"]
+[ext_resource type="Texture2D" uid="uid://cgr1aubyhpdwb" path="res://assets/monkey-sprites/standing/monkey-front.png" id="1_rb1f4"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_wtx44"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_rb1f4")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_s5ljv"]
+size = Vector2(57, 113)
+
+[node name="CharacterBody2D" type="CharacterBody2D" unique_id=1112790412]
+script = ExtResource("1_1uot1")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=2110700844]
+sprite_frames = SubResource("SpriteFrames_wtx44")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=101953220]
+position = Vector2(-1.5, 11.5)
+shape = SubResource("RectangleShape2D_s5ljv")

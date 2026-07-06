@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dmh7bdjengh7f"
-path="res://.godot/imported/monkey.png-9d10cf6047633b94fe49a37c37c74acb.ctex"
+uid="uid://b5gqmm0nx2hmy"
+path="res://.godot/imported/side2.png-e334db093d7b8cb91742e85c8360085e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://monkey.png"
-dest_files=["res://.godot/imported/monkey.png-9d10cf6047633b94fe49a37c37c74acb.ctex"]
+source_file="res://assets/monkey-sprites/walking/side/side2.png"
+dest_files=["res://.godot/imported/side2.png-e334db093d7b8cb91742e85c8360085e.ctex"]
 
 [params]
 
