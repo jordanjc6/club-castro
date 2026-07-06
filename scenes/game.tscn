@@ -1,6 +1,5 @@
 [gd_scene format=3 uid="uid://civqly8eil1ry"]
 
-[ext_resource type="PackedScene" uid="uid://cvtg4gx2483vj" path="res://scenes/monkey_character.tscn" id="1_uwrxv"]
 [ext_resource type="PackedScene" uid="uid://5ouahpp03mnv" path="res://scenes/monkey.tscn" id="2_yqjtg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s5ljv"]
@@ -8,11 +7,8 @@ size = Vector2(585, 20)
 
 [node name="Game" type="Node2D" unique_id=248023385]
 
-[node name="MonkeyCharacter" parent="." unique_id=620827955 instance=ExtResource("1_uwrxv")]
-position = Vector2(105, 47)
-
 [node name="Camera2D" type="Camera2D" parent="." unique_id=907679900]
-position = Vector2(106, 48)
+position = Vector2(104, 53)
 
 [node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1473054669]
 
