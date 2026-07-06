@@ -2,6 +2,9 @@
 
 [ext_resource type="Script" uid="uid://5gslet04piah" path="res://scripts/monkey.gd" id="1_1uot1"]
 [ext_resource type="Texture2D" uid="uid://cgr1aubyhpdwb" path="res://assets/monkey-sprites/standing/monkey-front.png" id="1_rb1f4"]
+[ext_resource type="Texture2D" uid="uid://dvle7xr4qeoay" path="res://assets/monkey-sprites/walking/side/side.png" id="3_x11h5"]
+[ext_resource type="Texture2D" uid="uid://b5gqmm0nx2hmy" path="res://assets/monkey-sprites/walking/side/side2.png" id="4_nandu"]
+[ext_resource type="Texture2D" uid="uid://p5x4e6qorlbj" path="res://assets/monkey-sprites/walking/side/side3.png" id="5_irmjr"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wtx44"]
 animations = [{
@@ -10,19 +13,36 @@ animations = [{
 "texture": ExtResource("1_rb1f4")
 }],
 "loop": 1,
-"name": &"default",
+"name": &"standing-front",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_x11h5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_nandu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_irmjr")
+}],
+"loop": 1,
+"name": &"walking-side",
 "speed": 5.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s5ljv"]
-size = Vector2(57, 113)
+size = Vector2(52, 113)
 
 [node name="CharacterBody2D" type="CharacterBody2D" unique_id=1112790412]
 script = ExtResource("1_1uot1")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=2110700844]
+position = Vector2(2, 9)
+scale = Vector2(0.7371915, 0.74434924)
 sprite_frames = SubResource("SpriteFrames_wtx44")
+animation = &"standing-front"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=101953220]
-position = Vector2(-1.5, 11.5)
+position = Vector2(1, 0)
 shape = SubResource("RectangleShape2D_s5ljv")
