@@ -1,26 +1,14 @@
 [gd_scene format=3 uid="uid://civqly8eil1ry"]
 
+[ext_resource type="Texture2D" uid="uid://du4254tl1hxv3" path="res://assets/backgrounds/background-jungle-plaza.png" id="1_yqjtg"]
 [ext_resource type="PackedScene" uid="uid://5ouahpp03mnv" path="res://scenes/monkey.tscn" id="2_yqjtg"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_s5ljv"]
-size = Vector2(585, 20)
 
 [node name="Game" type="Node2D" unique_id=248023385]
 
-[node name="Camera2D" type="Camera2D" parent="." unique_id=907679900]
-position = Vector2(104, 53)
-
-[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1473054669]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=1127735878]
-position = Vector2(105, 114)
-shape = SubResource("RectangleShape2D_s5ljv")
-
-[node name="ColorRect" type="ColorRect" parent="StaticBody2D" unique_id=1245055731]
-offset_left = -187.0
-offset_top = 105.0
-offset_right = 397.0
-offset_bottom = 123.0
+[node name="BackgroundJunglePlaza" type="Sprite2D" parent="." unique_id=275431069]
+position = Vector2(644, 367)
+scale = Vector2(0.8310474, 0.775739)
+texture = ExtResource("1_yqjtg")
 
 [node name="CharacterBody2D" parent="." unique_id=1112790412 instance=ExtResource("2_yqjtg")]
-position = Vector2(-88, 34)
+position = Vector2(648, 533)
