@@ -71,20 +71,26 @@ animations = [{
 "speed": 5.0
 }, {
 "frames": [{
-"duration": 1.5,
+"duration": 1.0,
+"texture": ExtResource("8_j0jt2")
+}, {
+"duration": 1.0,
 "texture": ExtResource("7_budfd")
 }, {
 "duration": 1.0,
 "texture": ExtResource("8_j0jt2")
 }, {
-"duration": 1.5,
+"duration": 1.0,
 "texture": ExtResource("9_sdq1a")
 }],
 "loop": 1,
 "name": &"walking-back",
-"speed": 5.0
+"speed": 10.0
 }, {
 "frames": [{
+"duration": 1.0,
+"texture": ExtResource("11_tqdlh")
+}, {
 "duration": 1.0,
 "texture": ExtResource("10_4br3j")
 }, {
@@ -96,23 +102,29 @@ animations = [{
 }],
 "loop": 1,
 "name": &"walking-back-diagonal",
-"speed": 5.0
+"speed": 10.0
 }, {
 "frames": [{
-"duration": 1.5,
-"texture": ExtResource("13_4wykx")
-}, {
-"duration": 0.8,
+"duration": 1.0,
 "texture": ExtResource("14_2f7x8")
 }, {
-"duration": 1.5,
+"duration": 1.0,
+"texture": ExtResource("13_4wykx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_2f7x8")
+}, {
+"duration": 1.0,
 "texture": ExtResource("15_ryhnd")
 }],
 "loop": 1,
 "name": &"walking-front",
-"speed": 5.0
+"speed": 10.0
 }, {
 "frames": [{
+"duration": 1.0,
+"texture": ExtResource("17_vhlao")
+}, {
 "duration": 1.0,
 "texture": ExtResource("16_ak2q3")
 }, {
@@ -124,9 +136,12 @@ animations = [{
 }],
 "loop": 1,
 "name": &"walking-front-diagonal",
-"speed": 5.0
+"speed": 10.0
 }, {
 "frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_0q8wh")
+}, {
 "duration": 1.0,
 "texture": SubResource("CompressedTexture2D_wpyu8")
 }, {
@@ -138,7 +153,7 @@ animations = [{
 }],
 "loop": 1,
 "name": &"walking-side",
-"speed": 5.0
+"speed": 10.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s5ljv"]
@@ -151,8 +166,8 @@ script = ExtResource("1_1uot1")
 position = Vector2(2, 9)
 scale = Vector2(0.7371915, 0.74434924)
 sprite_frames = SubResource("SpriteFrames_wtx44")
-animation = &"walking-back"
-frame_progress = 0.23510297
+animation = &"walking-side"
+frame_progress = 0.3696262
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=101953220]
 position = Vector2(6, 19.875)

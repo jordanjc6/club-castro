@@ -5,10 +5,21 @@
 
 [node name="Game" type="Node2D" unique_id=248023385]
 
-[node name="BackgroundJunglePlaza" type="Sprite2D" parent="." unique_id=275431069]
-position = Vector2(644, 367)
-scale = Vector2(0.8310474, 0.775739)
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1091903030]
+layer = -1
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer" unique_id=98416496]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 texture = ExtResource("1_yqjtg")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="CharacterBody2D" parent="." unique_id=1112790412 instance=ExtResource("2_yqjtg")]
-position = Vector2(648, 533)
+position = Vector2(650, 539)
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1006789555]
+position = Vector2(640, 360)
