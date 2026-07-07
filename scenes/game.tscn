@@ -23,3 +23,8 @@ position = Vector2(650, 539)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1006789555]
 position = Vector2(640, 360)
+
+[node name="MapBarrier" type="StaticBody2D" parent="." unique_id=801626984]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="MapBarrier" unique_id=1338022678]
+polygon = PackedVector2Array(646, 721, 527, 644, 359, 702, 257, 618, 193, 529, 11, 424, 71, 369, 251, 434, 462, 392, 534, 415, 616, 358, 687, 358, 763, 421, 850, 400, 910, 411, 1033, 461, 1181, 417, 1187, 469, 1116, 514, 1157, 563, 1105, 605, 1049, 575, 978, 608, 979, 718, 800, 722, 1325, 789, 1314, -56, -49, -50, -47, 791, 800, 722)

@@ -157,7 +157,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s5ljv"]
-size = Vector2(27, 81.75)
+size = Vector2(27, 14)
 
 [node name="CharacterBody2D" type="CharacterBody2D" unique_id=1112790412]
 script = ExtResource("1_1uot1")
@@ -166,9 +166,8 @@ script = ExtResource("1_1uot1")
 position = Vector2(2, 9)
 scale = Vector2(0.7371915, 0.74434924)
 sprite_frames = SubResource("SpriteFrames_wtx44")
-animation = &"walking-side"
-frame_progress = 0.3696262
+animation = &"standing-front"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=101953220]
-position = Vector2(6, 19.875)
+position = Vector2(6, 49)
 shape = SubResource("RectangleShape2D_s5ljv")
