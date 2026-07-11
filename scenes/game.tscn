@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://civqly8eil1ry"]
 
 [ext_resource type="Script" uid="uid://bvtns6mvyt83o" path="res://scenes/game.gd" id="1_lnu2h"]
-[ext_resource type="Texture2D" uid="uid://du4254tl1hxv3" path="res://assets/backgrounds/background-jungle-plaza.png" id="1_yqjtg"]
-[ext_resource type="PackedScene" uid="uid://5ouahpp03mnv" path="res://scenes/monkey.tscn" id="2_yqjtg"]
+[ext_resource type="Texture2D" uid="uid://du4254tl1hxv3" path="res://assets/backgrounds/areas/background-jungle-plaza.png" id="1_yqjtg"]
+[ext_resource type="PackedScene" uid="uid://5ouahpp03mnv" path="res://scenes/player/monkey.tscn" id="2_yqjtg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s5ljv"]
 size = Vector2(78, 136)

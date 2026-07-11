@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bjwpe4m0828om"]
 
-[ext_resource type="Texture2D" uid="uid://du4254tl1hxv3" path="res://assets/backgrounds/background-jungle-plaza.png" id="1_bkyf1"]
-[ext_resource type="PackedScene" uid="uid://5ouahpp03mnv" path="res://scenes/monkey.tscn" id="2_htph2"]
+[ext_resource type="Texture2D" uid="uid://du4254tl1hxv3" path="res://assets/backgrounds/areas/background-jungle-plaza.png" id="1_bkyf1"]
+[ext_resource type="PackedScene" uid="uid://5ouahpp03mnv" path="res://scenes/player/monkey.tscn" id="2_htph2"]
 [ext_resource type="Script" uid="uid://nqaalo1aog34" path="res://scripts/door.gd" id="3_j8qoq"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s5ljv"]
@@ -32,7 +32,7 @@ polygon = PackedVector2Array(650, 723, 929, 723, 1048, 620, 1152, 621, 1199, 566
 
 [node name="bbt-door" type="Area2D" parent="." unique_id=1907621678]
 script = ExtResource("3_j8qoq")
-target_room = "uid://cmlspjxln0qno"
+target_room = "uid://g6h6kew8yic6"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="bbt-door" unique_id=960736033]
 position = Vector2(883.125, 363.25)

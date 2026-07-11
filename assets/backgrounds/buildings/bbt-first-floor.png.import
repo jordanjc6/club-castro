@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://du4254tl1hxv3"
-path="res://.godot/imported/background-jungle-plaza.png-84f63b10e3f8210165526950a38aabac.ctex"
+uid="uid://cpq8r5nyyvfp8"
+path="res://.godot/imported/bbt-first-floor.png-983d9bb561183f3c1b1b03f54279b8a6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/backgrounds/areas/background-jungle-plaza.png"
-dest_files=["res://.godot/imported/background-jungle-plaza.png-84f63b10e3f8210165526950a38aabac.ctex"]
+source_file="res://assets/backgrounds/buildings/bbt-first-floor.png"
+dest_files=["res://.godot/imported/bbt-first-floor.png-983d9bb561183f3c1b1b03f54279b8a6.ctex"]
 
 [params]
 

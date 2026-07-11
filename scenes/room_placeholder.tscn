@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cmlspjxln0qno"]
 
 [ext_resource type="Texture2D" uid="uid://ck2epia2m2ujx" path="res://assets/monkey-sprites/designs/monkey-sprite-sheet.png" id="1_u6sg0"]
-[ext_resource type="PackedScene" uid="uid://5ouahpp03mnv" path="res://scenes/monkey.tscn" id="2_abp7i"]
+[ext_resource type="PackedScene" uid="uid://5ouahpp03mnv" path="res://scenes/player/monkey.tscn" id="2_abp7i"]
 [ext_resource type="Script" uid="uid://nqaalo1aog34" path="res://scripts/door.gd" id="3_ybakn"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s5ljv"]

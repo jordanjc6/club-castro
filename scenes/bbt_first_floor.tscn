@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://g6h6kew8yic6"]
+
+[ext_resource type="Texture2D" uid="uid://cpq8r5nyyvfp8" path="res://assets/backgrounds/buildings/bbt-first-floor.png" id="1_0bo8s"]
+[ext_resource type="PackedScene" uid="uid://5ouahpp03mnv" path="res://scenes/player/monkey.tscn" id="2_31vga"]
+[ext_resource type="Script" uid="uid://nqaalo1aog34" path="res://scripts/door.gd" id="3_0dud5"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_883ak"]
+size = Vector2(109, 75.875)
+
+[node name="bbt-first-floor" type="Node2D" unique_id=377639946]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1135406495]
+layer = -1
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer" unique_id=630002968]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_0bo8s")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="CharacterBody2D" parent="CanvasLayer" unique_id=1112790412 instance=ExtResource("2_31vga")]
+position = Vector2(454, 591)
+
+[node name="map-barrier" type="StaticBody2D" parent="." unique_id=2090513091]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="map-barrier" unique_id=1894101004]
+polygon = PackedVector2Array(424, 726, 110, 724, 124, 654, 1, 573, 0, 493, 62, 492, 94, 400, 165, 385, 237, 426, 256, 421, 288, 365, 357, 358, 390, 378, 466, 382, 657, 399, 657, 369, 858, 377, 858, 404, 894, 357, 1008, 363, 1026, 378, 1027, 428, 1051, 428, 1086, 327, 991, 117, 1068, 118, 1266, 389, 1269, 486, 1126, 716, 1030, 716, 1003, 607, 920, 590, 886, 718, 561, 719, 562, 750, 1313, 750, 1304, -45, -58, -29, -50, 758, 426, 755)
+
+[node name="bbt-door" type="Area2D" parent="." unique_id=546273466]
+script = ExtResource("3_0dud5")
+target_room = "uid://bjwpe4m0828om"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="bbt-door" unique_id=5821654]
+position = Vector2(488, 697)
+shape = SubResource("RectangleShape2D_883ak")
+
+[node name="stairs" type="Area2D" parent="." unique_id=1082566268]
+script = ExtResource("3_0dud5")
+target_room = "uid://cmlspjxln0qno"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="stairs" unique_id=358501002]
+position = Vector2(1058.5, 155.0625)
+shape = SubResource("RectangleShape2D_883ak")
+
+[connection signal="body_entered" from="bbt-door" to="bbt-door" method="_on_body_entered"]
+[connection signal="body_entered" from="stairs" to="stairs" method="_on_body_entered"]
