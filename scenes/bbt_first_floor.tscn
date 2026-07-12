@@ -3,9 +3,13 @@
 [ext_resource type="Texture2D" uid="uid://cpq8r5nyyvfp8" path="res://assets/backgrounds/buildings/bbt-first-floor.png" id="1_0bo8s"]
 [ext_resource type="PackedScene" uid="uid://5ouahpp03mnv" path="res://scenes/player/monkey.tscn" id="2_31vga"]
 [ext_resource type="Script" uid="uid://nqaalo1aog34" path="res://scripts/door.gd" id="3_0dud5"]
+[ext_resource type="Script" uid="uid://bqkfc4lkp1pd3" path="res://scripts/game_seat.gd" id="4_0dud5"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_883ak"]
 size = Vector2(109, 75.875)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_s5ljv"]
+radius = 80.1561
 
 [node name="bbt-first-floor" type="Node2D" unique_id=377639946]
 
@@ -46,5 +50,16 @@ target_room = "uid://cmlspjxln0qno"
 position = Vector2(1058.5, 155.0625)
 shape = SubResource("RectangleShape2D_883ak")
 
+[node name="pink-bean-bag" type="Node2D" parent="." unique_id=1116080741]
+script = ExtResource("4_0dud5")
+
+[node name="game-seat" type="Area2D" parent="pink-bean-bag" unique_id=580594206]
+position = Vector2(1058.5, 155.0625)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="pink-bean-bag/game-seat" unique_id=1185862635]
+position = Vector2(-900.5, 314.9375)
+shape = SubResource("CircleShape2D_s5ljv")
+
 [connection signal="body_entered" from="bbt-door" to="bbt-door" method="_on_body_entered"]
 [connection signal="body_entered" from="stairs" to="stairs" method="_on_body_entered"]
+[connection signal="body_entered" from="pink-bean-bag/game-seat" to="pink-bean-bag" method="_on_gameseat_entered"]
