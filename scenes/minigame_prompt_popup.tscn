@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://bt1p33j8es3tr"]
 
-[ext_resource type="Script" uid="uid://boc88drk5lgh3" path="res://scripts/minigame_popup.gd" id="1_5ur84"]
+[ext_resource type="Script" uid="uid://boc88drk5lgh3" path="res://scripts/minigame_prompt_popup.gd" id="1_oekvo"]
 
-[node name="minigame-popup" type="Control" unique_id=173143594]
+[node name="minigame-prompt-popup" type="Control" unique_id=173143594]
 layout_mode = 3
 anchors_preset = 0
-script = ExtResource("1_5ur84")
+script = ExtResource("1_oekvo")
 
 [node name="Panel" type="Panel" parent="." unique_id=173833905]
 layout_mode = 0
