@@ -5,6 +5,10 @@ const JUMP_VELOCITY = -400.0
 
 @onready var monkey = $AnimatedSprite2D
 
+func _ready():
+	if not is_multiplayer_authority():
+		set_physics_process(false)
+
 func _physics_process(delta: float) -> void:
 	# Add the gravity.
 	#if not is_on_floor():
