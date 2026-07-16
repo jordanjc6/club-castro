@@ -13,5 +13,5 @@ func _on_host_button_pressed():
 
 func _on_join_button_pressed():
 	print("join btn pressed")
-	NetworkManager.join_game(MAC_IP)
+	NetworkManager.join_game(JINA_MAC_IP)
 	get_tree().change_scene_to_file(GAME_SCENE)

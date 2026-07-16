@@ -8,18 +8,22 @@ const JUMP_VELOCITY = -400.0
 @export var synced_animation: String = "standing-front"
 @export var synced_flip: bool = false
 
-		
 var player_id := 0
+
+# 1. This runs as soon as the node enters the scene tree,
+# perfectly timing the authority setup with the network spawn.
+func _enter_tree():
+	# Use the node's name (which we set to the peer ID string) as the authority ID
+	var id = name.to_int()
+	set_multiplayer_authority(id)
+	
+	# We must also explicitly tell the synchronizer who owns it
+	if has_node("MultiplayerSynchronizer"):
+		$MultiplayerSynchronizer.set_multiplayer_authority(id)
 
 func set_player_id(id):
 	player_id = id
-	set_multiplayer_authority(id)
-
-#func _ready():
-	#if not is_multiplayer_authority():
-		##set_physics_process(false)
-		#if monkey.animation != synced_animation:
-			#monkey.play(synced_animation)
+	# Removed set_multiplayer_authority(id) from here to prevent premature execution
 
 func _physics_process(delta: float) -> void:
 	if is_multiplayer_authority():
@@ -33,7 +37,6 @@ func _physics_process(delta: float) -> void:
 			set_monkey_animation("standing-front")
 
 		move_and_slide()
-	
 	
 func set_monkey_animation(anim_name:String):
 	synced_animation = anim_name
