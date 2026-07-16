@@ -1,6 +1,7 @@
 extends Control
 
 const MAC_IP = "192.168.2.23"
+const DELL_IP = "192.168.2.10"
 const GAME_SCENE = "res://scenes/jungle_plaza.tscn"
 
 func _on_host_button_pressed():
