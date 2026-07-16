@@ -8,35 +8,36 @@ const JUMP_VELOCITY = -400.0
 @export var synced_animation: String = "standing-front"
 @export var synced_flip: bool = false
 
+# This flag stops the client's physics from overriding the server's spawn point
+var has_synced_spawn := false
 var player_id := 0
 
-# 1. This runs as soon as the node enters the scene tree,
-# perfectly timing the authority setup with the network spawn.
-#func _enter_tree():
-	## Use the node's name (which we set to the peer ID string) as the authority ID
-	#var id = name.to_int()
-	#set_multiplayer_authority(id)
-	#
-	## We must also explicitly tell the synchronizer who owns it
-	#if has_node("MultiplayerSynchronizer"):
-		#$MultiplayerSynchronizer.set_multiplayer_authority(id)
-		
 func _enter_tree():
 	var id = name.to_int()
 	set_multiplayer_authority(id)
 	
-	# This automatically finds any MultiplayerSynchronizer child node,
-	# regardless of what you named it!
+	# Automatically find and set authority on your synchronizer, no matter its name
 	for child in get_children():
 		if child is MultiplayerSynchronizer:
 			child.set_multiplayer_authority(id)
+			
+	# If this is the client controlling this monkey, pause its physics briefly
+	if is_multiplayer_authority():
+		_wait_for_spawn_sync()
+
+func _wait_for_spawn_sync():
+	await get_tree().physics_frame
+	has_synced_spawn = true
 
 func set_player_id(id):
 	player_id = id
-	# Removed set_multiplayer_authority(id) from here to prevent premature execution
 
 func _physics_process(delta: float) -> void:
 	if is_multiplayer_authority():
+		# 1. Stop processing if we haven't received the spawn coordinates yet
+		if not has_synced_spawn:
+			return 
+			
 		var direction := Input.get_vector("walk-left", "walk-right", "walk-backward", "walk-forward")
 		
 		if direction != Vector2.ZERO:
