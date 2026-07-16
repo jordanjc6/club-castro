@@ -12,17 +12,18 @@ func _ready():
 		if monkey.animation != current_animation:
 			monkey.play(current_animation)
 
-func _physics_process(delta: float) -> void:		
-	var direction := Input.get_vector("walk-left", "walk-right", "walk-backward", "walk-forward")
-	
-	if direction != Vector2.ZERO:
-		velocity = direction * SPEED
-		update_walk_animation(direction)
-	else:
-		velocity = velocity.move_toward(Vector2.ZERO, SPEED)
-		monkey.stop()
+func _physics_process(delta: float) -> void:
+	if is_multiplayer_authority():
+		var direction := Input.get_vector("walk-left", "walk-right", "walk-backward", "walk-forward")
+		
+		if direction != Vector2.ZERO:
+			velocity = direction * SPEED
+			update_walk_animation(direction)
+		else:
+			velocity = velocity.move_toward(Vector2.ZERO, SPEED)
+			monkey.stop()
 
-	move_and_slide()
+		move_and_slide()
 	
 func change_animation(anim_name: String):
 	current_animation = anim_name
@@ -58,3 +59,6 @@ func update_walk_animation(dir: Vector2) -> void:
 		change_animation("walking-side")
 		monkey.flip_h = (dir.x < 0)
 	
+#func _process(delta):
+	#if not is_multiplayer_authority():
+		#monkey.play(monkey.animation)
