@@ -9,7 +9,9 @@ const PLAYER_SCENE = preload("res://scenes/player/monkey.tscn")
 func _ready():
 	if multiplayer.is_server():
 		spawn_player(multiplayer.get_unique_id())
-
+		
+		# set to listen for connections
+		multiplayer.peer_connected.connect(_on_peer_connected)
 
 func spawn_player(id):
 	var player = PLAYER_SCENE.instantiate()
@@ -24,3 +26,6 @@ func spawn_player(id):
 
 	print("Spawned player: ", id)
 	
+func _on_peer_connected(id):
+	print("New player joined:", id)
+	spawn_player(id)
