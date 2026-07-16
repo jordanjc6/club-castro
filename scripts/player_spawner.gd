@@ -24,8 +24,8 @@ func spawn_player(id):
 	
 	player.set_player_id(id)
 
-	#players.add_child(player)
-	$players/MultiplayerSpawner.spawn(player)
+	players.add_child(player)
+	#$players/MultiplayerSpawner.spawn(player)
 
 	print("Spawned player: ", id)
 	
