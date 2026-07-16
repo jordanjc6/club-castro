@@ -8,6 +8,13 @@ const JUMP_VELOCITY = -400.0
 @export var synced_animation: String = "standing-front"
 @export var synced_flip: bool = false
 
+		
+var player_id := 0
+
+func set_player_id(id):
+	player_id = id
+	set_multiplayer_authority(id)
+
 #func _ready():
 	#if not is_multiplayer_authority():
 		##set_physics_process(false)

@@ -20,7 +20,9 @@ func spawn_player(id):
 
 	player.position = spawn_point.position
 
-	player.set_multiplayer_authority(id)
+	#player.set_multiplayer_authority(id)
+	
+	player.set_player_id(id)
 
 	players.add_child(player)
 
