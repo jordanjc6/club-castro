@@ -12,14 +12,24 @@ var player_id := 0
 
 # 1. This runs as soon as the node enters the scene tree,
 # perfectly timing the authority setup with the network spawn.
+#func _enter_tree():
+	## Use the node's name (which we set to the peer ID string) as the authority ID
+	#var id = name.to_int()
+	#set_multiplayer_authority(id)
+	#
+	## We must also explicitly tell the synchronizer who owns it
+	#if has_node("MultiplayerSynchronizer"):
+		#$MultiplayerSynchronizer.set_multiplayer_authority(id)
+		
 func _enter_tree():
-	# Use the node's name (which we set to the peer ID string) as the authority ID
 	var id = name.to_int()
 	set_multiplayer_authority(id)
 	
-	# We must also explicitly tell the synchronizer who owns it
-	if has_node("MultiplayerSynchronizer"):
-		$MultiplayerSynchronizer.set_multiplayer_authority(id)
+	# This automatically finds any MultiplayerSynchronizer child node,
+	# regardless of what you named it!
+	for child in get_children():
+		if child is MultiplayerSynchronizer:
+			child.set_multiplayer_authority(id)
 
 func set_player_id(id):
 	player_id = id
