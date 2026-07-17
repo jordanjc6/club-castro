@@ -18,8 +18,15 @@
 [ext_resource type="Texture2D" uid="uid://c33cijfsdpirr" path="res://assets/monkey-sprites/walking/front-diagonal/1.png" id="16_ak2q3"]
 [ext_resource type="Texture2D" uid="uid://dehtdtstryqgl" path="res://assets/monkey-sprites/walking/front-diagonal/2.png" id="17_vhlao"]
 [ext_resource type="Texture2D" uid="uid://dfwmamkrbesgk" path="res://assets/monkey-sprites/walking/front-diagonal/3.png" id="18_ucw3d"]
-[ext_resource type="Texture2D" uid="uid://bs381ij3i1gq3" path="res://assets/monkey-sprites/walking/side/walking-side2.png" id="19_nbekv"]
-[ext_resource type="Texture2D" uid="uid://cjohnlinqiga3" path="res://assets/monkey-sprites/walking/side/walking-side3.png" id="20_veeye"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_wpyu8"]
+load_path = "res://.godot/imported/walking-side.png-d92fce7a80bb95cb804ccab7dde52590.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_gsqvd"]
+load_path = "res://.godot/imported/walking-side2.png-3c0d0fafa8fdd977eadf26c28c78801e.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_x11h5"]
+load_path = "res://.godot/imported/walking-side3.png-175162ec5e41e8a98f25af998b88546f.ctex"
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wtx44"]
 animations = [{
@@ -136,10 +143,13 @@ animations = [{
 "texture": ExtResource("6_0q8wh")
 }, {
 "duration": 1.0,
-"texture": ExtResource("19_nbekv")
+"texture": SubResource("CompressedTexture2D_wpyu8")
 }, {
 "duration": 1.0,
-"texture": ExtResource("20_veeye")
+"texture": SubResource("CompressedTexture2D_gsqvd")
+}, {
+"duration": 1.0,
+"texture": SubResource("CompressedTexture2D_x11h5")
 }],
 "loop": 1,
 "name": &"walking-side",
@@ -149,17 +159,6 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s5ljv"]
 size = Vector2(27, 14)
 
-[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_nbekv"]
-properties/0/path = NodePath(".:position")
-properties/0/spawn = true
-properties/0/replication_mode = 1
-properties/1/path = NodePath(".:synced_animation")
-properties/1/spawn = true
-properties/1/replication_mode = 1
-properties/2/path = NodePath(".:synced_flip")
-properties/2/spawn = true
-properties/2/replication_mode = 1
-
 [node name="CharacterBody2D" type="CharacterBody2D" unique_id=1112790412]
 script = ExtResource("1_1uot1")
 
@@ -167,11 +166,8 @@ script = ExtResource("1_1uot1")
 position = Vector2(2, 9)
 scale = Vector2(0.7371915, 0.74434924)
 sprite_frames = SubResource("SpriteFrames_wtx44")
-animation = &"walking-side"
+animation = &"standing-front"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=101953220]
 position = Vector2(6, 49)
 shape = SubResource("RectangleShape2D_s5ljv")
-
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1377248427]
-replication_config = SubResource("SceneReplicationConfig_nbekv")
