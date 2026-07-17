@@ -53,6 +53,11 @@ walk-backward={
 ]
 }
 
+[layer_names]
+
+2d_physics/layer_1="Map Boundaries"
+2d_physics/layer_2="Player Characters"
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
