@@ -5,6 +5,10 @@ const JUMP_VELOCITY = -400.0
 
 @onready var monkey = $AnimatedSprite2D
 
+@export var player_id := 1:
+	set(id):
+		player_id = id
+
 func _physics_process(delta: float) -> void:
 	var direction := Input.get_vector("walk-left", "walk-right", "walk-backward", "walk-forward")
 	
