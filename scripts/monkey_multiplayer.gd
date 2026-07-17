@@ -2,6 +2,7 @@ extends CharacterBody2D
 
 const SPEED = 300.0
 const JUMP_VELOCITY = -400.0
+var direction
 
 @onready var monkey = $AnimatedSprite2D
 
@@ -11,17 +12,23 @@ const JUMP_VELOCITY = -400.0
 		%InputSynchronizer.set_multiplayer_authority(id)
 
 func _physics_process(delta: float) -> void:
+	direction = %InputSynchronizer.input_direction
 	if (multiplayer.is_server()):
-		var direction = %InputSynchronizer.input_direction
-		
 		if direction != Vector2.ZERO:
 			velocity = direction * SPEED
-			update_walk_animation(direction)
+			#update_walk_animation(direction)
 		else:
 			velocity = velocity.move_toward(Vector2.ZERO, SPEED)
-			monkey.stop()
+			#monkey.stop()
 
 		move_and_slide()
+	
+	if (not multiplayer.is_server() || MultiplayerManager.host_mode_enabled):
+		if direction != Vector2.ZERO:
+			update_walk_animation(direction)
+		else:
+			monkey.stop()
+		
 	
 func update_walk_animation(dir: Vector2) -> void:
 	# diagonal up-right
