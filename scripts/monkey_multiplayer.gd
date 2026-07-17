@@ -8,18 +8,20 @@ const JUMP_VELOCITY = -400.0
 @export var player_id := 1:
 	set(id):
 		player_id = id
+		%InputSynchronizer.set_multiplayer_authority(id)
 
 func _physics_process(delta: float) -> void:
-	var direction := Input.get_vector("walk-left", "walk-right", "walk-backward", "walk-forward")
-	
-	if direction != Vector2.ZERO:
-		velocity = direction * SPEED
-		update_walk_animation(direction)
-	else:
-		velocity = velocity.move_toward(Vector2.ZERO, SPEED)
-		monkey.stop()
+	if (multiplayer.is_server()):
+		var direction = %InputSynchronizer.input_direction
+		
+		if direction != Vector2.ZERO:
+			velocity = direction * SPEED
+			update_walk_animation(direction)
+		else:
+			velocity = velocity.move_toward(Vector2.ZERO, SPEED)
+			monkey.stop()
 
-	move_and_slide()
+		move_and_slide()
 	
 func update_walk_animation(dir: Vector2) -> void:
 	# diagonal up-right

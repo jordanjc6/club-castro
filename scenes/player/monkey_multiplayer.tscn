@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://carq3wm84wvl8" path="res://scripts/monkey_multiplayer.gd" id="1_b6687"]
 [ext_resource type="Texture2D" uid="uid://bhal8gh4ntvpf" path="res://assets/monkey-sprites/standing/standing-back.png" id="1_y04n0"]
 [ext_resource type="Texture2D" uid="uid://cnitydwvg4l4m" path="res://assets/monkey-sprites/standing/standing-back-diagonal.png" id="2_b6687"]
+[ext_resource type="Script" uid="uid://d12mikxyykhi2" path="res://scripts/multiplayer_input.gd" id="2_ovbpe"]
 [ext_resource type="Texture2D" uid="uid://bilxhdi0r61r2" path="res://assets/monkey-sprites/standing/standing-front.png" id="3_wy7ux"]
 [ext_resource type="Texture2D" uid="uid://dqostiussqq8t" path="res://assets/monkey-sprites/standing/standing-front-diagonal.png" id="4_2cldh"]
 [ext_resource type="Texture2D" uid="uid://bhfbgp0q8khcw" path="res://assets/monkey-sprites/standing/standing-side.png" id="5_dlwwh"]
@@ -20,6 +21,19 @@
 [ext_resource type="Texture2D" uid="uid://dfwmamkrbesgk" path="res://assets/monkey-sprites/walking/front-diagonal/3.png" id="17_xjqag"]
 [ext_resource type="Texture2D" uid="uid://bs381ij3i1gq3" path="res://assets/monkey-sprites/walking/side/walking-side2.png" id="18_gh7n5"]
 [ext_resource type="Texture2D" uid="uid://cjohnlinqiga3" path="res://assets/monkey-sprites/walking/side/walking-side3.png" id="19_eh8vr"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ovbpe"]
+properties/0/path = NodePath(".:player_id")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:position")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_bdlv7"]
+properties/0/path = NodePath("InputSynchronizer:input_direction")
+properties/0/spawn = true
+properties/0/replication_mode = 1
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_uw3v7"]
 animations = [{
@@ -153,6 +167,14 @@ size = Vector2(27, 14)
 collision_layer = 2
 motion_mode = 1
 script = ExtResource("1_b6687")
+
+[node name="PlayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1259899422]
+replication_config = SubResource("SceneReplicationConfig_ovbpe")
+
+[node name="InputSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=197869996]
+unique_name_in_owner = true
+replication_config = SubResource("SceneReplicationConfig_bdlv7")
+script = ExtResource("2_ovbpe")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=170859835]
 position = Vector2(2, 9)
