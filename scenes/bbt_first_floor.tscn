@@ -26,7 +26,7 @@ texture = ExtResource("1_0bo8s")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="CharacterBody2D" parent="CanvasLayer" unique_id=1112790412 instance=ExtResource("2_31vga")]
+[node name="CharacterBody2D" parent="." unique_id=1112790412 instance=ExtResource("2_31vga")]
 position = Vector2(454, 591)
 
 [node name="map-barrier" type="StaticBody2D" parent="." unique_id=2090513091]
