@@ -57,9 +57,9 @@ position = Vector2(648, 556)
 
 [node name="players" type="Node2D" parent="." unique_id=258289374]
 
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=1329680715]
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="players" unique_id=1329680715]
 _spawnable_scenes = PackedStringArray("uid://5ouahpp03mnv")
-spawn_path = NodePath("../players")
+spawn_path = NodePath("..")
 
 [connection signal="body_entered" from="bbt-door" to="bbt-door" method="_on_body_entered"]
 [connection signal="body_entered" from="the-cinema-door" to="the-cinema-door" method="_on_body_entered"]

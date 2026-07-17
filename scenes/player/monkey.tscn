@@ -164,7 +164,7 @@ properties/2/replication_mode = 1
 script = ExtResource("1_1uot1")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=2110700844]
-position = Vector2(73, 64)
+position = Vector2(2, 9)
 scale = Vector2(0.7371915, 0.74434924)
 sprite_frames = SubResource("SpriteFrames_wtx44")
 animation = &"walking-side"
