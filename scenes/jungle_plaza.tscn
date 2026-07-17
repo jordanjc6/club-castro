@@ -27,11 +27,14 @@ stretch_mode = 6
 position = Vector2(647, 528)
 
 [node name="map-barrier" type="StaticBody2D" parent="." unique_id=1255407059]
+collision_mask = 0
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="map-barrier" unique_id=421764410]
 polygon = PackedVector2Array(650, 723, 929, 723, 1048, 620, 1152, 621, 1199, 566, 1131, 502, 1251, 433, 1178, 380, 1062, 449, 919, 416, 917, 374, 851, 370, 827, 414, 793, 383, 765, 386, 764, 424, 690, 343, 690, 320, 610, 322, 610, 355, 539, 411, 537, 360, 474, 403, 454, 339, 363, 361, 383, 415, 253, 420, 78, 328, 7, 422, 124, 515, 200, 555, 241, 609, 280, 666, 346, 713, 624, 717, 623, 782, -83, 775, -86, -87, 1357, -93, 1355, 793, 781, 790, 623, 786)
 
 [node name="bbt-door" type="Area2D" parent="." unique_id=1907621678]
+collision_layer = 4
+collision_mask = 2
 script = ExtResource("3_j8qoq")
 target_room = "uid://g6h6kew8yic6"
 
@@ -40,6 +43,8 @@ position = Vector2(883.125, 363.25)
 shape = SubResource("RectangleShape2D_s5ljv")
 
 [node name="the-cinema-door" type="Area2D" parent="." unique_id=1876658108]
+collision_layer = 4
+collision_mask = 2
 script = ExtResource("3_j8qoq")
 target_room = "uid://cmlspjxln0qno"
 
@@ -48,6 +53,8 @@ position = Vector2(649, 320)
 shape = SubResource("RectangleShape2D_s5ljv")
 
 [node name="rec-center-door" type="Area2D" parent="." unique_id=1183098860]
+collision_layer = 4
+collision_mask = 2
 script = ExtResource("3_j8qoq")
 target_room = "uid://cmlspjxln0qno"
 

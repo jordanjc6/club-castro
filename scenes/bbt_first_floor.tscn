@@ -30,11 +30,14 @@ stretch_mode = 6
 position = Vector2(454, 591)
 
 [node name="map-barrier" type="StaticBody2D" parent="." unique_id=2090513091]
+collision_mask = 0
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="map-barrier" unique_id=1894101004]
 polygon = PackedVector2Array(424, 726, 110, 724, 124, 654, 1, 573, 0, 493, 62, 492, 94, 400, 165, 385, 237, 426, 256, 421, 288, 365, 357, 358, 390, 378, 466, 382, 657, 399, 657, 369, 858, 377, 858, 404, 894, 357, 1008, 363, 1026, 378, 1027, 428, 1051, 428, 1086, 327, 991, 117, 1068, 118, 1266, 389, 1269, 486, 1126, 716, 1030, 716, 1003, 607, 920, 590, 886, 718, 561, 719, 562, 750, 1313, 750, 1304, -45, -58, -29, -50, 758, 426, 755)
 
 [node name="bbt-door" type="Area2D" parent="." unique_id=546273466]
+collision_layer = 4
+collision_mask = 2
 script = ExtResource("3_0dud5")
 target_room = "uid://bjwpe4m0828om"
 
@@ -43,6 +46,8 @@ position = Vector2(488, 697)
 shape = SubResource("RectangleShape2D_883ak")
 
 [node name="stairs" type="Area2D" parent="." unique_id=1082566268]
+collision_layer = 4
+collision_mask = 2
 script = ExtResource("3_0dud5")
 target_room = "uid://cmlspjxln0qno"
 
@@ -55,6 +60,8 @@ script = ExtResource("4_0dud5")
 
 [node name="game-seat" type="Area2D" parent="pink-bean-bag" unique_id=580594206]
 position = Vector2(1058.5, 155.0625)
+collision_layer = 4
+collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="pink-bean-bag/game-seat" unique_id=1185862635]
 position = Vector2(-900.5, 314.9375)
