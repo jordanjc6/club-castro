@@ -4,9 +4,13 @@
 [ext_resource type="PackedScene" uid="uid://5ouahpp03mnv" path="res://scenes/player/monkey.tscn" id="2_htph2"]
 [ext_resource type="Script" uid="uid://nqaalo1aog34" path="res://scripts/door.gd" id="3_j8qoq"]
 [ext_resource type="Script" uid="uid://doydguqh43yjw" path="res://scenes/GameManager.gd" id="4_0ax84"]
+[ext_resource type="Script" uid="uid://c1meexkm7ti74" path="res://scripts/Teleporter.gd" id="5_e8mnv"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s5ljv"]
 size = Vector2(56.25, 103.5)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_00mmp"]
+radius = 60.40695
 
 [node name="jungle-plaza" type="Node2D" unique_id=854219030]
 
@@ -99,8 +103,18 @@ spawn_limit = 2
 [node name="Players" type="Node2D" parent="." unique_id=1092168601]
 position = Vector2(652, 554)
 
+[node name="Teleporter" type="Area2D" parent="." unique_id=300706385]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("5_e8mnv")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Teleporter" unique_id=283008603]
+position = Vector2(1154, 470)
+shape = SubResource("CircleShape2D_00mmp")
+
 [connection signal="body_entered" from="bbt-door" to="bbt-door" method="_on_body_entered"]
 [connection signal="body_entered" from="the-cinema-door" to="the-cinema-door" method="_on_body_entered"]
 [connection signal="body_entered" from="rec-center-door" to="rec-center-door" method="_on_body_entered"]
 [connection signal="pressed" from="MultiplayerHUD/Panel/VBoxContainer/Button" to="Node" method="_host_button_pressed"]
 [connection signal="pressed" from="MultiplayerHUD/Panel/VBoxContainer/Button2" to="Node" method="_join_button_pressed"]
+[connection signal="body_entered" from="Teleporter" to="Teleporter" method="_on_body_entered"]
