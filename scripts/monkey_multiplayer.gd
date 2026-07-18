@@ -6,6 +6,7 @@ var direction
 
 @onready var monkey = $AnimatedSprite2D
 @onready var camera = $Camera2D
+@onready var animation_player = $ScreenFadeLayer/AnimationPlayer
 
 @export var player_id := 1:
 	set(id):
@@ -25,6 +26,16 @@ func _ready() -> void:
 		camera.top_level = true 
 	else:
 		camera.enabled = false
+
+# This RPC will only execute on the network peer that owns this specific player
+@rpc("authority", "call_local", "reliable")
+func play_teleport_fade() -> void:
+	animation_player.play("fade_to_black")
+	
+	# Wait for the fade out to finish before letting the screen clear
+	await animation_player.animation_finished
+	
+	animation_player.play("fade_from_black")
 
 func _physics_process(delta: float) -> void:
 	direction = %InputSynchronizer.input_direction

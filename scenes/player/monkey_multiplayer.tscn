@@ -166,6 +166,60 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cd356"]
 size = Vector2(27, 14)
 
+[sub_resource type="Animation" id="Animation_ovbpe"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ColorRect:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0, 0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_8boaa"]
+resource_name = "fade_from_black"
+length = 0.39999999999999997
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ColorRect:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 1), Color(0, 0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_bdlv7"]
+resource_name = "fade_to_black"
+length = 0.39999999999999997
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ColorRect:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 0), Color(0, 0, 0, 0.93333334)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_8boaa"]
+_data = {
+&"RESET": SubResource("Animation_ovbpe"),
+&"fade_from_black": SubResource("Animation_8boaa"),
+&"fade_to_black": SubResource("Animation_bdlv7")
+}
+
 [node name="CharacterBody2D" type="CharacterBody2D" unique_id=128853272]
 collision_layer = 2
 collision_mask = 5
@@ -191,3 +245,17 @@ position = Vector2(6, 49)
 shape = SubResource("RectangleShape2D_cd356")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1686944126]
+
+[node name="ScreenFadeLayer" type="CanvasLayer" parent="." unique_id=1238348833]
+
+[node name="ColorRect" type="ColorRect" parent="ScreenFadeLayer" unique_id=625342201]
+modulate = Color(0, 0, 0, 0)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="ScreenFadeLayer" unique_id=923778978]
+libraries/ = SubResource("AnimationLibrary_8boaa")
