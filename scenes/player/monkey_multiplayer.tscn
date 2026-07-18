@@ -189,3 +189,5 @@ animation = &"standing-front"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=412955455]
 position = Vector2(6, 49)
 shape = SubResource("RectangleShape2D_cd356")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1686944126]
