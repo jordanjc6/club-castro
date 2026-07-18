@@ -12,6 +12,7 @@ size = Vector2(56.25, 103.5)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=379465062]
 layer = -1
+follow_viewport_enabled = true
 
 [node name="TextureRect" type="TextureRect" parent="CanvasLayer" unique_id=392926900]
 anchors_preset = 15
