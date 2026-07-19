@@ -183,7 +183,7 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id="Animation_8boaa"]
 resource_name = "fade_from_black"
-length = 0.39999999999999997
+length = 0.4
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -199,7 +199,7 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id="Animation_bdlv7"]
 resource_name = "fade_to_black"
-length = 0.39999999999999997
+length = 0.4
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
