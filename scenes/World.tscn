@@ -1,0 +1,183 @@
+[gd_scene format=3 uid="uid://bjwpe4m0828om"]
+
+[ext_resource type="Texture2D" uid="uid://du4254tl1hxv3" path="res://assets/backgrounds/areas/background-jungle-plaza.png" id="1_1lgw5"]
+[ext_resource type="Texture2D" uid="uid://cpq8r5nyyvfp8" path="res://assets/backgrounds/buildings/bbt-first-floor.png" id="2_hlk0d"]
+[ext_resource type="PackedScene" uid="uid://5ouahpp03mnv" path="res://scenes/player/monkey.tscn" id="3_0uv0p"]
+[ext_resource type="Texture2D" uid="uid://b2mut4j8c83cn" path="res://assets/backgrounds/buildings/the-cinema.png" id="3_hlk0d"]
+[ext_resource type="Script" uid="uid://c1meexkm7ti74" path="res://scripts/Teleporter.gd" id="4_b3faq"]
+[ext_resource type="Script" uid="uid://doydguqh43yjw" path="res://scenes/GameManager.gd" id="5_ygioq"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kdute"]
+size = Vector2(61, 110.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_s5ljv"]
+size = Vector2(81.5, 120.875)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_00mmp"]
+size = Vector2(181, 38.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_t5v6p"]
+size = Vector2(185, 35.5)
+
+[node name="World" type="Node2D" unique_id=854219030]
+
+[node name="JunglePlaza" type="CanvasLayer" parent="." unique_id=379465062]
+layer = -1
+follow_viewport_enabled = true
+
+[node name="TextureRect" type="TextureRect" parent="JunglePlaza" unique_id=392926900]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_1lgw5")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="jungle-plaza-barrier" type="StaticBody2D" parent="." unique_id=1255407059]
+collision_mask = 0
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="jungle-plaza-barrier" unique_id=421764410]
+polygon = PackedVector2Array(650, 723, 929, 723, 1048, 620, 1152, 621, 1199, 566, 1131, 502, 1251, 433, 1178, 380, 1062, 449, 919, 416, 917, 374, 851, 370, 827, 414, 793, 383, 765, 386, 764, 424, 690, 343, 690, 320, 610, 322, 610, 355, 539, 411, 537, 360, 474, 403, 454, 339, 363, 361, 383, 415, 253, 420, 78, 328, 7, 422, 124, 515, 200, 555, 241, 609, 280, 666, 346, 713, 624, 717, 623, 782, -83, 775, -86, -87, 1357, -93, 1355, 793, 781, 790, 623, 786)
+
+[node name="bbt-door" type="Area2D" parent="." unique_id=300706385]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("4_b3faq")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="bbt-door" unique_id=283008603]
+position = Vector2(881, 366)
+shape = SubResource("RectangleShape2D_kdute")
+
+[node name="the-cinema-door" type="Area2D" parent="." unique_id=1876658108]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("4_b3faq")
+target_position = Vector2(640, -590)
+new_zone_offset = Vector2(0, -950)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="the-cinema-door" unique_id=1233878116]
+position = Vector2(650.5, 323.125)
+shape = SubResource("RectangleShape2D_s5ljv")
+
+[node name="rec-center-door" type="Area2D" parent="." unique_id=1183098860]
+collision_layer = 4
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="rec-center-door" unique_id=899600037]
+position = Vector2(420, 348)
+shape = SubResource("RectangleShape2D_s5ljv")
+
+[node name="BBT" type="CanvasLayer" parent="." unique_id=1613253207]
+layer = -1
+offset = Vector2(1500, 0)
+transform = Transform2D(1, 0, 0, 1, 1500, 0)
+follow_viewport_enabled = true
+
+[node name="TextureRect" type="TextureRect" parent="BBT" unique_id=2113386303]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_hlk0d")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="bbt-barrier2" type="StaticBody2D" parent="." unique_id=566437638]
+collision_mask = 0
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="bbt-barrier2" unique_id=1071816510]
+position = Vector2(1507, -4)
+polygon = PackedVector2Array(424, 726, 110, 724, 124, 654, 1, 573, 0, 493, 62, 492, 94, 400, 165, 385, 237, 426, 256, 421, 288, 365, 357, 358, 390, 378, 466, 382, 657, 399, 657, 369, 858, 377, 858, 404, 894, 357, 1008, 363, 1026, 378, 1027, 428, 1051, 428, 1086, 327, 991, 117, 1068, 118, 1266, 389, 1269, 486, 1126, 716, 1030, 716, 1003, 607, 920, 590, 886, 718, 561, 719, 562, 750, 1313, 750, 1304, -45, -58, -29, -50, 758, 426, 755)
+
+[node name="bbt-to-jungle-plaza" type="Area2D" parent="." unique_id=2126927000]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("4_b3faq")
+target_position = Vector2(640, 360)
+new_zone_offset = Vector2(0, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="bbt-to-jungle-plaza" unique_id=1399803393]
+position = Vector2(1981.5, 700.25)
+shape = SubResource("RectangleShape2D_00mmp")
+
+[node name="TheCinema" type="CanvasLayer" parent="." unique_id=926102334]
+layer = -1
+offset = Vector2(0, -950)
+transform = Transform2D(1, 0, 0, 1, 0, -950)
+follow_viewport_enabled = true
+
+[node name="TextureRect" type="TextureRect" parent="TheCinema" unique_id=507396644]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_hlk0d")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="bbt-barrier" type="StaticBody2D" parent="." unique_id=934257745]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="bbt-barrier" unique_id=1062350718]
+polygon = PackedVector2Array(541, -229, 214, -229, 215, -302, 141, -298, 117, -320, 304, -524, 341, -525, 324, -811, 376, -829, 373, -863, 447, -867, 571, -880, 677, -885, 790, -876, 900, -853, 953, -823, 927, -529, 966, -528, 1178, -294, 1052, -293, 1055, -234, 730, -230, 729, -203, 1296, -207, 1292, -976, -25, -964, -24, -204, 727, -203)
+
+[node name="the-cinema-to-jungle-plaza" type="Area2D" parent="." unique_id=1658201268]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("4_b3faq")
+target_position = Vector2(640, 360)
+new_zone_offset = Vector2(0, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="the-cinema-to-jungle-plaza" unique_id=1678244186]
+position = Vector2(634.5, -248.25)
+shape = SubResource("RectangleShape2D_t5v6p")
+
+[node name="Node" type="Node" parent="." unique_id=619952250]
+script = ExtResource("5_ygioq")
+
+[node name="MultiplayerHUD" type="Control" parent="." unique_id=398977205]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Panel" type="Panel" parent="MultiplayerHUD" unique_id=1445952787]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MultiplayerHUD/Panel" unique_id=1102428660]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Button" type="Button" parent="MultiplayerHUD/Panel/VBoxContainer" unique_id=1684952006]
+layout_mode = 2
+text = "Host Game"
+
+[node name="Button2" type="Button" parent="MultiplayerHUD/Panel/VBoxContainer" unique_id=1698921905]
+layout_mode = 2
+text = "Join Game"
+
+[node name="Player" parent="." unique_id=1112790412 instance=ExtResource("3_0uv0p")]
+position = Vector2(647, 528)
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=760490683]
+_spawnable_scenes = PackedStringArray("uid://dt6pnon02v1yv")
+spawn_path = NodePath("../Players")
+spawn_limit = 2
+
+[node name="Players" type="Node2D" parent="." unique_id=1092168601]
+position = Vector2(652, 554)
+
+[connection signal="body_entered" from="bbt-door" to="bbt-door" method="_on_body_entered"]
+[connection signal="body_entered" from="the-cinema-door" to="the-cinema-door" method="_on_body_entered"]
+[connection signal="body_entered" from="rec-center-door" to="rec-center-door" method="_on_body_entered"]
+[connection signal="body_entered" from="bbt-to-jungle-plaza" to="bbt-to-jungle-plaza" method="_on_body_entered"]
+[connection signal="body_entered" from="the-cinema-to-jungle-plaza" to="the-cinema-to-jungle-plaza" method="_on_body_entered"]
+[connection signal="pressed" from="MultiplayerHUD/Panel/VBoxContainer/Button" to="Node" method="_host_button_pressed"]
+[connection signal="pressed" from="MultiplayerHUD/Panel/VBoxContainer/Button2" to="Node" method="_join_button_pressed"]

@@ -1,9 +1,17 @@
 extends Area2D
 
-#@export var target_position: Vector2 = Vector2(500, 500)
+# Note: can set target_position and new_zone_offset in each area2d that Teleporter
+# script is attached to in inspector -> Target Position, New Zone Offset.
+# Below values is just example calculations.
+
+# The center coordinate of the new CanvasLayer area
+# = (x, y) 
+# = ( x offset of canvaslayer + (viewport width / 2) , y offset of canvaslayer + (viewport height / 2) )
 @export var target_position: Vector2 = Vector2(1500 + (1280 / 2), 720 / 2)
 
 # The exact top-left corner coordinate (Offset) of the new CanvasLayer (BBT shop)
+# = (x, y)
+# = ( x offset of canvaslayer, y offset of canvaslayer )
 @export var new_zone_offset: Vector2 = Vector2(1500, 0)
 
 func _on_body_entered(body: Node2D):
