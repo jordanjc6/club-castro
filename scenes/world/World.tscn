@@ -15,7 +15,7 @@
 [node name="TheCinema" parent="." unique_id=1682686883 instance=ExtResource("3_252at")]
 
 [node name="SinglePlayer" parent="." unique_id=1112790412 instance=ExtResource("4_qh0kd")]
-position = Vector2(647, 528)
+position = Vector2(646, 531)
 
 [node name="MultiplayerHUD" type="Control" parent="." unique_id=398977205]
 unique_name_in_owner = true
@@ -47,10 +47,10 @@ script = ExtResource("5_qxiha")
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=760490683]
 _spawnable_scenes = PackedStringArray("uid://dt6pnon02v1yv")
-spawn_path = NodePath("../Players")
+spawn_path = NodePath("../MultiPlayers")
 spawn_limit = 2
 
-[node name="Players" type="Node2D" parent="." unique_id=1092168601]
+[node name="MultiPlayers" type="Node2D" parent="." unique_id=1092168601]
 position = Vector2(647, 527)
 
 [connection signal="pressed" from="MultiplayerHUD/Panel/VBoxContainer/HostButton" to="GameManager" method="_host_button_pressed"]
