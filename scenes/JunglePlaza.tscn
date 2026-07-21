@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://dc4doea3ehha5"]
+
+[ext_resource type="Texture2D" uid="uid://du4254tl1hxv3" path="res://assets/backgrounds/areas/background-jungle-plaza.png" id="1_cg43h"]
+[ext_resource type="Script" uid="uid://c1meexkm7ti74" path="res://scripts/Teleporter.gd" id="2_3ayop"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_04rbq"]
+size = Vector2(61, 110.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wgrbw"]
+size = Vector2(81.5, 120.875)
+
+[node name="JunglePlaza" type="Node2D" unique_id=1739898985]
+
+[node name="JunglePlazaMap" type="CanvasLayer" parent="." unique_id=1438311061]
+layer = -1
+follow_viewport_enabled = true
+
+[node name="TextureRect" type="TextureRect" parent="JunglePlazaMap" unique_id=735928923]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_cg43h")
+expand_mode = 1
+stretch_mode = 6
+metadata/_edit_use_anchors_ = true
+
+[node name="JunglePlazaCollisions" type="Node2D" parent="." unique_id=1647931020]
+
+[node name="jungle-plaza-barrier" type="StaticBody2D" parent="JunglePlazaCollisions" unique_id=1856242003]
+collision_mask = 0
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="JunglePlazaCollisions/jungle-plaza-barrier" unique_id=1209837384]
+polygon = PackedVector2Array(650, 723, 929, 723, 1048, 620, 1152, 621, 1199, 566, 1131, 502, 1251, 433, 1178, 380, 1062, 449, 919, 416, 917, 374, 851, 370, 827, 414, 793, 383, 765, 386, 764, 424, 690, 343, 690, 320, 610, 322, 610, 355, 539, 411, 537, 360, 474, 403, 454, 339, 363, 361, 383, 415, 253, 420, 78, 328, 7, 422, 124, 515, 200, 555, 241, 609, 280, 666, 346, 713, 624, 717, 623, 782, -83, 775, -86, -87, 1357, -93, 1355, 793, 781, 790, 623, 786)
+
+[node name="bbt-door" type="Area2D" parent="JunglePlazaCollisions" unique_id=1845687201]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("2_3ayop")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="JunglePlazaCollisions/bbt-door" unique_id=1324070534]
+position = Vector2(881, 366)
+shape = SubResource("RectangleShape2D_04rbq")
+
+[node name="the-cinema-door" type="Area2D" parent="JunglePlazaCollisions" unique_id=49626806]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("2_3ayop")
+target_position = Vector2(640, -590)
+new_zone_offset = Vector2(0, -950)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="JunglePlazaCollisions/the-cinema-door" unique_id=659725196]
+position = Vector2(650.5, 323.125)
+shape = SubResource("RectangleShape2D_wgrbw")
+
+[node name="rec-center-door" type="Area2D" parent="JunglePlazaCollisions" unique_id=360913881]
+collision_layer = 4
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="JunglePlazaCollisions/rec-center-door" unique_id=2074506494]
+position = Vector2(420, 348)
+shape = SubResource("RectangleShape2D_wgrbw")
+
+[connection signal="body_entered" from="JunglePlazaCollisions/bbt-door" to="JunglePlazaCollisions/bbt-door" method="_on_body_entered"]
+[connection signal="body_entered" from="JunglePlazaCollisions/the-cinema-door" to="JunglePlazaCollisions/the-cinema-door" method="_on_body_entered"]
+[connection signal="body_entered" from="JunglePlazaCollisions/rec-center-door" to="JunglePlazaCollisions/rec-center-door" method="_on_body_entered"]

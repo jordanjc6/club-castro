@@ -1,18 +1,12 @@
 [gd_scene format=3 uid="uid://bjwpe4m0828om"]
 
-[ext_resource type="Texture2D" uid="uid://du4254tl1hxv3" path="res://assets/backgrounds/areas/background-jungle-plaza.png" id="1_1lgw5"]
+[ext_resource type="PackedScene" uid="uid://dc4doea3ehha5" path="res://scenes/JunglePlaza.tscn" id="1_0uv0p"]
 [ext_resource type="Texture2D" uid="uid://cpq8r5nyyvfp8" path="res://assets/backgrounds/buildings/bbt-first-floor.png" id="2_hlk0d"]
 [ext_resource type="PackedScene" uid="uid://5ouahpp03mnv" path="res://scenes/player/monkey.tscn" id="3_0uv0p"]
 [ext_resource type="Texture2D" uid="uid://b2mut4j8c83cn" path="res://assets/backgrounds/buildings/the-cinema.png" id="3_hlk0d"]
 [ext_resource type="Script" uid="uid://c1meexkm7ti74" path="res://scripts/Teleporter.gd" id="4_b3faq"]
 [ext_resource type="Texture2D" uid="uid://c2eivhirv8qug" path="res://assets/backgrounds/buildings/theatre.png" id="5_0uv0p"]
 [ext_resource type="Script" uid="uid://doydguqh43yjw" path="res://scenes/GameManager.gd" id="5_ygioq"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_kdute"]
-size = Vector2(61, 110.5)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_s5ljv"]
-size = Vector2(81.5, 120.875)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_00mmp"]
 size = Vector2(181, 38.5)
@@ -25,53 +19,7 @@ size = Vector2(51, 73.25)
 
 [node name="World" type="Node2D" unique_id=854219030]
 
-[node name="JunglePlaza" type="CanvasLayer" parent="." unique_id=379465062]
-layer = -1
-follow_viewport_enabled = true
-
-[node name="TextureRect" type="TextureRect" parent="JunglePlaza" unique_id=392926900]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("1_1lgw5")
-expand_mode = 1
-stretch_mode = 6
-
-[node name="jungle-plaza-barrier" type="StaticBody2D" parent="." unique_id=1255407059]
-collision_mask = 0
-
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="jungle-plaza-barrier" unique_id=421764410]
-polygon = PackedVector2Array(650, 723, 929, 723, 1048, 620, 1152, 621, 1199, 566, 1131, 502, 1251, 433, 1178, 380, 1062, 449, 919, 416, 917, 374, 851, 370, 827, 414, 793, 383, 765, 386, 764, 424, 690, 343, 690, 320, 610, 322, 610, 355, 539, 411, 537, 360, 474, 403, 454, 339, 363, 361, 383, 415, 253, 420, 78, 328, 7, 422, 124, 515, 200, 555, 241, 609, 280, 666, 346, 713, 624, 717, 623, 782, -83, 775, -86, -87, 1357, -93, 1355, 793, 781, 790, 623, 786)
-
-[node name="bbt-door" type="Area2D" parent="." unique_id=300706385]
-collision_layer = 4
-collision_mask = 2
-script = ExtResource("4_b3faq")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="bbt-door" unique_id=283008603]
-position = Vector2(881, 366)
-shape = SubResource("RectangleShape2D_kdute")
-
-[node name="the-cinema-door" type="Area2D" parent="." unique_id=1876658108]
-collision_layer = 4
-collision_mask = 2
-script = ExtResource("4_b3faq")
-target_position = Vector2(640, -590)
-new_zone_offset = Vector2(0, -950)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="the-cinema-door" unique_id=1233878116]
-position = Vector2(650.5, 323.125)
-shape = SubResource("RectangleShape2D_s5ljv")
-
-[node name="rec-center-door" type="Area2D" parent="." unique_id=1183098860]
-collision_layer = 4
-collision_mask = 2
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="rec-center-door" unique_id=899600037]
-position = Vector2(420, 348)
-shape = SubResource("RectangleShape2D_s5ljv")
+[node name="JunglePlaza" parent="." unique_id=1739898985 instance=ExtResource("1_0uv0p")]
 
 [node name="BBT" type="CanvasLayer" parent="." unique_id=1613253207]
 layer = -1
@@ -203,11 +151,8 @@ spawn_path = NodePath("../Players")
 spawn_limit = 2
 
 [node name="Players" type="Node2D" parent="." unique_id=1092168601]
-position = Vector2(652, 554)
+position = Vector2(647, 527)
 
-[connection signal="body_entered" from="bbt-door" to="bbt-door" method="_on_body_entered"]
-[connection signal="body_entered" from="the-cinema-door" to="the-cinema-door" method="_on_body_entered"]
-[connection signal="body_entered" from="rec-center-door" to="rec-center-door" method="_on_body_entered"]
 [connection signal="body_entered" from="bbt-to-jungle-plaza" to="bbt-to-jungle-plaza" method="_on_body_entered"]
 [connection signal="body_entered" from="the-cinema-to-jungle-plaza" to="the-cinema-to-jungle-plaza" method="_on_body_entered"]
 [connection signal="body_entered" from="to-theatre" to="to-theatre" method="_on_body_entered"]

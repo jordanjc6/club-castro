@@ -77,20 +77,6 @@ func update_camera_grid() -> void:
 	) + current_grid_offset
 	
 	camera.global_position = target_camera_pos
-	
-	
-	## 1. Find which grid cell index the player is currently in
-	#var current_cell_x = floor(global_position.x / GRID_SIZE.x)
-	#var current_cell_y = floor(global_position.y / GRID_SIZE.y)
-	#
-	## 2. Calculate the global center coordinate of that specific grid cell
-	#var target_camera_pos = Vector2(
-		#(current_cell_x * GRID_SIZE.x) + (GRID_SIZE.x / 2.0),
-		#(current_cell_y * GRID_SIZE.y) + (GRID_SIZE.y / 2.0)
-	#)
-	#
-	## 3. Position the camera at the center of the active screen cell
-	#camera.global_position = target_camera_pos
 
 # Because current_grid_offset controls the local camera, the server needs 
 # an RPC to update this value on the specific client machine during a teleport.
