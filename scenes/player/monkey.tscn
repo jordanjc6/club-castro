@@ -149,7 +149,61 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s5ljv"]
 size = Vector2(27, 14)
 
-[node name="CharacterBody2D" type="CharacterBody2D" unique_id=1112790412]
+[sub_resource type="Animation" id="Animation_ovbpe"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ColorRect:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0, 0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_8boaa"]
+resource_name = "fade_from_black"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ColorRect:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 1), Color(0, 0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_bdlv7"]
+resource_name = "fade_to_black"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ColorRect:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 0), Color(0, 0, 0, 0.93333334)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_nbekv"]
+_data = {
+&"RESET": SubResource("Animation_ovbpe"),
+&"fade_from_black": SubResource("Animation_8boaa"),
+&"fade_to_black": SubResource("Animation_bdlv7")
+}
+
+[node name="SinglePlayer" type="CharacterBody2D" unique_id=1112790412]
 collision_layer = 2
 collision_mask = 5
 script = ExtResource("1_1uot1")
@@ -163,3 +217,20 @@ animation = &"standing-front"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=101953220]
 position = Vector2(6, 49)
 shape = SubResource("RectangleShape2D_s5ljv")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1405154612]
+
+[node name="ScreenFadeLayer" type="CanvasLayer" parent="." unique_id=295071113]
+
+[node name="ColorRect" type="ColorRect" parent="ScreenFadeLayer" unique_id=228679456]
+modulate = Color(0, 0, 0, 0)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="ScreenFadeLayer" unique_id=796248632]
+libraries/ = SubResource("AnimationLibrary_nbekv")

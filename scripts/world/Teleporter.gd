@@ -16,7 +16,7 @@ extends Area2D
 
 func _on_body_entered(body: Node2D):
 	# Only the server evaluates physical scene changes and collision overrides
-	if not multiplayer.is_server():
+	if not multiplayer.is_server() && body.name != "SinglePlayer":
 		return
 	
 	print("teleporter entered by %s" % body)
@@ -25,7 +25,10 @@ func _on_body_entered(body: Node2D):
 	if body is CharacterBody2D:
 		# Tell the specific player instance to trigger their local screen fade
 		if body.has_method("play_teleport_fade"):
-			body.play_teleport_fade.rpc_id(body.player_id)
+			if (body.name == "SinglePlayer"):
+				body.play_teleport_fade()
+			else:
+				body.play_teleport_fade.rpc_id(body.player_id)
 			
 		# Small optional delay (e.g., 0.15s) so the screen is partially dark 
 		# before the physical position and camera snap over
@@ -33,7 +36,10 @@ func _on_body_entered(body: Node2D):
 		
 		# Update the grid offset on the client controlling this player
 		if body.has_method("update_zone_offset"):
-			body.update_zone_offset.rpc_id(body.player_id, new_zone_offset)
+			if (body.name == "SinglePlayer"):
+				body.update_zone_offset(new_zone_offset)
+			else:
+				body.update_zone_offset.rpc_id(body.player_id, new_zone_offset)
 		
 		# Perform the actual physical move
 		body.global_position = target_position
