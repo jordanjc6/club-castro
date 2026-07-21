@@ -27,6 +27,10 @@ window/size/window_width_override=844
 window/size/window_height_override=390
 window/stretch/mode="viewport"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godot-apple-plugins/plugin.cfg")
+
 [input]
 
 walk-right={
