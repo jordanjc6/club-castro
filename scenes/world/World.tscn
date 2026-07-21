@@ -34,11 +34,11 @@ layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="Button" type="Button" parent="MultiplayerHUD/Panel/VBoxContainer" unique_id=1684952006]
+[node name="HostButton" type="Button" parent="MultiplayerHUD/Panel/VBoxContainer" unique_id=1684952006]
 layout_mode = 2
 text = "Host Game"
 
-[node name="Button2" type="Button" parent="MultiplayerHUD/Panel/VBoxContainer" unique_id=1698921905]
+[node name="JoinButton" type="Button" parent="MultiplayerHUD/Panel/VBoxContainer" unique_id=1698921905]
 layout_mode = 2
 text = "Join Game"
 
@@ -53,5 +53,5 @@ spawn_limit = 2
 [node name="MultiPlayers" type="Node2D" parent="." unique_id=1092168601]
 position = Vector2(647, 527)
 
-[connection signal="pressed" from="MultiplayerHUD/Panel/VBoxContainer/Button" to="GameManager" method="_host_button_pressed"]
-[connection signal="pressed" from="MultiplayerHUD/Panel/VBoxContainer/Button2" to="GameManager" method="_join_button_pressed"]
+[connection signal="pressed" from="MultiplayerHUD/Panel/VBoxContainer/HostButton" to="GameManager" method="_host_button_pressed"]
+[connection signal="pressed" from="MultiplayerHUD/Panel/VBoxContainer/JoinButton" to="GameManager" method="_join_button_pressed"]
