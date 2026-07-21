@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dc4doea3ehha5"]
 
-[ext_resource type="Texture2D" uid="uid://du4254tl1hxv3" path="res://assets/backgrounds/areas/background-jungle-plaza.png" id="1_cg43h"]
-[ext_resource type="Script" uid="uid://c1meexkm7ti74" path="res://scripts/Teleporter.gd" id="2_3ayop"]
+[ext_resource type="Texture2D" uid="uid://du4254tl1hxv3" path="res://assets/backgrounds/areas/jungle-plaza.png" id="1_cg43h"]
+[ext_resource type="Script" uid="uid://c1meexkm7ti74" path="res://scripts/world/Teleporter.gd" id="2_3ayop"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_04rbq"]
 size = Vector2(61, 110.5)

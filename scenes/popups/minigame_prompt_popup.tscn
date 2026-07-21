@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bt1p33j8es3tr"]
 
-[ext_resource type="Script" uid="uid://boc88drk5lgh3" path="res://scripts/minigame_prompt_popup.gd" id="1_oekvo"]
+[ext_resource type="Script" uid="uid://boc88drk5lgh3" path="res://scripts/popups/minigame_prompt_popup.gd" id="1_oekvo"]
 
 [node name="minigame-prompt-popup" type="Control" unique_id=173143594]
 layout_mode = 3

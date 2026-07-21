@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dugk7wjnxe7xp"]
 
-[ext_resource type="Script" uid="uid://bmlpq6c66evjd" path="res://scripts/minigame_waiting_popup.gd" id="1_5qxxd"]
+[ext_resource type="Script" uid="uid://bmlpq6c66evjd" path="res://scripts/popups/minigame_waiting_popup.gd" id="1_5qxxd"]
 
 [node name="minigame-waiting-popup" type="Control" unique_id=1104810483]
 layout_mode = 3

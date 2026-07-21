@@ -33,12 +33,12 @@ func switch_scene(target_scene_path: String) -> void:
 	tween.tween_property(fade_rect, "modulate:a", 0.0, 0.4)
 	
 func show_prompt_popup(table):
-	var popup = preload("res://scenes/minigame_prompt_popup.tscn").instantiate()
+	var popup = preload("res://scenes/popups/minigame_prompt_popup.tscn").instantiate()
 	popup.table = table
 	get_tree().current_scene.add_child(popup)
 	
 func show_waiting_popup(table):
-	var popup = preload("res://scenes/minigame_waiting_popup.tscn").instantiate()
+	var popup = preload("res://scenes/popups/minigame_waiting_popup.tscn").instantiate()
 	popup.table = table
 	get_tree().current_scene.add_child(popup)
 	popup.update_players()

@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://dt6pnon02v1yv"]
 
-[ext_resource type="Script" uid="uid://carq3wm84wvl8" path="res://scripts/monkey_multiplayer.gd" id="1_b6687"]
+[ext_resource type="Script" uid="uid://carq3wm84wvl8" path="res://scripts/player/monkey_multiplayer.gd" id="1_b6687"]
 [ext_resource type="Texture2D" uid="uid://bhal8gh4ntvpf" path="res://assets/monkey-sprites/standing/standing-back.png" id="1_y04n0"]
 [ext_resource type="Texture2D" uid="uid://cnitydwvg4l4m" path="res://assets/monkey-sprites/standing/standing-back-diagonal.png" id="2_b6687"]
-[ext_resource type="Script" uid="uid://d12mikxyykhi2" path="res://scripts/multiplayer_input.gd" id="2_ovbpe"]
+[ext_resource type="Script" uid="uid://d12mikxyykhi2" path="res://scripts/player/multiplayer_input.gd" id="2_ovbpe"]
 [ext_resource type="Texture2D" uid="uid://bilxhdi0r61r2" path="res://assets/monkey-sprites/standing/standing-front.png" id="3_wy7ux"]
 [ext_resource type="Texture2D" uid="uid://dqostiussqq8t" path="res://assets/monkey-sprites/standing/standing-front-diagonal.png" id="4_2cldh"]
 [ext_resource type="Texture2D" uid="uid://bhfbgp0q8khcw" path="res://assets/monkey-sprites/standing/standing-side.png" id="5_dlwwh"]

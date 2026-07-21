@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c2eivhirv8qug"
-path="res://.godot/imported/theatre.png-a979b0a0bcd1a0951d1ab7c2096171e4.ctex"
+path="res://.godot/imported/theatre.png-735c0714ffad727dd8508004d1447314.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/backgrounds/buildings/theatre.png"
-dest_files=["res://.godot/imported/theatre.png-a979b0a0bcd1a0951d1ab7c2096171e4.ctex"]
+source_file="res://assets/backgrounds/buildings/the-cinema/theatre.png"
+dest_files=["res://.godot/imported/theatre.png-735c0714ffad727dd8508004d1447314.ctex"]
 
 [params]
 

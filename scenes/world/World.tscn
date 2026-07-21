@@ -1,20 +1,20 @@
 [gd_scene format=3 uid="uid://bjwpe4m0828om"]
 
-[ext_resource type="PackedScene" uid="uid://dc4doea3ehha5" path="res://scenes/JunglePlaza.tscn" id="1_0uv0p"]
-[ext_resource type="PackedScene" uid="uid://bq0dam8ufvp3i" path="res://scenes/BBT.tscn" id="2_0uv0p"]
-[ext_resource type="PackedScene" uid="uid://5ouahpp03mnv" path="res://scenes/player/monkey.tscn" id="3_0uv0p"]
-[ext_resource type="PackedScene" uid="uid://bannfykn1ryhq" path="res://scenes/TheCinema.tscn" id="3_1lgw5"]
-[ext_resource type="Script" uid="uid://doydguqh43yjw" path="res://scenes/GameManager.gd" id="5_ygioq"]
+[ext_resource type="PackedScene" uid="uid://dc4doea3ehha5" path="res://scenes/world/JunglePlaza.tscn" id="1_qxiha"]
+[ext_resource type="PackedScene" uid="uid://bq0dam8ufvp3i" path="res://scenes/world/BBT.tscn" id="2_i1jm3"]
+[ext_resource type="PackedScene" uid="uid://bannfykn1ryhq" path="res://scenes/world/TheCinema.tscn" id="3_252at"]
+[ext_resource type="PackedScene" uid="uid://5ouahpp03mnv" path="res://scenes/player/monkey.tscn" id="4_qh0kd"]
+[ext_resource type="Script" uid="uid://doydguqh43yjw" path="res://scripts/world/GameManager.gd" id="5_qxiha"]
 
 [node name="World" type="Node2D" unique_id=854219030]
 
-[node name="JunglePlaza" parent="." unique_id=1739898985 instance=ExtResource("1_0uv0p")]
+[node name="JunglePlaza" parent="." unique_id=1739898985 instance=ExtResource("1_qxiha")]
 
-[node name="BBT" parent="." unique_id=323713113 instance=ExtResource("2_0uv0p")]
+[node name="BBT" parent="." unique_id=323713113 instance=ExtResource("2_i1jm3")]
 
-[node name="TheCinema" parent="." unique_id=1682686883 instance=ExtResource("3_1lgw5")]
+[node name="TheCinema" parent="." unique_id=1682686883 instance=ExtResource("3_252at")]
 
-[node name="SinglePlayer" parent="." unique_id=1112790412 instance=ExtResource("3_0uv0p")]
+[node name="SinglePlayer" parent="." unique_id=1112790412 instance=ExtResource("4_qh0kd")]
 position = Vector2(647, 528)
 
 [node name="MultiplayerHUD" type="Control" parent="." unique_id=398977205]
@@ -43,7 +43,7 @@ layout_mode = 2
 text = "Join Game"
 
 [node name="GameManager" type="Node" parent="." unique_id=619952250]
-script = ExtResource("5_ygioq")
+script = ExtResource("5_qxiha")
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=760490683]
 _spawnable_scenes = PackedStringArray("uid://dt6pnon02v1yv")

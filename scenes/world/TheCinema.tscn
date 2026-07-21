@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://bannfykn1ryhq"]
 
-[ext_resource type="Texture2D" uid="uid://b2mut4j8c83cn" path="res://assets/backgrounds/buildings/the-cinema.png" id="1_2wii5"]
-[ext_resource type="Script" uid="uid://c1meexkm7ti74" path="res://scripts/Teleporter.gd" id="2_t41h0"]
-[ext_resource type="PackedScene" uid="uid://cje6eaxrs7ia0" path="res://scenes/Theatre.tscn" id="3_2wii5"]
+[ext_resource type="Texture2D" uid="uid://b2mut4j8c83cn" path="res://assets/backgrounds/buildings/the-cinema/the-cinema.png" id="1_2wii5"]
+[ext_resource type="Script" uid="uid://c1meexkm7ti74" path="res://scripts/world/Teleporter.gd" id="2_t41h0"]
+[ext_resource type="PackedScene" uid="uid://cje6eaxrs7ia0" path="res://scenes/world/Theatre.tscn" id="3_2wii5"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mx0fu"]
 size = Vector2(185, 35.5)

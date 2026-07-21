@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cpq8r5nyyvfp8"
-path="res://.godot/imported/bbt-first-floor.png-983d9bb561183f3c1b1b03f54279b8a6.ctex"
+uid="uid://b2mut4j8c83cn"
+path="res://.godot/imported/the-cinema.png-1815054111b836da6275daf8f1a06f37.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/backgrounds/buildings/bbt-first-floor.png"
-dest_files=["res://.godot/imported/bbt-first-floor.png-983d9bb561183f3c1b1b03f54279b8a6.ctex"]
+source_file="res://assets/backgrounds/buildings/the-cinema/the-cinema.png"
+dest_files=["res://.godot/imported/the-cinema.png-1815054111b836da6275daf8f1a06f37.ctex"]
 
 [params]
 

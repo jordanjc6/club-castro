@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bq0dam8ufvp3i"]
 
-[ext_resource type="Texture2D" uid="uid://cpq8r5nyyvfp8" path="res://assets/backgrounds/buildings/bbt-first-floor.png" id="1_i77ue"]
-[ext_resource type="Script" uid="uid://c1meexkm7ti74" path="res://scripts/Teleporter.gd" id="2_spf70"]
+[ext_resource type="Texture2D" uid="uid://cpq8r5nyyvfp8" path="res://assets/backgrounds/buildings/bbt/bbt-first-floor.png" id="1_i77ue"]
+[ext_resource type="Script" uid="uid://c1meexkm7ti74" path="res://scripts/world/Teleporter.gd" id="2_spf70"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_083f8"]
 size = Vector2(181, 34.25)

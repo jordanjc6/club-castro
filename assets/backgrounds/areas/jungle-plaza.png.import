@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://du4254tl1hxv3"
-path="res://.godot/imported/background-jungle-plaza.png-84f63b10e3f8210165526950a38aabac.ctex"
+path="res://.godot/imported/jungle-plaza.png-a0e1e5450a3042ca78f92cbae46e2b78.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/backgrounds/areas/background-jungle-plaza.png"
-dest_files=["res://.godot/imported/background-jungle-plaza.png-84f63b10e3f8210165526950a38aabac.ctex"]
+source_file="res://assets/backgrounds/areas/jungle-plaza.png"
+dest_files=["res://.godot/imported/jungle-plaza.png-a0e1e5450a3042ca78f92cbae46e2b78.ctex"]
 
 [params]
 
