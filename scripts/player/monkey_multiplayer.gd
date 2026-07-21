@@ -6,7 +6,6 @@ var direction
 
 # Define your grid size based on your game resolution (e.g., 1152x648 or 1920x1080)
 const GRID_SIZE = Vector2(1280, 720)
-#const GRID_SIZE = Vector2(800, 500)
 
 # Tracks the top-left starting coordinate of the active world section
 var current_grid_offset: Vector2 = Vector2.ZERO
@@ -45,10 +44,8 @@ func _physics_process(delta: float) -> void:
 	if (multiplayer.is_server()):
 		if direction != Vector2.ZERO:
 			velocity = direction * SPEED
-			#update_walk_animation(direction)
 		else:
 			velocity = velocity.move_toward(Vector2.ZERO, SPEED)
-			#monkey.stop()
 
 		move_and_slide()
 	

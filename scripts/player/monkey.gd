@@ -2,11 +2,35 @@ extends CharacterBody2D
 
 const SPEED = 300.0
 const JUMP_VELOCITY = -400.0
+var direction
+
+# Define your grid size based on your game resolution (e.g., 1152x648 or 1920x1080)
+const GRID_SIZE = Vector2(1280, 720)
+
+# Tracks the top-left starting coordinate of the active world section
+var current_grid_offset: Vector2 = Vector2.ZERO
 
 @onready var monkey = $AnimatedSprite2D
+@onready var camera = $Camera2D
+@onready var animation_player = $ScreenFadeLayer/AnimationPlayer
+
+
+func _ready() -> void:
+	# enable the camera
+	camera.make_current()
+	# Detach camera rotation/position scaling from parent body movement
+	camera.top_level = true 
+
+func play_teleport_fade() -> void:
+	animation_player.play("fade_to_black")
+	
+	# Wait for the fade out to finish before letting the screen clear
+	await animation_player.animation_finished
+	
+	animation_player.play("fade_from_black")
 
 func _physics_process(delta: float) -> void:
-	var direction := Input.get_vector("walk-left", "walk-right", "walk-backward", "walk-forward")
+	direction = Input.get_vector("walk-left", "walk-right", "walk-backward", "walk-forward")
 	
 	if direction != Vector2.ZERO:
 		velocity = direction * SPEED
@@ -16,7 +40,27 @@ func _physics_process(delta: float) -> void:
 		monkey.stop()
 
 	move_and_slide()
+	update_camera_grid()
+
+func update_camera_grid() -> void:
+	# 1. Calculate player position relative to the current zone's top-left corner
+	var local_pos = global_position - current_grid_offset
 	
+	# 2. Find which local grid cell index the player is in
+	var current_cell_x = floor(local_pos.x / GRID_SIZE.x)
+	var current_cell_y = floor(local_pos.y / GRID_SIZE.y)
+	
+	# 3. Calculate the global center, adding the offset back at the end
+	var target_camera_pos = Vector2(
+		(current_cell_x * GRID_SIZE.x) + (GRID_SIZE.x / 2.0),
+		(current_cell_y * GRID_SIZE.y) + (GRID_SIZE.y / 2.0)
+	) + current_grid_offset
+	
+	camera.global_position = target_camera_pos
+
+func update_zone_offset(new_offset: Vector2) -> void:
+	current_grid_offset = new_offset
+
 func update_walk_animation(dir: Vector2) -> void:
 	# diagonal up-right
 	if dir.x > 0 and dir.y > 0:
