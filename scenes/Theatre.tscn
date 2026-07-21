@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://cje6eaxrs7ia0"]
+
+[ext_resource type="Texture2D" uid="uid://c2eivhirv8qug" path="res://assets/backgrounds/buildings/theatre.png" id="1_cv0m5"]
+
+[node name="Theatre" type="Node2D" unique_id=968989905]
+
+[node name="TheatreMap" type="CanvasLayer" parent="." unique_id=424849751]
+layer = -1
+offset = Vector2(0, -1800)
+transform = Transform2D(1, 0, 0, 1, 0, -1800)
+follow_viewport_enabled = true
+
+[node name="TextureRect" type="TextureRect" parent="TheatreMap" unique_id=66141464]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_cv0m5")
+expand_mode = 1
+stretch_mode = 6

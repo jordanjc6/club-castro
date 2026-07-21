@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://bq0dam8ufvp3i"]
+
+[ext_resource type="Texture2D" uid="uid://cpq8r5nyyvfp8" path="res://assets/backgrounds/buildings/bbt-first-floor.png" id="1_i77ue"]
+[ext_resource type="Script" uid="uid://c1meexkm7ti74" path="res://scripts/Teleporter.gd" id="2_spf70"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_083f8"]
+size = Vector2(181, 34.25)
+
+[node name="BBT" type="Node2D" unique_id=323713113]
+
+[node name="BBTMap" type="CanvasLayer" parent="." unique_id=455165754]
+layer = -1
+offset = Vector2(1500, 0)
+transform = Transform2D(1, 0, 0, 1, 1500, 0)
+follow_viewport_enabled = true
+
+[node name="TextureRect" type="TextureRect" parent="BBTMap" unique_id=585355339]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_i77ue")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="BBTCollisions" type="Node2D" parent="." unique_id=434983155]
+
+[node name="bbt-barrier" type="StaticBody2D" parent="BBTCollisions" unique_id=1721347745]
+collision_mask = 0
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="BBTCollisions/bbt-barrier" unique_id=1428677320]
+position = Vector2(1497, -2)
+polygon = PackedVector2Array(424, 726, 110, 724, 124, 654, 1, 573, 0, 493, 62, 492, 94, 400, 165, 385, 237, 426, 256, 421, 288, 365, 357, 358, 390, 378, 466, 382, 657, 399, 657, 369, 858, 377, 858, 404, 894, 357, 1008, 363, 1026, 378, 1027, 428, 1051, 428, 1086, 327, 991, 117, 1068, 118, 1266, 389, 1269, 486, 1126, 716, 1030, 716, 1003, 607, 920, 590, 886, 718, 561, 719, 562, 750, 1313, 750, 1304, -45, -58, -29, -50, 758, 426, 755)
+
+[node name="bbt-to-jungle-plaza" type="Area2D" parent="BBTCollisions" unique_id=1136105776]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("2_spf70")
+target_position = Vector2(640, 360)
+new_zone_offset = Vector2(0, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BBTCollisions/bbt-to-jungle-plaza" unique_id=262046844]
+position = Vector2(1980, 703)
+shape = SubResource("RectangleShape2D_083f8")
+
+[connection signal="body_entered" from="BBTCollisions/bbt-to-jungle-plaza" to="BBTCollisions/bbt-to-jungle-plaza" method="_on_body_entered"]

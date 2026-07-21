@@ -1,0 +1,65 @@
+[gd_scene format=3 uid="uid://bannfykn1ryhq"]
+
+[ext_resource type="Texture2D" uid="uid://b2mut4j8c83cn" path="res://assets/backgrounds/buildings/the-cinema.png" id="1_2wii5"]
+[ext_resource type="Script" uid="uid://c1meexkm7ti74" path="res://scripts/Teleporter.gd" id="2_t41h0"]
+[ext_resource type="PackedScene" uid="uid://cje6eaxrs7ia0" path="res://scenes/Theatre.tscn" id="3_2wii5"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mx0fu"]
+size = Vector2(185, 35.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_iquk2"]
+size = Vector2(51, 73.25)
+
+[node name="TheCinema" type="Node2D" unique_id=1682686883]
+
+[node name="TheCinemaMap" type="CanvasLayer" parent="." unique_id=1941181431]
+layer = -1
+offset = Vector2(0, -950)
+transform = Transform2D(1, 0, 0, 1, 0, -950)
+follow_viewport_enabled = true
+
+[node name="TextureRect" type="TextureRect" parent="TheCinemaMap" unique_id=680806015]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_2wii5")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="TheCinemaCollisions" type="Node2D" parent="." unique_id=1016027743]
+
+[node name="the-cinema-barrier" type="StaticBody2D" parent="TheCinemaCollisions" unique_id=1326691450]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="TheCinemaCollisions/the-cinema-barrier" unique_id=673300926]
+position = Vector2(0, 0.48840332)
+scale = Vector2(1, 0.98310155)
+polygon = PackedVector2Array(541, -229, 214, -229, 215, -302, 141, -298, 117, -320, 304, -524, 341, -525, 324, -811, 376, -829, 373, -863, 447, -867, 571, -880, 677, -885, 790, -876, 900, -853, 953, -823, 927, -529, 966, -528, 1178, -294, 1052, -293, 1055, -234, 730, -230, 729, -203, 1296, -207, 1292, -976, -25, -964, -24, -204, 727, -203)
+
+[node name="the-cinema-to-jungle-plaza" type="Area2D" parent="TheCinemaCollisions" unique_id=1381998142]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("2_t41h0")
+target_position = Vector2(640, 360)
+new_zone_offset = Vector2(0, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TheCinemaCollisions/the-cinema-to-jungle-plaza" unique_id=1915248249]
+position = Vector2(634.5, -248.25)
+shape = SubResource("RectangleShape2D_mx0fu")
+
+[node name="to-theatre" type="Area2D" parent="TheCinemaCollisions" unique_id=1441508666]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("2_t41h0")
+target_position = Vector2(640, -1440)
+new_zone_offset = Vector2(0, -1800)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TheCinemaCollisions/to-theatre" unique_id=1790709402]
+position = Vector2(866.5, -865.625)
+shape = SubResource("RectangleShape2D_iquk2")
+
+[node name="Theatre" parent="TheCinemaCollisions" unique_id=968989905 instance=ExtResource("3_2wii5")]
+
+[connection signal="body_entered" from="TheCinemaCollisions/the-cinema-to-jungle-plaza" to="TheCinemaCollisions/the-cinema-to-jungle-plaza" method="_on_body_entered"]
+[connection signal="body_entered" from="TheCinemaCollisions/to-theatre" to="TheCinemaCollisions/to-theatre" method="_on_body_entered"]
