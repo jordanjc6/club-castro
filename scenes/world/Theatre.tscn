@@ -2,9 +2,13 @@
 
 [ext_resource type="Texture2D" uid="uid://c2eivhirv8qug" path="res://assets/backgrounds/buildings/the-cinema/theatre.png" id="1_cv0m5"]
 [ext_resource type="Script" uid="uid://c1meexkm7ti74" path="res://scripts/world/Teleporter.gd" id="2_btfg8"]
+[ext_resource type="Script" uid="uid://blue2ntdcwyex" path="res://scripts/popups/movie_projector.gd" id="3_55x2c"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_00mmp"]
 size = Vector2(64, 201)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_t5v6p"]
+size = Vector2(63.5, 60)
 
 [node name="Theatre" type="Node2D" unique_id=968989905]
 
@@ -30,6 +34,7 @@ stretch_mode = 6
 collision_mask = 0
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="TheatreCollisions/theatre-barrier" unique_id=418377874]
+position = Vector2(-3, -1)
 polygon = PackedVector2Array(627, -1077, -4, -1084, 65, -1164, 54, -1385, 127, -1395, 130, -1261, 276, -1481, 377, -1489, 960, -1481, 1012, -1448, 1056, -1415, 1280, -1118, 1280, -1076, 667, -1076, 666, -1046, 1320, -1047, 1315, -1832, -43, -1829, -43, -1049, 666, -1044, 655, -1076)
 
 [node name="theatre-to-cinema" type="Area2D" parent="TheatreCollisions" unique_id=479300806]
@@ -40,7 +45,62 @@ target_position = Vector2(640, -590)
 new_zone_offset = Vector2(0, -950)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TheatreCollisions/theatre-to-cinema" unique_id=1620647589]
-position = Vector2(93, -1272.5)
+position = Vector2(81, -1293)
 shape = SubResource("RectangleShape2D_00mmp")
 
+[node name="MovieProjector" type="Node2D" parent="." unique_id=1845853004]
+script = ExtResource("3_55x2c")
+
+[node name="Area2D" type="Area2D" parent="MovieProjector" unique_id=2056654171]
+collision_layer = 4
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MovieProjector/Area2D" unique_id=721876728]
+position = Vector2(316, -1482)
+shape = SubResource("RectangleShape2D_t5v6p")
+
+[node name="MovieScreen" type="AspectRatioContainer" parent="." unique_id=2032382032]
+offset_left = 303.0
+offset_top = -1745.0
+offset_right = 978.0
+offset_bottom = -1495.0
+ratio = 1.7778
+
+[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="MovieScreen" unique_id=1715721047]
+unique_name_in_owner = true
+layout_mode = 2
+expand = true
+loop = true
+
+[node name="MovieSelector" type="Control" parent="." unique_id=501268689]
+unique_name_in_owner = true
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_left = 581.0
+offset_top = -1646.0
+offset_right = 1021.0
+offset_bottom = -1291.0
+
+[node name="Panel" type="Panel" parent="MovieSelector" unique_id=630878723]
+layout_mode = 0
+offset_right = 119.0
+offset_bottom = 73.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MovieSelector/Panel" unique_id=172059618]
+layout_mode = 0
+offset_right = 111.0
+offset_bottom = 66.0
+
+[node name="1" type="Button" parent="MovieSelector/Panel/VBoxContainer" unique_id=1110334123]
+layout_mode = 2
+text = "1"
+
+[node name="2" type="Button" parent="MovieSelector/Panel/VBoxContainer" unique_id=926251504]
+layout_mode = 2
+text = "2"
+
 [connection signal="body_entered" from="TheatreCollisions/theatre-to-cinema" to="TheatreCollisions/theatre-to-cinema" method="_on_body_entered"]
+[connection signal="body_entered" from="MovieProjector/Area2D" to="MovieProjector" method="_on_movie_projector_area_entered"]
+[connection signal="pressed" from="MovieSelector/Panel/VBoxContainer/1" to="MovieProjector" method="_on_movie_1_pressed"]
+[connection signal="pressed" from="MovieSelector/Panel/VBoxContainer/2" to="MovieProjector" method="_on_movie_2_pressed"]
