@@ -59,7 +59,7 @@ new_zone_offset = Vector2(0, -1800)
 position = Vector2(866.5, -865.625)
 shape = SubResource("RectangleShape2D_iquk2")
 
-[node name="Theatre" parent="TheCinemaCollisions" unique_id=968989905 instance=ExtResource("3_2wii5")]
+[node name="Theatre" parent="." unique_id=968989905 instance=ExtResource("3_2wii5")]
 
 [connection signal="body_entered" from="TheCinemaCollisions/the-cinema-to-jungle-plaza" to="TheCinemaCollisions/the-cinema-to-jungle-plaza" method="_on_body_entered"]
 [connection signal="body_entered" from="TheCinemaCollisions/to-theatre" to="TheCinemaCollisions/to-theatre" method="_on_body_entered"]

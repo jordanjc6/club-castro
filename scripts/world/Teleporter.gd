@@ -14,6 +14,7 @@ extends Area2D
 # = ( x offset of canvaslayer, y offset of canvaslayer )
 @export var new_zone_offset: Vector2 = Vector2(1500, 0)
 
+
 func _on_body_entered(body: Node2D):
 	# Only the server evaluates physical scene changes and collision overrides
 	if not multiplayer.is_server() && body.name != "SinglePlayer":
@@ -43,3 +44,12 @@ func _on_body_entered(body: Node2D):
 		
 		# Perform the actual physical move
 		body.global_position = target_position
+		
+		# conditionally increment/decrement theatre players counter
+		# ONLY trigger this if the body entering is the local player controlled by this client
+		if body.is_multiplayer_authority():
+			# client calls update count function
+			if (name == "to-theatre"):
+				MultiplayerManager.rpc_id(1, "increment_players_in_theatre")
+			if (name == "theatre-to-cinema"):
+				MultiplayerManager.rpc_id(1, "decrement_players_in_theatre")

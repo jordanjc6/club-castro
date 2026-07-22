@@ -5,7 +5,7 @@ var movies: Array = [
 	preload("res://assets/videos/paredes.ogv")
 ]
 
-# Track the current active movie index (-1 means no movie playing) and selector state
+# Global variables (meant to be shared with all clients in multiplayer)
 var current_movie_index: int = -1
 var is_movie_selector_open: bool = false
 
