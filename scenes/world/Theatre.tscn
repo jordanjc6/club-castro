@@ -1,6 +1,10 @@
 [gd_scene format=3 uid="uid://cje6eaxrs7ia0"]
 
 [ext_resource type="Texture2D" uid="uid://c2eivhirv8qug" path="res://assets/backgrounds/buildings/the-cinema/theatre.png" id="1_cv0m5"]
+[ext_resource type="Script" uid="uid://c1meexkm7ti74" path="res://scripts/world/Teleporter.gd" id="2_btfg8"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_00mmp"]
+size = Vector2(64, 201)
 
 [node name="Theatre" type="Node2D" unique_id=968989905]
 
@@ -19,3 +23,24 @@ grow_vertical = 2
 texture = ExtResource("1_cv0m5")
 expand_mode = 1
 stretch_mode = 6
+
+[node name="TheatreCollisions" type="Node2D" parent="." unique_id=380994429]
+
+[node name="theatre-barrier" type="StaticBody2D" parent="TheatreCollisions" unique_id=1941359432]
+collision_mask = 0
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="TheatreCollisions/theatre-barrier" unique_id=418377874]
+polygon = PackedVector2Array(627, -1077, -4, -1084, 65, -1164, 54, -1385, 127, -1395, 130, -1261, 276, -1481, 377, -1489, 960, -1481, 1012, -1448, 1056, -1415, 1280, -1118, 1280, -1076, 667, -1076, 666, -1046, 1320, -1047, 1315, -1832, -43, -1829, -43, -1049, 666, -1044, 655, -1076)
+
+[node name="theatre-to-cinema" type="Area2D" parent="TheatreCollisions" unique_id=479300806]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("2_btfg8")
+target_position = Vector2(640, -590)
+new_zone_offset = Vector2(0, -950)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TheatreCollisions/theatre-to-cinema" unique_id=1620647589]
+position = Vector2(93, -1272.5)
+shape = SubResource("RectangleShape2D_00mmp")
+
+[connection signal="body_entered" from="TheatreCollisions/theatre-to-cinema" to="TheatreCollisions/theatre-to-cinema" method="_on_body_entered"]
