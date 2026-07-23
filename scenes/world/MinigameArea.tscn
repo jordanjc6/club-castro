@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cjnc5jcd6qw46"]
 
 [ext_resource type="Script" uid="uid://b08ikt2fy4hr8" path="res://scripts/world/MinigameArea.gd" id="1_27q8l"]
+[ext_resource type="Script" uid="uid://c2jxq0su2e0kq" path="res://scripts/popups/grid_container.gd" id="2_o1j7i"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_00mmp"]
 radius = 49.0408
@@ -44,16 +45,80 @@ layout_mode = 2
 text = "No"
 
 [node name="GameWindow" type="Control" parent="MinigameUI" unique_id=1624588319]
-visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_left = 111.0
-offset_top = 65.0
-offset_right = 460.0
-offset_bottom = 210.0
+offset_top = 171.0
+offset_right = 743.0
+offset_bottom = 560.0
 
-[node name="Label" type="Label" parent="MinigameUI/GameWindow" unique_id=964628802]
+[node name="ColorRect" type="ColorRect" parent="MinigameUI/GameWindow" unique_id=621276240]
 layout_mode = 0
-offset_right = 107.0
-offset_bottom = 69.0
-text = "Tic-Tac-Toe Board"
+offset_left = 41.0
+offset_top = 34.0
+offset_right = 390.0
+offset_bottom = 226.0
+color = Color(0, 0.71711826, 1.92523e-07, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MinigameUI/GameWindow" unique_id=886393385]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 33.0
+offset_right = 392.0
+offset_bottom = 222.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MinigameUI/GameWindow/VBoxContainer" unique_id=1238355767]
+layout_mode = 2
+
+[node name="GameLabel" type="Label" parent="MinigameUI/GameWindow/VBoxContainer/HBoxContainer" unique_id=964628802]
+layout_mode = 2
+text = "Tic-Tac-Toe"
+
+[node name="TurnLabel" type="Label" parent="MinigameUI/GameWindow/VBoxContainer/HBoxContainer" unique_id=1399552820]
+layout_mode = 2
+text = "Turn ---"
+
+[node name="CenterContainer" type="CenterContainer" parent="MinigameUI/GameWindow/VBoxContainer" unique_id=1825699849]
+custom_minimum_size = Vector2(0, 160)
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer" unique_id=1078334501]
+layout_mode = 2
+columns = 3
+script = ExtResource("2_o1j7i")
+
+[node name="Button" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=984885302]
+layout_mode = 2
+text = "---"
+
+[node name="Button2" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=1175005459]
+layout_mode = 2
+text = "---"
+
+[node name="Button3" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=1430900708]
+layout_mode = 2
+text = "---"
+
+[node name="Button4" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=1744239433]
+layout_mode = 2
+text = "---"
+
+[node name="Button5" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=448490264]
+layout_mode = 2
+text = "---"
+
+[node name="Button6" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=1204175691]
+layout_mode = 2
+text = "---"
+
+[node name="Button7" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=1391469090]
+layout_mode = 2
+text = "---"
+
+[node name="Button8" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=1276582232]
+layout_mode = 2
+text = "---"
+
+[node name="Button9" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=599075889]
+layout_mode = 2
+text = "---"

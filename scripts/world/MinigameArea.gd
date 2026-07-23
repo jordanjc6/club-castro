@@ -169,7 +169,7 @@ func client_end_game(result_text: String) -> void:
 func update_ui_grid() -> void:
 	# Safely update grid buttons based on current board_state indexes
 	# Assuming your Tic-Tac-Toe grid has 9 buttons in a GridContainer
-	var grid_container = game_window.get_node_or_null("GridContainer")
+	var grid_container = game_window.get_node_or_null("VBoxContainer/CenterContainer/GridContainer")
 	if not grid_container: return
 	
 	for i in range(9):
