@@ -1,0 +1,59 @@
+[gd_scene format=3 uid="uid://cjnc5jcd6qw46"]
+
+[ext_resource type="Script" uid="uid://b08ikt2fy4hr8" path="res://scripts/world/MinigameArea.gd" id="1_27q8l"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_00mmp"]
+radius = 49.0408
+
+[node name="MinigameArea" type="Node2D" unique_id=2005503400]
+script = ExtResource("1_27q8l")
+
+[node name="InteractionArea" type="Area2D" parent="." unique_id=1306371111]
+collision_layer = 4
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea" unique_id=619535156]
+shape = SubResource("CircleShape2D_00mmp")
+
+[node name="MinigameUI" type="CanvasLayer" parent="." unique_id=535232106]
+
+[node name="PromptPanel" type="PanelContainer" parent="MinigameUI" unique_id=577733101]
+offset_left = 109.0
+offset_top = -148.0
+offset_right = 547.0
+offset_bottom = 146.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MinigameUI/PromptPanel" unique_id=2121607502]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MinigameUI/PromptPanel/VBoxContainer" unique_id=172648264]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+text = "Play Tic-Tac-Toe?"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MinigameUI/PromptPanel/VBoxContainer" unique_id=1497153879]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+
+[node name="YesButton" type="Button" parent="MinigameUI/PromptPanel/VBoxContainer/HBoxContainer" unique_id=1802095504]
+layout_mode = 2
+text = "Yes"
+
+[node name="NoButton" type="Button" parent="MinigameUI/PromptPanel/VBoxContainer/HBoxContainer" unique_id=1119980951]
+layout_mode = 2
+text = "No"
+
+[node name="GameWindow" type="Control" parent="MinigameUI" unique_id=1624588319]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_left = 111.0
+offset_top = 65.0
+offset_right = 460.0
+offset_bottom = 210.0
+
+[node name="Label" type="Label" parent="MinigameUI/GameWindow" unique_id=964628802]
+layout_mode = 0
+offset_right = 107.0
+offset_bottom = 69.0
+text = "Tic-Tac-Toe Board"

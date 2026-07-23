@@ -1,4 +1,5 @@
 extends CharacterBody2D
+class_name MultiPlayer
 
 const SPEED = 300.0
 const JUMP_VELOCITY = -400.0
@@ -28,6 +29,10 @@ func _ready() -> void:
 		camera.top_level = true 
 	else:
 		camera.enabled = false
+
+func is_local_player() -> bool:
+	# Returns true only for the player controlled by this device
+	return is_multiplayer_authority()
 
 # This RPC will only execute on the network peer that owns this specific player
 @rpc("authority", "call_local", "reliable")

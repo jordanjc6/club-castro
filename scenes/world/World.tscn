@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://bannfykn1ryhq" path="res://scenes/world/TheCinema.tscn" id="3_252at"]
 [ext_resource type="PackedScene" uid="uid://5ouahpp03mnv" path="res://scenes/player/monkey.tscn" id="4_qh0kd"]
 [ext_resource type="Script" uid="uid://doydguqh43yjw" path="res://scripts/world/GameManager.gd" id="5_qxiha"]
+[ext_resource type="PackedScene" uid="uid://cjnc5jcd6qw46" path="res://scenes/world/MinigameArea.tscn" id="6_i1jm3"]
 
 [node name="World" type="Node2D" unique_id=854219030]
 
@@ -52,6 +53,9 @@ spawn_limit = 2
 
 [node name="Players" type="Node2D" parent="." unique_id=1092168601]
 position = Vector2(647, 527)
+
+[node name="MinigameArea" parent="." unique_id=2005503400 instance=ExtResource("6_i1jm3")]
+position = Vector2(467, 458)
 
 [connection signal="pressed" from="MultiplayerHUD/Panel/VBoxContainer/HostButton" to="GameManager" method="_host_button_pressed"]
 [connection signal="pressed" from="MultiplayerHUD/Panel/VBoxContainer/JoinButton" to="GameManager" method="_join_button_pressed"]
