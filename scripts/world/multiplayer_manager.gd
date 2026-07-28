@@ -32,7 +32,8 @@ func join_game():
 	print("join game")
 	
 	var client_peer = ENetMultiplayerPeer.new()
-	client_peer.create_client(SERVER_IP, SERVER_PORT)
+	#client_peer.create_client(SERVER_IP, SERVER_PORT)
+	client_peer.create_client(MAC_IP, SERVER_PORT)
 	
 	multiplayer.multiplayer_peer = client_peer
 	
