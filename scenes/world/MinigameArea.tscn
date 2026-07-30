@@ -4,7 +4,12 @@
 [ext_resource type="Script" uid="uid://c2jxq0su2e0kq" path="res://scripts/popups/grid_container.gd" id="2_o1j7i"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_00mmp"]
-radius = 49.0408
+radius = 61.03278
+
+[sub_resource type="LabelSettings" id="LabelSettings_o1j7i"]
+line_spacing = 0.0
+font_size = 48
+font_color = Color(0, 0, 0, 1)
 
 [node name="MinigameArea" type="Node2D" unique_id=2005503400]
 script = ExtResource("1_27q8l")
@@ -17,12 +22,18 @@ collision_mask = 2
 shape = SubResource("CircleShape2D_00mmp")
 
 [node name="MinigameUI" type="CanvasLayer" parent="." unique_id=535232106]
+follow_viewport_enabled = true
 
 [node name="PromptPanel" type="PanelContainer" parent="MinigameUI" unique_id=577733101]
-offset_left = 109.0
-offset_top = -148.0
-offset_right = 547.0
-offset_bottom = 146.0
+anchors_preset = -1
+anchor_left = 0.07300001
+anchor_top = 0.16100001
+anchor_right = 0.07300001
+anchor_bottom = 0.16100001
+offset_left = 209.56
+offset_top = -113.92001
+offset_right = 867.56
+offset_bottom = 145.07999
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MinigameUI/PromptPanel" unique_id=2121607502]
 layout_mode = 2
@@ -47,78 +58,113 @@ text = "No"
 [node name="GameWindow" type="Control" parent="MinigameUI" unique_id=1624588319]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 111.0
-offset_top = 171.0
-offset_right = 743.0
-offset_bottom = 560.0
+offset_left = 370.0
+offset_top = 35.0
+offset_right = 901.0
+offset_bottom = 688.0
 
 [node name="ColorRect" type="ColorRect" parent="MinigameUI/GameWindow" unique_id=621276240]
-layout_mode = 0
-offset_left = 41.0
-offset_top = 34.0
-offset_right = 390.0
-offset_bottom = 226.0
-color = Color(0, 0.71711826, 1.92523e-07, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.7764706, 0.8745098, 0.9647059, 1)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MinigameUI/GameWindow" unique_id=886393385]
-layout_mode = 0
-offset_left = 40.0
-offset_top = 33.0
-offset_right = 392.0
-offset_bottom = 222.0
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MinigameUI/GameWindow/VBoxContainer" unique_id=1238355767]
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
+theme_override_constants/separation = 4
 
 [node name="GameLabel" type="Label" parent="MinigameUI/GameWindow/VBoxContainer/HBoxContainer" unique_id=964628802]
 layout_mode = 2
-text = "Tic-Tac-Toe"
-
-[node name="TurnLabel" type="Label" parent="MinigameUI/GameWindow/VBoxContainer/HBoxContainer" unique_id=1399552820]
-layout_mode = 2
-text = "Turn ---"
+size_flags_horizontal = 3
+text = "X's and O's"
+label_settings = SubResource("LabelSettings_o1j7i")
+horizontal_alignment = 1
 
 [node name="CenterContainer" type="CenterContainer" parent="MinigameUI/GameWindow/VBoxContainer" unique_id=1825699849]
 custom_minimum_size = Vector2(0, 160)
 layout_mode = 2
+size_flags_vertical = 3
 
 [node name="GridContainer" type="GridContainer" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer" unique_id=1078334501]
+custom_minimum_size = Vector2(475, 500)
 layout_mode = 2
 columns = 3
 script = ExtResource("2_o1j7i")
 
 [node name="Button" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=984885302]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 text = "---"
 
 [node name="Button2" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=1175005459]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 text = "---"
 
 [node name="Button3" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=1430900708]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 text = "---"
 
 [node name="Button4" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=1744239433]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 text = "---"
 
 [node name="Button5" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=448490264]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 text = "---"
 
 [node name="Button6" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=1204175691]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 text = "---"
 
 [node name="Button7" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=1391469090]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 text = "---"
 
 [node name="Button8" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=1276582232]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 text = "---"
 
 [node name="Button9" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=599075889]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 text = "---"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MinigameUI/GameWindow/VBoxContainer" unique_id=458711080]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="PlayersLabel" type="Label" parent="MinigameUI/GameWindow/VBoxContainer/HBoxContainer2" unique_id=1438328561]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Players..."
+label_settings = SubResource("LabelSettings_o1j7i")
+horizontal_alignment = 1
