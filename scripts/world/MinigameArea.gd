@@ -43,10 +43,14 @@ func _on_body_exited(body: Node) -> void:
 		#prompt_panel.visible = false
 		#if game_window.visible:
 			#_on_cancel_button_pressed()
+		
+	# check if player 'exited' because they disconnected from the game (removed from tree)
+	if not is_instance_valid(body) or not body.is_inside_tree():
+		return
 	
 	if body is MultiPlayer:
 		var input_sync = body.get_node_or_null("InputSynchronizer")
-		if input_sync and input_sync.is_multiplayer_authority():
+		if input_sync and input_sync.is_inside_tree() and input_sync.is_multiplayer_authority():
 			print("game area exited by %s" % body)
 			prompt_panel.visible = false
 			if game_window.visible || seated_players.size() == 1:
