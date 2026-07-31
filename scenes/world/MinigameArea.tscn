@@ -11,6 +11,61 @@ line_spacing = 0.0
 font_size = 48
 font_color = Color(0, 0, 0, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_00mmp"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+draw_center = false
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o1j7i"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+draw_center = false
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sskc1"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+draw_center = false
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iwbfe"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+draw_center = false
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_si14j"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+draw_center = false
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5c2kw"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+draw_center = false
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p1f2n"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+draw_center = false
+border_width_right = 5
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mkqqu"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+draw_center = false
+border_width_right = 5
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_udbak"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
 [node name="MinigameArea" type="Node2D" unique_id=2005503400]
 script = ExtResource("1_27q8l")
 
@@ -88,7 +143,7 @@ theme_override_constants/separation = 4
 [node name="GameLabel" type="Label" parent="MinigameUI/GameWindow/VBoxContainer/HBoxContainer" unique_id=964628802]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "X's and O's"
+text = "Tic-Tac-Toe"
 label_settings = SubResource("LabelSettings_o1j7i")
 horizontal_alignment = 1
 
@@ -100,6 +155,8 @@ size_flags_vertical = 3
 [node name="GridContainer" type="GridContainer" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer" unique_id=1078334501]
 custom_minimum_size = Vector2(475, 500)
 layout_mode = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/v_separation = 0
 columns = 3
 script = ExtResource("2_o1j7i")
 
@@ -107,55 +164,262 @@ script = ExtResource("2_o1j7i")
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "---"
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_disabled_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_normal_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_disabled_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 72
+theme_override_styles/normal = SubResource("StyleBoxFlat_00mmp")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_00mmp")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_00mmp")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_00mmp")
+theme_override_styles/hover = SubResource("StyleBoxFlat_00mmp")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_00mmp")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_00mmp")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_00mmp")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_00mmp")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_00mmp")
+theme_override_styles/focus = SubResource("StyleBoxFlat_00mmp")
 
 [node name="Button2" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=1175005459]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "---"
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_disabled_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_normal_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_disabled_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 72
+theme_override_styles/normal = SubResource("StyleBoxFlat_o1j7i")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_o1j7i")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_o1j7i")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_o1j7i")
+theme_override_styles/hover = SubResource("StyleBoxFlat_o1j7i")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_o1j7i")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_o1j7i")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_o1j7i")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_o1j7i")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_o1j7i")
+theme_override_styles/focus = SubResource("StyleBoxFlat_o1j7i")
 
 [node name="Button3" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=1430900708]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "---"
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_disabled_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_normal_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_disabled_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 72
+theme_override_styles/normal = SubResource("StyleBoxFlat_sskc1")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_sskc1")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_sskc1")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_sskc1")
+theme_override_styles/hover = SubResource("StyleBoxFlat_sskc1")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_sskc1")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_sskc1")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_sskc1")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_sskc1")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_sskc1")
+theme_override_styles/focus = SubResource("StyleBoxFlat_sskc1")
 
 [node name="Button4" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=1744239433]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "---"
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_disabled_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_normal_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_disabled_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 72
+theme_override_styles/normal = SubResource("StyleBoxFlat_iwbfe")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_iwbfe")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_iwbfe")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_iwbfe")
+theme_override_styles/hover = SubResource("StyleBoxFlat_iwbfe")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_iwbfe")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_iwbfe")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_iwbfe")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_iwbfe")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_iwbfe")
+theme_override_styles/focus = SubResource("StyleBoxFlat_iwbfe")
 
 [node name="Button5" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=448490264]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "---"
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_disabled_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_normal_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_disabled_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 72
+theme_override_styles/normal = SubResource("StyleBoxFlat_si14j")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_si14j")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_si14j")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_si14j")
+theme_override_styles/hover = SubResource("StyleBoxFlat_si14j")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_si14j")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_si14j")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_si14j")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_si14j")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_si14j")
+theme_override_styles/focus = SubResource("StyleBoxFlat_si14j")
 
 [node name="Button6" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=1204175691]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "---"
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_disabled_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_normal_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_disabled_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 72
+theme_override_styles/normal = SubResource("StyleBoxFlat_5c2kw")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_5c2kw")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_5c2kw")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_5c2kw")
+theme_override_styles/hover = SubResource("StyleBoxFlat_5c2kw")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_5c2kw")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_5c2kw")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_5c2kw")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_5c2kw")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_5c2kw")
+theme_override_styles/focus = SubResource("StyleBoxFlat_5c2kw")
 
 [node name="Button7" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=1391469090]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "---"
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_disabled_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_normal_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_disabled_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 72
+theme_override_styles/normal = SubResource("StyleBoxFlat_p1f2n")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_p1f2n")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_p1f2n")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_p1f2n")
+theme_override_styles/hover = SubResource("StyleBoxFlat_p1f2n")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_p1f2n")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_p1f2n")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_p1f2n")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_p1f2n")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_p1f2n")
+theme_override_styles/focus = SubResource("StyleBoxFlat_p1f2n")
 
 [node name="Button8" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=1276582232]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "---"
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_disabled_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_normal_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_disabled_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 72
+theme_override_styles/normal = SubResource("StyleBoxFlat_mkqqu")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_mkqqu")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_mkqqu")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_mkqqu")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mkqqu")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_mkqqu")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_mkqqu")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_mkqqu")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_mkqqu")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_mkqqu")
+theme_override_styles/focus = SubResource("StyleBoxFlat_mkqqu")
 
 [node name="Button9" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=599075889]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "---"
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_disabled_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_normal_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_disabled_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 72
+theme_override_styles/normal = SubResource("StyleBoxFlat_udbak")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_udbak")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_udbak")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_udbak")
+theme_override_styles/hover = SubResource("StyleBoxFlat_udbak")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_udbak")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_udbak")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_udbak")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_udbak")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxFlat_udbak")
+theme_override_styles/focus = SubResource("StyleBoxFlat_udbak")
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="MinigameUI/GameWindow/VBoxContainer" unique_id=458711080]
 custom_minimum_size = Vector2(0, 50)
