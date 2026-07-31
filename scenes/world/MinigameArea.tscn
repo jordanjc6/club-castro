@@ -6,6 +6,18 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_00mmp"]
 radius = 61.03278
 
+[sub_resource type="Theme" id="Theme_udbak"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bsyqw"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t5v6p"]
+bg_color = Color(0.7764706, 0.8745098, 0.9647059, 1)
+corner_radius_top_left = 40
+corner_radius_top_right = 40
+corner_radius_bottom_right = 40
+corner_radius_bottom_left = 40
+
 [sub_resource type="LabelSettings" id="LabelSettings_o1j7i"]
 line_spacing = 0.0
 font_size = 48
@@ -110,22 +122,24 @@ text = "Yes"
 layout_mode = 2
 text = "No"
 
-[node name="GameWindow" type="Control" parent="MinigameUI" unique_id=1624588319]
-layout_mode = 3
-anchors_preset = 0
+[node name="GameWindow" type="Panel" parent="MinigameUI" unique_id=2080723378]
+clip_contents = true
 offset_left = 370.0
 offset_top = 35.0
 offset_right = 901.0
 offset_bottom = 688.0
+theme = SubResource("Theme_udbak")
+theme_override_styles/panel = SubResource("StyleBoxFlat_bsyqw")
 
-[node name="ColorRect" type="ColorRect" parent="MinigameUI/GameWindow" unique_id=621276240]
+[node name="BackgroundColor" type="Panel" parent="MinigameUI/GameWindow" unique_id=1124829411]
+clip_contents = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.7764706, 0.8745098, 0.9647059, 1)
+theme_override_styles/panel = SubResource("StyleBoxFlat_t5v6p")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MinigameUI/GameWindow" unique_id=886393385]
 layout_mode = 1
