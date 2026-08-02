@@ -1,5 +1,5 @@
 extends CharacterBody2D
-
+# test
 const SPEED = 300.0
 const JUMP_VELOCITY = -400.0
 var direction
