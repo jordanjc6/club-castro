@@ -4,15 +4,6 @@ func _ready() -> void:
 	# Loop through all 9 buttons inside this grid container
 	for i in get_child_count():
 		var btn = get_child(i) as Button
-		
-		# Clear any default text and make them square block sizes
-		#btn.text = ""
-		#btn.custom_minimum_size = Vector2(80, 80) 
-		# 1. Change the Font Size (e.g., set to 48px)
-		#btn.add_theme_font_size_override("font_size", 72)
-	
-		# 2. Change the Font Color (Normal state)
-		#btn.add_theme_color_override("font_color", Color.BLACK)
 	
 		# Connect the click event dynamically
 		btn.pressed.connect(func():

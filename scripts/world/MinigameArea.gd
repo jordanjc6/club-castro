@@ -23,28 +23,14 @@ func _ready() -> void:
 	interaction_area.body_exited.connect(_on_body_exited)
 
 func _on_body_entered(body: Node) -> void:
-	## Matches your exact custom class_name "MultiPlayer"
-	#if body is MultiPlayer and body.is_local_player():
-		## Only prompt if there is an open seat
-		#if seated_players.size() < 2 and not game_window.visible:
-			#prompt_panel.visible = true
-	
 	if body is MultiPlayer:
-		# Check if the player entering is controlled by THIS specific computer
 		var input_sync = body.get_node_or_null("InputSynchronizer")
 		if input_sync and input_sync.is_multiplayer_authority():
-			# Only prompt if there is an open seat
 			if seated_players.size() < 2 and not game_window.visible:
 				print("game area entered by %s" % body)
 				prompt_panel.visible = true
 
 func _on_body_exited(body: Node) -> void:
-	#if body is MultiPlayer and body.is_local_player():
-		#prompt_panel.visible = false
-		#if game_window.visible:
-			#_on_cancel_button_pressed()
-		
-	# check if player 'exited' because they disconnected from the game (removed from tree)
 	if not is_instance_valid(body) or not body.is_inside_tree():
 		return
 	
@@ -77,28 +63,32 @@ func server_request_seat(peer_id: int) -> void:
 	seated_players.append(peer_id)
 	print("player %d sitting at minigame" % peer_id)
 	
+	client_open_game.rpc_id(seated_players[0], true)
+	sync_match_state.rpc_id(seated_players[0], board_state, current_turn_idx, seated_players)
+	
 	if seated_players.size() == 2:
-		print("starting game with players %s and %s" % [seated_players[0], seated_players[1]])
-		# Reset internal board on server
 		board_state.fill(0)
 		current_turn_idx = 0
 		
-		# Open game windows with explicitly assigned player roles
-		client_open_game.rpc_id(seated_players[0], true)  # True = X (First)
-		client_open_game.rpc_id(seated_players[1], false) # False = O
+		client_open_game.rpc_id(seated_players[0], true)
+		client_open_game.rpc_id(seated_players[1], false)
 		
-		# Sync the initial empty state to both players
-		sync_match_state.rpc_id(seated_players[0], board_state, current_turn_idx)
-		sync_match_state.rpc_id(seated_players[1], board_state, current_turn_idx)
+		sync_match_state.rpc_id(seated_players[0], board_state, current_turn_idx, seated_players)
+		sync_match_state.rpc_id(seated_players[1], board_state, current_turn_idx, seated_players)
 
 @rpc("any_peer", "call_local", "reliable")
 func server_leave_seat(peer_id: int) -> void:
 	if not multiplayer.is_server(): return
 	if seated_players.has(peer_id):
-		for player in seated_players:
-			client_close_game.rpc_id(player)
+		var notify_list = seated_players.duplicate()
 		seated_players.clear()
-		print("seated players cleared")
+		board_state.fill(0)
+		current_turn_idx = 0
+		
+		# Server pushes cleared state & closes windows for all players in this match
+		for player in notify_list:
+			sync_match_state.rpc_id(player, board_state, current_turn_idx, seated_players)
+			client_close_game.rpc_id(player)
 
 # --- SERVER GAMEPLAY LOGIC ---
 
@@ -107,33 +97,39 @@ func server_submit_move(cell_idx: int) -> void:
 	if not multiplayer.is_server(): return
 	var moving_peer = multiplayer.get_remote_sender_id()
 	
-	# Validate: Is it actually this player's turn?
 	if seated_players.size() < 2 or moving_peer != seated_players[current_turn_idx]:
 		return
-	# Validate: Is the cell actually empty?
 	if board_state[cell_idx] != 0:
 		return
 		
-	# Process move (Player 1 writes 1, Player 2 writes 2)
 	var marker = 1 if current_turn_idx == 0 else 2
 	board_state[cell_idx] = marker
 	
-	# Check for win or draw
-	if check_win_condition(marker):
-		client_end_game.rpc_id(seated_players[0], "You Win!" if current_turn_idx == 0 else "You Lose!")
-		client_end_game.rpc_id(seated_players[1], "You Win!" if current_turn_idx == 1 else "You Lose!")
+	# Check Win / Draw
+	if check_win_condition(marker) or not board_state.has(0):
+		var p1 = seated_players[0]
+		var p2 = seated_players[1]
+		
+		var is_draw = not check_win_condition(marker)
+		var p1_msg = "It's a Draw!" if is_draw else ("You Win!" if current_turn_idx == 0 else "You Lose!")
+		var p2_msg = "It's a Draw!" if is_draw else ("You Win!" if current_turn_idx == 1 else "You Lose!")
+
+		# Reset server state first
+		board_state.fill(0)
+		current_turn_idx = 0
 		seated_players.clear()
-		return
-	elif not board_state.has(0):
-		client_end_game.rpc_id(seated_players[0], "It's a Draw!")
-		client_end_game.rpc_id(seated_players[1], "It's a Draw!")
-		seated_players.clear()
+		
+		# Sync cleared state to both clients before ending game
+		sync_match_state.rpc_id(p1, board_state, current_turn_idx, seated_players)
+		sync_match_state.rpc_id(p2, board_state, current_turn_idx, seated_players)
+		
+		client_end_game.rpc_id(p1, p1_msg)
+		client_end_game.rpc_id(p2, p2_msg)
 		return
 		
-	# Switch turns and push updates
 	current_turn_idx = 1 if current_turn_idx == 0 else 0
-	sync_match_state.rpc_id(seated_players[0], board_state, current_turn_idx)
-	sync_match_state.rpc_id(seated_players[1], board_state, current_turn_idx)
+	sync_match_state.rpc_id(seated_players[0], board_state, current_turn_idx, seated_players)
+	sync_match_state.rpc_id(seated_players[1], board_state, current_turn_idx, seated_players)
 
 func check_win_condition(m: int) -> bool:
 	var b = board_state
@@ -141,39 +137,42 @@ func check_win_condition(m: int) -> bool:
 			(b[0]==m and b[3]==m and b[6]==m) or (b[1]==m and b[4]==m and b[7]==m) or (b[2]==m and b[5]==m and b[8]==m) or
 			(b[0]==m and b[4]==m and b[8]==m) or (b[2]==m and b[4]==m and b[6]==m))
 
-# --- CLIENT SYNC CLIENT LOGIC ---
+# --- CLIENT SYNC LOGIC ---
 
 @rpc("authority", "call_local", "reliable")
 func client_open_game(is_p1: bool) -> void:
-	print("opened game for %s" % multiplayer.get_unique_id())
 	am_i_player_one = is_p1
 	prompt_panel.visible = false
 	game_window.visible = true
-	# Reset local visual grid clear state
 	update_ui_grid()
+	update_player_labels()
 
 @rpc("authority", "call_local", "reliable")
 func client_close_game() -> void:
-	print("closed game for %s" % multiplayer.get_unique_id())
 	game_window.visible = false
+	board_state.fill(0)
+	seated_players.clear()
+	update_ui_grid()
+	update_player_labels()
 
 @rpc("authority", "call_local", "reliable")
-func sync_match_state(server_board: Array, server_turn_idx: int) -> void:
-	print("sync match state for %s" % multiplayer.get_unique_id())
+func sync_match_state(server_board: Array, server_turn_idx: int, server_seated_players: Array) -> void:
 	board_state = server_board
 	current_turn_idx = server_turn_idx
+	seated_players = server_seated_players
 	update_ui_grid()
 	update_player_labels()
 
 @rpc("authority", "call_local", "reliable")
 func client_end_game(result_text: String) -> void:
 	print("Game Over: ", result_text)
-	# You can replace this with a temporary UI popup message label
 	game_window.visible = false 
+	board_state.fill(0)
+	seated_players.clear()
+	update_ui_grid()
+	update_player_labels()
 
 func update_ui_grid() -> void:
-	# Safely update grid buttons based on current board_state indexes
-	# Assuming your Tic-Tac-Toe grid has 9 buttons in a GridContainer
 	var grid_container = game_window.get_node_or_null("VBoxContainer/CenterContainer/GridContainer")
 	if not grid_container: return
 	
@@ -187,29 +186,26 @@ func update_ui_grid() -> void:
 			btn.disabled = true
 		else:
 			btn.text = ""
-			# Disable clicking if it isn't our local turn right now
 			var is_my_turn = (current_turn_idx == 0 and am_i_player_one) or (current_turn_idx == 1 and not am_i_player_one)
 			btn.disabled = not is_my_turn
 
 func update_player_labels() -> void:
-	# Safely fetch your two RichTextLabel nodes
+	var p1 = "Player 1"
+	var p2 = "Player 2" if seated_players.size() == 2 else "Waiting..."
+	
 	var player1_label = game_window.get_node_or_null("VBoxContainer/HBoxContainer2/Player1Label") as RichTextLabel
 	var player2_label = game_window.get_node_or_null("VBoxContainer/HBoxContainer2/Player2Label") as RichTextLabel
 	
-	# Guard clause: Stop if either player label is missing
 	if not player1_label or not player2_label:
 		return
 	
-	if current_turn_idx == 0:
-		# Player 1 Active: Bold, Black text with arrow
-		player1_label.text = "[center][b]► " + "<Player 1>" + "[/b][/center]"
-		
-		# Player 2 Inactive: Regular weight
-		player2_label.text = "[center]" + "<Player 2>" + "[/center]"
-		
+	if seated_players.size() == 2:
+		if current_turn_idx == 0:
+			player1_label.text = "[center][b]► " + p1 + "[/b][/center]"
+			player2_label.text = "[center]" + p2 + "[/center]"
+		else:
+			player1_label.text = "[center]" + p1 + "[/center]"
+			player2_label.text = "[center][b]► " + p2 + "[/b][/center]"
 	else:
-		# Player 1 Inactive: Regular weight
-		player1_label.text = "[center]" + "<Player 1>" + "[/center]"
-		
-		# Player 2 Active: Bold, Black text with arrow
-		player2_label.text = "[center][b]► " + "<Player 2>" + "[/b][/center]"
+		player1_label.text = "[center]" + p1 + "[/center]"
+		player2_label.text = "[center]" + p2 + "[/center]"
