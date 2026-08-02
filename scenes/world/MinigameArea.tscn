@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b08ikt2fy4hr8" path="res://scripts/world/MinigameArea.gd" id="1_27q8l"]
 [ext_resource type="Script" uid="uid://c2jxq0su2e0kq" path="res://scripts/popups/grid_container.gd" id="2_o1j7i"]
+[ext_resource type="Texture2D" uid="uid://tiu625i0s3fp" path="res://assets/textures/wooden.jpg" id="2_udbak"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_00mmp"]
 radius = 61.03278
@@ -13,6 +14,11 @@ bg_color = Color(0.6, 0.6, 0.6, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t5v6p"]
 bg_color = Color(0.7764706, 0.8745098, 0.9647059, 1)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0, 0, 0, 1)
 corner_radius_top_left = 40
 corner_radius_top_right = 40
 corner_radius_bottom_right = 40
@@ -22,6 +28,14 @@ corner_radius_bottom_left = 40
 line_spacing = 0.0
 font_size = 48
 font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kpbkc"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_00mmp"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
@@ -165,6 +179,22 @@ horizontal_alignment = 1
 custom_minimum_size = Vector2(0, 160)
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer" unique_id=1740789376]
+custom_minimum_size = Vector2(500, 528)
+layout_mode = 2
+texture = ExtResource("2_udbak")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="Panel" type="Panel" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/TextureRect" unique_id=138073242]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_kpbkc")
 
 [node name="GridContainer" type="GridContainer" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer" unique_id=1078334501]
 custom_minimum_size = Vector2(475, 500)
@@ -440,9 +470,22 @@ custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="PlayersLabel" type="Label" parent="MinigameUI/GameWindow/VBoxContainer/HBoxContainer2" unique_id=1438328561]
+[node name="Player1Label" type="RichTextLabel" parent="MinigameUI/GameWindow/VBoxContainer/HBoxContainer2" unique_id=701823240]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Players..."
-label_settings = SubResource("LabelSettings_o1j7i")
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/normal_font_size = 32
+theme_override_font_sizes/bold_font_size = 32
+bbcode_enabled = true
+text = "Waiting..."
+horizontal_alignment = 1
+
+[node name="Player2Label" type="RichTextLabel" parent="MinigameUI/GameWindow/VBoxContainer/HBoxContainer2" unique_id=943457947]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/normal_font_size = 32
+theme_override_font_sizes/bold_font_size = 32
+bbcode_enabled = true
+text = "Waiting..."
 horizontal_alignment = 1

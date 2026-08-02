@@ -163,6 +163,7 @@ func sync_match_state(server_board: Array, server_turn_idx: int) -> void:
 	board_state = server_board
 	current_turn_idx = server_turn_idx
 	update_ui_grid()
+	update_player_labels()
 
 @rpc("authority", "call_local", "reliable")
 func client_end_game(result_text: String) -> void:
@@ -189,3 +190,26 @@ func update_ui_grid() -> void:
 			# Disable clicking if it isn't our local turn right now
 			var is_my_turn = (current_turn_idx == 0 and am_i_player_one) or (current_turn_idx == 1 and not am_i_player_one)
 			btn.disabled = not is_my_turn
+
+func update_player_labels() -> void:
+	# Safely fetch your two RichTextLabel nodes
+	var player1_label = game_window.get_node_or_null("VBoxContainer/HBoxContainer2/Player1Label") as RichTextLabel
+	var player2_label = game_window.get_node_or_null("VBoxContainer/HBoxContainer2/Player2Label") as RichTextLabel
+	
+	# Guard clause: Stop if either player label is missing
+	if not player1_label or not player2_label:
+		return
+	
+	if current_turn_idx == 0:
+		# Player 1 Active: Bold, Black text with arrow
+		player1_label.text = "[center][b]► " + "<Player 1>" + "[/b][/center]"
+		
+		# Player 2 Inactive: Regular weight
+		player2_label.text = "[center]" + "<Player 2>" + "[/center]"
+		
+	else:
+		# Player 1 Inactive: Regular weight
+		player1_label.text = "[center]" + "<Player 1>" + "[/center]"
+		
+		# Player 2 Active: Bold, Black text with arrow
+		player2_label.text = "[center][b]► " + "<Player 2>" + "[/b][/center]"
