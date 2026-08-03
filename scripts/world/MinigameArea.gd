@@ -1,10 +1,13 @@
 extends Node2D
 
 @onready var interaction_area: Area2D = $InteractionArea
-@onready var prompt_panel: PanelContainer = $MinigameUI/PromptPanel
-@onready var join_button: Button = $MinigameUI/PromptPanel/VBoxContainer/HBoxContainer/YesButton
-@onready var cancel_button: Button = $MinigameUI/PromptPanel/VBoxContainer/HBoxContainer/NoButton
+@onready var game_prompt_panel: PanelContainer = $MinigameUI/GamePrompt
+@onready var join_button: Button = $MinigameUI/GamePrompt/VBoxContainer/HBoxContainer/YesButton
+@onready var cancel_button: Button = $MinigameUI/GamePrompt/VBoxContainer/HBoxContainer/NoButton
 @onready var game_window: Control = $MinigameUI/GameWindow
+@onready var game_result_panel: PanelContainer = $MinigameUI/GameResult
+@onready var game_result_label: Label = $MinigameUI/GameResult/VBoxContainer/Label
+@onready var close_result_button: Button = $MinigameUI/GameResult/VBoxContainer/HBoxContainer/CloseButton
 
 # --- MATCH VARIABLES (Unique per table instance) ---
 # ---------------------------------------------------
@@ -12,17 +15,24 @@ var seated_players: Array[int] = []
 var board_state: Array[int] = [0, 0, 0, 0, 0, 0, 0, 0, 0] # 0=empty, 1=Player1 (X), 2=Player2 (O)
 var current_turn_idx: int = 0 # Index of whose turn it is in seated_players
 var am_i_player_one: bool = false
+var result_timer: SceneTreeTimer = null # used to show game result for some seconds
 
 func _ready() -> void:
-	prompt_panel.visible = false
+	# ui popups hidden on startup
+	game_prompt_panel.visible = false
 	game_window.visible = false
+	game_result_panel.visible = false
 	
+	# interaction area signals
 	interaction_area.body_entered.connect(_on_body_entered)
 	interaction_area.body_exited.connect(_on_body_exited)
 	
-	# prompt panel buttons
+	# game prompt panel buttons
 	join_button.pressed.connect(_on_join_button_pressed)
 	cancel_button.pressed.connect(_on_cancel_button_pressed)
+	
+	# game result panel buttons
+	close_result_button.pressed.connect(_on_close_result_button_pressed)
 
 # show local game prompt upon entering game area
 #
@@ -36,7 +46,8 @@ func _on_body_entered(body: Node) -> void:
 			# ensure game not full
 			if seated_players.size() < 2:
 				print("game area entered by %s" % body)
-				prompt_panel.visible = true
+				game_prompt_panel.visible = true
+				game_result_panel.visible = false
 
 # close local game prompt / quit game upon leaving game area
 #
@@ -50,7 +61,7 @@ func _on_body_exited(body: Node) -> void:
 		
 		if input_sync and input_sync.is_inside_tree() and input_sync.is_multiplayer_authority():
 			print("game area exited by %s" % body)
-			prompt_panel.visible = false
+			game_prompt_panel.visible = false
 			
 			# if game is in progress, quit it
 			if game_window.visible:
@@ -60,16 +71,42 @@ func _on_body_exited(body: Node) -> void:
 #
 func _on_join_button_pressed() -> void:
 	print("%d requested to join game" % multiplayer.get_unique_id())
-	prompt_panel.visible = false
+	game_prompt_panel.visible = false
 	server_request_seat.rpc_id(1, multiplayer.get_unique_id())
 
 # close local game prompt and game window, tell server to quit game for all players
 #
 func _on_cancel_button_pressed() -> void:
 	print("%d cancelled game" % multiplayer.get_unique_id())
-	prompt_panel.visible = false
+	game_prompt_panel.visible = false
 	game_window.visible = false
 	server_leave_seat.rpc_id(1, multiplayer.get_unique_id())
+
+# show local game result
+#
+@rpc("authority", "call_local", "reliable")
+func show_game_result(message: String) -> void:
+	print("show game result for %d" % multiplayer.get_unique_id())
+	game_result_label.text = message
+	game_result_panel.visible = true
+	
+	# show result for a set amount of time..
+	
+	# Create and store timer
+	var this_timer = get_tree().create_timer(5.0)
+	result_timer = this_timer
+	await this_timer.timeout
+	
+	# Only hide if this timer is STILL active and hasn't been cancelled/replaced
+	if result_timer == this_timer:
+		game_result_panel.visible = false
+		result_timer = null
+
+# close local game result
+#
+func _on_close_result_button_pressed() -> void:
+	print("%d closed game result" % multiplayer.get_unique_id())
+	game_result_panel.visible = false
 
 # --- SERVER LOBBY LOGIC ---
 # --------------------------
@@ -165,6 +202,8 @@ func server_submit_move(cell_idx: int) -> void:
 		sync_match_state.rpc_id(p2, board_state, current_turn_idx, seated_players)
 		client_end_game.rpc_id(p1, p1_msg)
 		client_end_game.rpc_id(p2, p2_msg)
+		show_game_result.rpc_id(p1, p1_msg)
+		show_game_result.rpc_id(p2, p2_msg)
 		return
 	
 	# set next player's turn and sync players' match states
@@ -188,8 +227,9 @@ func check_win_condition(m: int) -> bool:
 @rpc("authority", "call_local", "reliable")
 func client_open_game(is_p1: bool) -> void:
 	am_i_player_one = is_p1
-	prompt_panel.visible = false
+	game_prompt_panel.visible = false
 	game_window.visible = true
+	result_timer = null
 	print("%d opened game" % multiplayer.get_unique_id())
 
 # set local game state variables to match server's master copies
@@ -207,8 +247,9 @@ func sync_match_state(server_board: Array, server_turn_idx: int, server_seated_p
 #
 @rpc("authority", "call_local", "reliable")
 func client_end_game(result_text: String) -> void:
-	print("Game Over: ", result_text)
+	print("Game Over (%d): %s" % [multiplayer.get_unique_id(), result_text])
 	game_window.visible = false 
+	result_timer = null
 	board_state.fill(0)
 	seated_players.clear()
 	update_ui_grid()

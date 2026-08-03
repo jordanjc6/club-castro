@@ -50,51 +50,70 @@ shape = SubResource("RectangleShape2D_083f8")
 [node name="CollisionShape2D" parent="MinigameArea/InteractionArea" parent_id_path=PackedInt32Array(2005503400, 1306371111) index="0" unique_id=619535156]
 position = Vector2(1661, 471)
 
-[node name="PromptPanel" parent="MinigameArea/MinigameUI" parent_id_path=PackedInt32Array(2005503400, 535232106) index="0" unique_id=577733101]
+[node name="GamePrompt" parent="MinigameArea/MinigameUI" parent_id_path=PackedInt32Array(2005503400, 535232106) index="0" unique_id=577733101]
 offset_left = 1694.5599
 offset_top = -111.92001
 offset_right = 2352.56
 offset_bottom = 147.07999
 
-[node name="GameWindow" parent="MinigameArea/MinigameUI" parent_id_path=PackedInt32Array(2005503400, 535232106) index="1" unique_id=1624588319]
+[node name="GameWindow" parent="MinigameArea/MinigameUI" parent_id_path=PackedInt32Array(2005503400, 535232106) index="1" unique_id=2080723378]
 offset_left = 1850.0
 offset_top = 32.0
 offset_right = 2381.0
 offset_bottom = 685.0
+
+[node name="GameResult" parent="MinigameArea/MinigameUI" parent_id_path=PackedInt32Array(2005503400, 535232106) index="2" unique_id=1165060706]
+visible = false
+offset_left = 1688.5599
+offset_right = 2413.56
+offset_bottom = 90.07999
 
 [node name="MinigameArea2" parent="." unique_id=1772129830 instance=ExtResource("3_ke0q3")]
 
 [node name="CollisionShape2D" parent="MinigameArea2/InteractionArea" parent_id_path=PackedInt32Array(1772129830, 1306371111) index="0" unique_id=619535156]
 position = Vector2(1832, 423)
 
-[node name="PromptPanel" parent="MinigameArea2/MinigameUI" parent_id_path=PackedInt32Array(1772129830, 535232106) index="0" unique_id=577733101]
+[node name="GamePrompt" parent="MinigameArea2/MinigameUI" parent_id_path=PackedInt32Array(1772129830, 535232106) index="0" unique_id=577733101]
 offset_left = 1694.5599
 offset_top = -111.92001
 offset_right = 2352.56
 offset_bottom = 147.07999
 
-[node name="GameWindow" parent="MinigameArea2/MinigameUI" parent_id_path=PackedInt32Array(1772129830, 535232106) index="1" unique_id=1624588319]
+[node name="GameWindow" parent="MinigameArea2/MinigameUI" parent_id_path=PackedInt32Array(1772129830, 535232106) index="1" unique_id=2080723378]
 offset_left = 1850.0
 offset_top = 32.0
 offset_right = 2381.0
 offset_bottom = 685.0
+
+[node name="GameResult" parent="MinigameArea2/MinigameUI" parent_id_path=PackedInt32Array(1772129830, 535232106) index="2" unique_id=1165060706]
+visible = false
+offset_left = 1690.5599
+offset_right = 2413.56
+offset_bottom = 90.07999
 
 [node name="MinigameArea3" parent="." unique_id=723725470 instance=ExtResource("3_ke0q3")]
 
 [node name="CollisionShape2D" parent="MinigameArea3/InteractionArea" parent_id_path=PackedInt32Array(723725470, 1306371111) index="0" unique_id=619535156]
 position = Vector2(1955, 481)
 
-[node name="PromptPanel" parent="MinigameArea3/MinigameUI" parent_id_path=PackedInt32Array(723725470, 535232106) index="0" unique_id=577733101]
+[node name="GamePrompt" parent="MinigameArea3/MinigameUI" parent_id_path=PackedInt32Array(723725470, 535232106) index="0" unique_id=577733101]
 offset_left = 1694.5599
 offset_top = -111.92001
 offset_right = 2352.56
 offset_bottom = 147.07999
 
-[node name="GameWindow" parent="MinigameArea3/MinigameUI" parent_id_path=PackedInt32Array(723725470, 535232106) index="1" unique_id=1624588319]
+[node name="GameWindow" parent="MinigameArea3/MinigameUI" parent_id_path=PackedInt32Array(723725470, 535232106) index="1" unique_id=2080723378]
 offset_left = 1850.0
 offset_top = 32.0
 offset_right = 2381.0
 offset_bottom = 685.0
+
+[node name="GameResult" parent="MinigameArea3/MinigameUI" parent_id_path=PackedInt32Array(723725470, 535232106) index="2" unique_id=1165060706]
+visible = false
+offset_left = 1686.5599
+offset_top = -112.92001
+offset_right = 2416.56
+offset_bottom = 91.07999
 
 [connection signal="body_entered" from="BBTCollisions/bbt-to-jungle-plaza" to="BBTCollisions/bbt-to-jungle-plaza" method="_on_body_entered"]
 
