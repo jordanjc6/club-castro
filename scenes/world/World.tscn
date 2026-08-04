@@ -63,7 +63,5 @@ position = Vector2(647, 527)
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="Players" unique_id=831218793]
 replication_config = SubResource("SceneReplicationConfig_qxiha")
 
-[node name="Node2D" type="Node2D" parent="." unique_id=1719173152]
-
 [connection signal="pressed" from="HUD/MultiplayerHUD/Panel/VBoxContainer/HostButton" to="GameManager" method="_host_button_pressed"]
 [connection signal="pressed" from="HUD/MultiplayerHUD/Panel/VBoxContainer/JoinButton" to="GameManager" method="_join_button_pressed"]

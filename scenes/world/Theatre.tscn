@@ -41,7 +41,7 @@ polygon = PackedVector2Array(627, -1077, -4, -1084, 65, -1164, 54, -1385, 127, -
 collision_layer = 4
 collision_mask = 2
 script = ExtResource("2_btfg8")
-target_position = Vector2(640, -590)
+target_position = Vector2(870, -870)
 new_zone_offset = Vector2(0, -950)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TheatreCollisions/theatre-to-cinema" unique_id=1620647589]

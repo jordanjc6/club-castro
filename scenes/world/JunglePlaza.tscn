@@ -38,6 +38,7 @@ polygon = PackedVector2Array(650, 723, 929, 723, 1048, 620, 1152, 621, 1199, 566
 collision_layer = 4
 collision_mask = 2
 script = ExtResource("2_3ayop")
+target_position = Vector2(2000, 600)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="JunglePlazaCollisions/bbt-door" unique_id=1324070534]
 position = Vector2(881, 366)
@@ -47,7 +48,7 @@ shape = SubResource("RectangleShape2D_04rbq")
 collision_layer = 4
 collision_mask = 2
 script = ExtResource("2_3ayop")
-target_position = Vector2(640, -590)
+target_position = Vector2(630, -350)
 new_zone_offset = Vector2(0, -950)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="JunglePlazaCollisions/the-cinema-door" unique_id=659725196]

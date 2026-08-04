@@ -52,7 +52,7 @@ shape = SubResource("RectangleShape2D_mx0fu")
 collision_layer = 4
 collision_mask = 2
 script = ExtResource("2_t41h0")
-target_position = Vector2(640, -1440)
+target_position = Vector2(130, -1250)
 new_zone_offset = Vector2(0, -1800)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TheCinemaCollisions/to-theatre" unique_id=1790709402]

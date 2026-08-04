@@ -38,7 +38,7 @@ polygon = PackedVector2Array(424, 726, 110, 724, 124, 654, 1, 573, 0, 493, 62, 4
 collision_layer = 4
 collision_mask = 2
 script = ExtResource("2_spf70")
-target_position = Vector2(640, 360)
+target_position = Vector2(859, 420)
 new_zone_offset = Vector2(0, 0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BBTCollisions/bbt-to-jungle-plaza" unique_id=262046844]
