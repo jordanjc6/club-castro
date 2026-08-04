@@ -13,18 +13,25 @@ var num_players_in_theatre: int = 0
 
 func become_host():
 	print("become host")
-	
-	_players_spawn_node = get_tree().get_current_scene().get_node("Players")
-	
 	host_mode_enabled = true
 	
+	# move multiplayers spawn point to current position of single player
+	var world_scene = get_tree().get_current_scene()
+	_players_spawn_node = world_scene.get_node("Players")
+	var single_player = world_scene.get_node_or_null("SinglePlayer")
+	if single_player:
+		_players_spawn_node.global_position = single_player.global_position
+	
+	# create multiplayer server
 	var server_peer = ENetMultiplayerPeer.new()
 	server_peer.create_server(SERVER_PORT)
 	
+	# set multiplayer callbacks
 	multiplayer.multiplayer_peer = server_peer
 	multiplayer.peer_connected.connect(_add_player_to_game)
 	multiplayer.peer_disconnected.connect(_delete_player)
 	
+	# remove single player and spawn multi player
 	_remove_single_player()
 	_add_player_to_game(1)
 
@@ -42,9 +49,12 @@ func join_game():
 func _add_player_to_game(id: int):
 	print("player %s joined the game" % id)
 	
+	# instantiate player and fields
 	var player_to_add = multiplayer_scene.instantiate()
 	player_to_add.player_id = id
 	player_to_add.name = str(id)
+	
+	# spawn player
 	_players_spawn_node.add_child(player_to_add, true)
 	
 func _delete_player(id: int):
