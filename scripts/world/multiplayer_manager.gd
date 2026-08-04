@@ -69,6 +69,18 @@ func _add_player_to_game(id: int):
 			
 			# Tell the client explicitly to update its zone offset
 			player_to_add.rpc("update_zone_offset", target_grid_offset)
+			
+			# increment count if player spawns in theatre
+			# (x1, y1) = top left theatremap offset
+			# (x2, y2) = bottom right theatremap based on texturerect size (1280, 720)
+			var theatre_x1 = 0
+			var theatre_x2 = 1280 
+			var theatre_y1 = -1800
+			var theatre_y2 = -1800 + 720
+			var x = target_pos.x
+			var y = target_pos.y
+			if (x >= theatre_x1 and x <= theatre_x2 and y >= theatre_y1 and y <= theatre_y2):
+				MultiplayerManager.rpc_id(1, "increment_players_in_theatre")
 	
 func _delete_player(id: int):
 	print("player %s left the game" % id)
