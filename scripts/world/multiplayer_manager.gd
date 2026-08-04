@@ -49,13 +49,26 @@ func join_game():
 func _add_player_to_game(id: int):
 	print("player %s joined the game" % id)
 	
-	# instantiate player and fields
 	var player_to_add = multiplayer_scene.instantiate()
 	player_to_add.player_id = id
 	player_to_add.name = str(id)
 	
-	# spawn player
+	# Add child first so multiplayer authority & spawner register it
 	_players_spawn_node.add_child(player_to_add, true)
+	
+	# If a client joined an active host (Host is peer ID 1)
+	if id != 1:
+		var host_player = _players_spawn_node.get_node_or_null("1")
+		if host_player:
+			var target_pos = host_player.global_position
+			var target_grid_offset = host_player.current_grid_offset
+			
+			# Set on server
+			player_to_add.global_position = target_pos
+			player_to_add.current_grid_offset = target_grid_offset
+			
+			# Tell the client explicitly to update its zone offset
+			player_to_add.rpc("update_zone_offset", target_grid_offset)
 	
 func _delete_player(id: int):
 	print("player %s left the game" % id)

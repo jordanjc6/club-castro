@@ -25,10 +25,17 @@ func _ready() -> void:
 	# Only enable the camera if this player instance belongs to the local machine
 	if %InputSynchronizer.is_multiplayer_authority():
 		camera.make_current()
+		
 		# Detach camera rotation/position scaling from parent body movement
 		camera.top_level = true 
+		
+		# Defer camera snapping to allow global_position and zone offset to replicate
+		get_tree().process_frame.connect(_init_camera_on_spawn, CONNECT_ONE_SHOT)
 	else:
 		camera.enabled = false
+
+func _init_camera_on_spawn() -> void:
+	update_camera_grid()
 
 func is_local_player() -> bool:
 	# Returns true only for the player controlled by this device
@@ -85,6 +92,8 @@ func update_camera_grid() -> void:
 @rpc("authority", "call_local", "reliable")
 func update_zone_offset(new_offset: Vector2) -> void:
 	current_grid_offset = new_offset
+	if %InputSynchronizer.is_multiplayer_authority():
+		update_camera_grid()
 
 func update_walk_animation(dir: Vector2) -> void:
 	# diagonal up-right
