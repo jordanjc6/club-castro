@@ -120,6 +120,9 @@ func _stop_video_stream() -> void:
 	var world_scene = get_tree().get_current_scene()
 	var video_player = world_scene.get_node_or_null("TheCinema/Theatre/MovieScreen/VideoStreamPlayer")
 	var movie_projector = world_scene.get_node_or_null("TheCinema/Theatre/MovieProjector")
+	var movie_selector = world_scene.get_node_or_null("TheCinema/Theatre/MovieSelector")
 	video_player.stop()
 	video_player.stream = null
 	movie_projector.current_movie_index = -1
+	movie_projector.is_movie_selector_open = false
+	movie_selector.visible = false
