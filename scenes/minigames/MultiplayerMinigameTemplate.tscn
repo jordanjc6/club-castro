@@ -1,0 +1,150 @@
+[gd_scene format=3 uid="uid://k2ywjytrg2r5"]
+
+[ext_resource type="Script" uid="uid://cj3pigyda72fm" path="res://scripts/minigames/MultiplayerMinigameTemplate.gd" id="1_7vioo"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_00mmp"]
+radius = 61.03278
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ke0q3"]
+bg_color = Color(0.7764706, 0.8745098, 0.9647059, 1)
+border_width_left = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_bottom_right = 40
+corner_radius_bottom_left = 40
+
+[sub_resource type="LabelSettings" id="LabelSettings_nibfx"]
+font_size = 48
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yokly"]
+bg_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 35
+corner_radius_top_right = 35
+corner_radius_bottom_right = 35
+corner_radius_bottom_left = 35
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bsyqw"]
+bg_color = Color(0, 0, 0, 1)
+
+[node name="MultiplayerMinigameTemplate" type="Node2D" unique_id=2005503400]
+script = ExtResource("1_7vioo")
+
+[node name="InteractionArea" type="Area2D" parent="." unique_id=1306371111]
+collision_layer = 4
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea" unique_id=619535156]
+shape = SubResource("CircleShape2D_00mmp")
+
+[node name="MinigameUI" type="CanvasLayer" parent="." unique_id=535232106]
+follow_viewport_enabled = true
+
+[node name="GamePrompt" type="PanelContainer" parent="MinigameUI" unique_id=577733101]
+anchors_preset = -1
+anchor_left = 0.07300001
+anchor_top = 0.16100001
+anchor_right = 0.07300001
+anchor_bottom = 0.16100001
+offset_left = 209.56
+offset_top = -113.92001
+offset_right = 859.56
+offset_bottom = 86.07999
+theme_override_styles/panel = SubResource("StyleBoxFlat_ke0q3")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MinigameUI/GamePrompt" unique_id=2121607502]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MinigameUI/GamePrompt/VBoxContainer" unique_id=172648264]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "Play Tic-Tac-Toe?"
+label_settings = SubResource("LabelSettings_nibfx")
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MinigameUI/GamePrompt/VBoxContainer" unique_id=1497153879]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_constants/separation = 75
+alignment = 1
+
+[node name="YesButton" type="Button" parent="MinigameUI/GamePrompt/VBoxContainer/HBoxContainer" unique_id=1802095504]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 42
+theme_override_styles/normal = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/hover = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/focus = SubResource("StyleBoxFlat_yokly")
+text = "Yes"
+
+[node name="NoButton" type="Button" parent="MinigameUI/GamePrompt/VBoxContainer/HBoxContainer" unique_id=2015736610]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 42
+theme_override_styles/normal = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/hover = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/focus = SubResource("StyleBoxFlat_yokly")
+text = "No"
+
+[node name="GameWindow" type="Panel" parent="MinigameUI" unique_id=2080723378]
+clip_contents = true
+offset_left = 370.0
+offset_top = 35.0
+offset_right = 901.0
+offset_bottom = 688.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_bsyqw")
+
+[node name="GameResult" type="PanelContainer" parent="MinigameUI" unique_id=1386153806]
+anchors_preset = -1
+anchor_left = 0.07300001
+anchor_top = 0.16100001
+anchor_right = 0.07300001
+anchor_bottom = 0.16100001
+offset_left = 210.56
+offset_top = -115.92001
+offset_right = 859.56
+offset_bottom = 85.07999
+theme_override_styles/panel = SubResource("StyleBoxFlat_ke0q3")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MinigameUI/GameResult" unique_id=1853412220]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MinigameUI/GameResult/VBoxContainer" unique_id=1851355475]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "<Game Result>"
+label_settings = SubResource("LabelSettings_nibfx")
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MinigameUI/GameResult/VBoxContainer" unique_id=1548872913]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_constants/separation = 75
+alignment = 1
+
+[node name="CloseButton" type="Button" parent="MinigameUI/GameResult/VBoxContainer/HBoxContainer" unique_id=647496552]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 42
+theme_override_styles/normal = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/hover = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/focus = SubResource("StyleBoxFlat_yokly")
+text = "Close"

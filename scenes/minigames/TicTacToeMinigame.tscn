@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://cjnc5jcd6qw46"]
 
-[ext_resource type="Script" uid="uid://b08ikt2fy4hr8" path="res://scripts/world/MinigameArea.gd" id="1_27q8l"]
-[ext_resource type="Script" uid="uid://c2jxq0su2e0kq" path="res://scripts/popups/grid_container.gd" id="2_o1j7i"]
-[ext_resource type="Texture2D" uid="uid://tiu625i0s3fp" path="res://assets/textures/wooden.jpg" id="2_udbak"]
+[ext_resource type="Script" uid="uid://b08ikt2fy4hr8" path="res://scripts/minigames/TicTacToe/TicTacToeMinigame.gd" id="1_uebrt"]
+[ext_resource type="Texture2D" uid="uid://tiu625i0s3fp" path="res://assets/textures/wooden.jpg" id="2_axe24"]
+[ext_resource type="Script" uid="uid://c2jxq0su2e0kq" path="res://scripts/minigames/TicTacToe/grid_container.gd" id="3_q2lvx"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_00mmp"]
 radius = 61.03278
@@ -112,8 +112,8 @@ border_color = Color(0, 0, 0, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_udbak"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
 
-[node name="MinigameArea" type="Node2D" unique_id=2005503400]
-script = ExtResource("1_27q8l")
+[node name="TicTacToeMinigame" type="Node2D" unique_id=2005503400]
+script = ExtResource("1_uebrt")
 
 [node name="InteractionArea" type="Area2D" parent="." unique_id=1306371111]
 collision_layer = 4
@@ -230,7 +230,7 @@ size_flags_vertical = 3
 [node name="TextureRect" type="TextureRect" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer" unique_id=1740789376]
 custom_minimum_size = Vector2(500, 528)
 layout_mode = 2
-texture = ExtResource("2_udbak")
+texture = ExtResource("2_axe24")
 expand_mode = 1
 stretch_mode = 1
 
@@ -249,7 +249,7 @@ layout_mode = 2
 theme_override_constants/h_separation = 0
 theme_override_constants/v_separation = 0
 columns = 3
-script = ExtResource("2_o1j7i")
+script = ExtResource("3_q2lvx")
 
 [node name="Button" type="Button" parent="MinigameUI/GameWindow/VBoxContainer/CenterContainer/GridContainer" unique_id=984885302]
 layout_mode = 2
