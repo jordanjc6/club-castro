@@ -4,7 +4,34 @@
 [ext_resource type="PackedScene" uid="uid://bq0dam8ufvp3i" path="res://scenes/world/BBT.tscn" id="2_i1jm3"]
 [ext_resource type="PackedScene" uid="uid://bannfykn1ryhq" path="res://scenes/world/TheCinema.tscn" id="3_252at"]
 [ext_resource type="PackedScene" uid="uid://5ouahpp03mnv" path="res://scenes/player/monkey.tscn" id="4_qh0kd"]
+[ext_resource type="Script" uid="uid://bknaby53d7dgl" path="res://scripts/world/side_nav.gd" id="5_252at"]
+[ext_resource type="Texture2D" uid="uid://egdknrgtofd" path="res://assets/icons/left-arrow.svg" id="5_i1jm3"]
 [ext_resource type="Script" uid="uid://doydguqh43yjw" path="res://scripts/world/GameManager.gd" id="5_qxiha"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_252at"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qxiha"]
+bg_color = Color(0, 0, 0, 0.47058824)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i1jm3"]
+bg_color = Color(0, 0, 0, 0.47058824)
+border_width_left = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qh0kd"]
+bg_color = Color(0, 0, 0, 0.47058824)
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0, 0, 0, 1)
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_qxiha"]
 properties/0/path = NodePath(".:position")
@@ -23,31 +50,61 @@ properties/0/replication_mode = 1
 position = Vector2(647, 528)
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=484417608]
-
-[node name="MultiplayerHUD" type="Control" parent="HUD" unique_id=398977205]
 unique_name_in_owner = true
-layout_mode = 3
-anchors_preset = 0
+
+[node name="SideNav" type="HBoxContainer" parent="HUD" unique_id=1923128839]
 offset_right = 40.0
 offset_bottom = 40.0
+theme_override_constants/separation = 0
+script = ExtResource("5_252at")
 
-[node name="Panel" type="Panel" parent="HUD/MultiplayerHUD" unique_id=1445952787]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="VBoxContainer" type="VBoxContainer" parent="HUD/MultiplayerHUD/Panel" unique_id=1102428660]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="HostButton" type="Button" parent="HUD/MultiplayerHUD/Panel/VBoxContainer" unique_id=1684952006]
+[node name="MultiplayerHUD" type="PanelContainer" parent="HUD/SideNav" unique_id=41617895]
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_252at")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/SideNav/MultiplayerHUD" unique_id=1102428660]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="HostButton" type="Button" parent="HUD/SideNav/MultiplayerHUD/VBoxContainer" unique_id=148504957]
+custom_minimum_size = Vector2(100, 80)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_qxiha")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_qxiha")
+theme_override_styles/hover = SubResource("StyleBoxFlat_qxiha")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_qxiha")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_qxiha")
+theme_override_styles/focus = SubResource("StyleBoxFlat_qxiha")
 text = "Host Game"
 
-[node name="JoinButton" type="Button" parent="HUD/MultiplayerHUD/Panel/VBoxContainer" unique_id=1698921905]
+[node name="JoinButton" type="Button" parent="HUD/SideNav/MultiplayerHUD/VBoxContainer" unique_id=1699824764]
+custom_minimum_size = Vector2(100, 80)
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_i1jm3")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_i1jm3")
+theme_override_styles/hover = SubResource("StyleBoxFlat_i1jm3")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_i1jm3")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_i1jm3")
+theme_override_styles/focus = SubResource("StyleBoxFlat_i1jm3")
 text = "Join Game"
+
+[node name="ToggleButton" type="Button" parent="HUD/SideNav" unique_id=268719714]
+custom_minimum_size = Vector2(40, 60)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_qh0kd")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_qh0kd")
+theme_override_styles/hover = SubResource("StyleBoxFlat_qh0kd")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_qh0kd")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_qh0kd")
+theme_override_styles/focus = SubResource("StyleBoxFlat_qh0kd")
+icon = ExtResource("5_i1jm3")
+expand_icon = true
 
 [node name="GameManager" type="Node" parent="." unique_id=619952250]
 script = ExtResource("5_qxiha")
@@ -62,6 +119,3 @@ position = Vector2(647, 527)
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="Players" unique_id=831218793]
 replication_config = SubResource("SceneReplicationConfig_qxiha")
-
-[connection signal="pressed" from="HUD/MultiplayerHUD/Panel/VBoxContainer/HostButton" to="GameManager" method="_host_button_pressed"]
-[connection signal="pressed" from="HUD/MultiplayerHUD/Panel/VBoxContainer/JoinButton" to="GameManager" method="_join_button_pressed"]

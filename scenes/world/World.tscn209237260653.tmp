@@ -1,0 +1,82 @@
+[gd_scene format=3 uid="uid://bjwpe4m0828om"]
+
+[ext_resource type="PackedScene" uid="uid://dc4doea3ehha5" path="res://scenes/world/JunglePlaza.tscn" id="1_qxiha"]
+[ext_resource type="PackedScene" uid="uid://bq0dam8ufvp3i" path="res://scenes/world/BBT.tscn" id="2_i1jm3"]
+[ext_resource type="PackedScene" uid="uid://bannfykn1ryhq" path="res://scenes/world/TheCinema.tscn" id="3_252at"]
+[ext_resource type="PackedScene" uid="uid://5ouahpp03mnv" path="res://scenes/player/monkey.tscn" id="4_qh0kd"]
+[ext_resource type="Script" uid="uid://doydguqh43yjw" path="res://scripts/world/GameManager.gd" id="5_qxiha"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qxiha"]
+bg_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 35
+corner_radius_top_right = 35
+corner_radius_bottom_right = 35
+corner_radius_bottom_left = 35
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_qxiha"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+
+[node name="World" type="Node2D" unique_id=854219030]
+
+[node name="JunglePlaza" parent="." unique_id=1739898985 instance=ExtResource("1_qxiha")]
+
+[node name="BBT" parent="." unique_id=323713113 instance=ExtResource("2_i1jm3")]
+
+[node name="TheCinema" parent="." unique_id=1682686883 instance=ExtResource("3_252at")]
+
+[node name="SinglePlayer" parent="." unique_id=1112790412 instance=ExtResource("4_qh0kd")]
+position = Vector2(647, 528)
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=484417608]
+
+[node name="MultiplayerHUD" type="PanelContainer" parent="HUD" unique_id=41617895]
+unique_name_in_owner = true
+offset_right = 221.0
+offset_bottom = 134.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/MultiplayerHUD" unique_id=1102428660]
+layout_mode = 2
+
+[node name="HostButton" type="Button" parent="HUD/MultiplayerHUD/VBoxContainer" unique_id=148504957]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 42
+theme_override_styles/normal = SubResource("StyleBoxFlat_qxiha")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_qxiha")
+theme_override_styles/hover = SubResource("StyleBoxFlat_qxiha")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_qxiha")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_qxiha")
+theme_override_styles/focus = SubResource("StyleBoxFlat_qxiha")
+text = "Host Game"
+
+[node name="JoinButton" type="Button" parent="HUD/MultiplayerHUD/VBoxContainer" unique_id=1567699212]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 42
+theme_override_styles/normal = SubResource("StyleBoxFlat_qxiha")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_qxiha")
+theme_override_styles/hover = SubResource("StyleBoxFlat_qxiha")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_qxiha")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_qxiha")
+theme_override_styles/focus = SubResource("StyleBoxFlat_qxiha")
+text = "Join Game"
+
+[node name="GameManager" type="Node" parent="." unique_id=619952250]
+script = ExtResource("5_qxiha")
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=760490683]
+_spawnable_scenes = PackedStringArray("uid://dt6pnon02v1yv")
+spawn_path = NodePath("../Players")
+spawn_limit = 2
+
+[node name="Players" type="Node2D" parent="." unique_id=1092168601]
+position = Vector2(647, 527)
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="Players" unique_id=831218793]
+replication_config = SubResource("SceneReplicationConfig_qxiha")
