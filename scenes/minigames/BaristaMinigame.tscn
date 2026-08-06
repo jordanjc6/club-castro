@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://blgq5u7jc5i8u"]
 
 [ext_resource type="Script" uid="uid://dwouxlredwifj" path="res://scripts/minigames/BaristaMinigame.gd" id="1_do0cr"]
+[ext_resource type="Texture2D" uid="uid://b6p7o3lwpal1" path="res://assets/minigames/bbt-barista-game.png" id="2_btron"]
+[ext_resource type="PackedScene" uid="uid://b450rdp2b4yk5" path="res://scenes/minigames/cup.tscn" id="2_u8cd1"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_00mmp"]
 radius = 61.03278
@@ -25,23 +27,32 @@ corner_radius_top_right = 35
 corner_radius_bottom_right = 35
 corner_radius_bottom_left = 35
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bsyqw"]
-bg_color = Color(0, 0, 0, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_do0cr"]
+draw_center = false
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_do0cr"]
+texture = ExtResource("2_btron")
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_t5v6p"]
+radius = 56.142673
 
 [node name="BaristaMinigame" type="Node2D" unique_id=2005503400]
 script = ExtResource("1_do0cr")
+small_cup_scene = ExtResource("2_u8cd1")
 
 [node name="InteractionArea" type="Area2D" parent="." unique_id=1306371111]
 collision_layer = 4
 collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea" unique_id=619535156]
+position = Vector2(1, 0)
 shape = SubResource("CircleShape2D_00mmp")
 
 [node name="MinigameUI" type="CanvasLayer" parent="." unique_id=535232106]
 follow_viewport_enabled = true
 
 [node name="GamePrompt" type="PanelContainer" parent="MinigameUI" unique_id=577733101]
+visible = false
 anchors_preset = -1
 anchor_left = 0.07300001
 anchor_top = 0.16100001
@@ -59,7 +70,7 @@ layout_mode = 2
 [node name="Label" type="Label" parent="MinigameUI/GamePrompt/VBoxContainer" unique_id=172648264]
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
-text = "Play Tic-Tac-Toe?"
+text = "Play Boba Barista?"
 label_settings = SubResource("LabelSettings_nibfx")
 horizontal_alignment = 1
 
@@ -100,13 +111,54 @@ text = "No"
 
 [node name="GameWindow" type="Panel" parent="MinigameUI" unique_id=2080723378]
 clip_contents = true
-offset_left = 370.0
-offset_top = 35.0
-offset_right = 901.0
-offset_bottom = 688.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_bsyqw")
+offset_left = -3.0
+offset_top = -2.0
+offset_right = 1285.0
+offset_bottom = 722.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_do0cr")
+
+[node name="Screen" type="Panel" parent="MinigameUI/GameWindow" unique_id=1546417429]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_do0cr")
+
+[node name="SmallCupSpawner" type="Button" parent="MinigameUI/GameWindow/Screen" unique_id=1772568663]
+layout_mode = 0
+offset_left = 92.0
+offset_top = 381.0
+offset_right = 179.0
+offset_bottom = 486.0
+flat = true
+
+[node name="Coasters" type="Node2D" parent="MinigameUI/GameWindow/Screen" unique_id=1112938180]
+
+[node name="Coaster1" type="Area2D" parent="MinigameUI/GameWindow/Screen/Coasters" unique_id=457428784 groups=["coasters"]]
+position = Vector2(3, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/Coasters/Coaster1" unique_id=325637182]
+position = Vector2(505, 588)
+shape = SubResource("CircleShape2D_t5v6p")
+
+[node name="Coaster2" type="Area2D" parent="MinigameUI/GameWindow/Screen/Coasters" unique_id=1629121503 groups=["coasters"]]
+position = Vector2(3, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/Coasters/Coaster2" unique_id=544384941]
+position = Vector2(690, 591)
+shape = SubResource("CircleShape2D_t5v6p")
+
+[node name="Coaster3" type="Area2D" parent="MinigameUI/GameWindow/Screen/Coasters" unique_id=346633535 groups=["coasters"]]
+position = Vector2(3, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/Coasters/Coaster3" unique_id=1548798217]
+position = Vector2(872, 588)
+shape = SubResource("CircleShape2D_t5v6p")
 
 [node name="GameResult" type="PanelContainer" parent="MinigameUI" unique_id=1386153806]
+visible = false
 anchors_preset = -1
 anchor_left = 0.07300001
 anchor_top = 0.16100001

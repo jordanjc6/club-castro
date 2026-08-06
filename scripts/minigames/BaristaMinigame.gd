@@ -11,11 +11,20 @@
 
 extends Node2D
 
+@export var small_cup_scene: PackedScene
+
+# game prompt
 @onready var interaction_area: Area2D = $InteractionArea
 @onready var game_prompt_panel: PanelContainer = $MinigameUI/GamePrompt
 @onready var join_button: Button = $MinigameUI/GamePrompt/VBoxContainer/HBoxContainer/YesButton
 @onready var cancel_button: Button = $MinigameUI/GamePrompt/VBoxContainer/HBoxContainer/NoButton
+
+# game window
 @onready var game_window: Control = $MinigameUI/GameWindow
+@onready var screen: Control = $MinigameUI/GameWindow/Screen
+@onready var spawner_button: Control = $MinigameUI/GameWindow/Screen/SmallCupSpawner
+
+# game result
 @onready var game_result_panel: PanelContainer = $MinigameUI/GameResult
 @onready var game_result_label: Label = $MinigameUI/GameResult/VBoxContainer/Label
 @onready var close_result_button: Button = $MinigameUI/GameResult/VBoxContainer/HBoxContainer/CloseButton
@@ -41,6 +50,9 @@ func _ready() -> void:
 	# game prompt panel buttons
 	join_button.pressed.connect(_on_join_button_pressed)
 	cancel_button.pressed.connect(_on_cancel_button_pressed)
+	
+	# game window
+	spawner_button.gui_input.connect(_on_spawner_gui_input)
 	
 	# game result panel buttons
 	close_result_button.pressed.connect(_on_close_result_button_pressed)
@@ -80,6 +92,20 @@ func _on_cancel_button_pressed() -> void:
 	game_prompt_panel.visible = false
 	game_window.visible = false
 	server_leave_seat.rpc_id(1, multiplayer.get_unique_id())
+
+func _on_spawner_gui_input(event: InputEvent) -> void:
+	# Trigger on initial left mouse click down
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		_spawn_cup()
+
+func _spawn_cup() -> void:
+	if small_cup_scene == null:
+		push_warning("Small cup scene not assigned in Inspector!")
+		return
+		
+	var cup_instance = small_cup_scene.instantiate()
+	screen.add_child(cup_instance)
+	cup_instance.global_position = get_global_mouse_position()
 
 # show local game result
 #
