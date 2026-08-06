@@ -1,3 +1,14 @@
+# inspired by club penguin pizza game
+# gets orders every x seconds up to a max limit at once
+# fulfilling a bbt order clears the order and allows another order to come
+# players have a set amount of time to fulfill as many orders as possible
+# 4 work spaces for bbt orders to be prepared
+# choose cup size, toppings, ice level, drink type, sugar level
+# once order is ready (right or wrong) click 'send order', if order matched
+# a pending order then clear that order, otherwise no order cleared
+# there is no removing a wrong action on an order, just need to send it to remove
+# it from work space
+
 extends Node2D
 
 @onready var interaction_area: Area2D = $InteractionArea
