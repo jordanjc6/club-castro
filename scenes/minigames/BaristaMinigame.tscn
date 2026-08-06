@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://dwouxlredwifj" path="res://scripts/minigames/BaristaMinigame.gd" id="1_do0cr"]
 [ext_resource type="Texture2D" uid="uid://b6p7o3lwpal1" path="res://assets/minigames/bbt-barista-game.png" id="2_btron"]
 [ext_resource type="PackedScene" uid="uid://b450rdp2b4yk5" path="res://scenes/minigames/cup.tscn" id="2_u8cd1"]
+[ext_resource type="PackedScene" uid="uid://casxckw0ijbxu" path="res://scenes/minigames/mango_dispenser.tscn" id="4_s5snv"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_00mmp"]
 radius = 61.03278
@@ -157,6 +158,13 @@ position = Vector2(3, 0)
 position = Vector2(872, 588)
 shape = SubResource("CircleShape2D_t5v6p")
 
+[node name="Area2D" parent="MinigameUI/GameWindow/Screen" unique_id=805822949 instance=ExtResource("4_s5snv")]
+position = Vector2(496, 346)
+
+[node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/Area2D" index="0" unique_id=13670146]
+position = Vector2(12.00001, 32.000004)
+scale = Vector2(0.28739798, 0.26086953)
+
 [node name="GameResult" type="PanelContainer" parent="MinigameUI" unique_id=1386153806]
 visible = false
 anchors_preset = -1
@@ -200,3 +208,5 @@ theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_yokly")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_yokly")
 theme_override_styles/focus = SubResource("StyleBoxFlat_yokly")
 text = "Close"
+
+[editable path="MinigameUI/GameWindow/Screen/Area2D"]

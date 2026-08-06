@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://casxckw0ijbxu"]
 
-[ext_resource type="Texture2D" uid="uid://bukauq4q72kcx" path="res://assets/minigames/mango-dispenser.png" id="1_tk0fo"]
+[ext_resource type="Texture2D" uid="uid://ceqrpyttj7dgr" path="res://assets/minigames/mango-dispenser.png" id="1_tk0fo"]
 
 [node name="Area2D" type="Area2D" unique_id=805822949]
 
