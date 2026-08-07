@@ -9,13 +9,17 @@ size = Vector2(71, 111)
 [node name="cup" type="Area2D" unique_id=359205666]
 script = ExtResource("1_kdyx7")
 
-[node name="MangoFill" type="ColorRect" parent="." unique_id=851076021]
-visible = false
-offset_left = -37.0
-offset_top = -55.0
-offset_right = 39.0
-offset_bottom = 55.0
-color = Color(0.99215686, 0.74509805, 0.007843138, 1)
+[node name="MangoFill" type="Polygon2D" parent="." unique_id=280173564]
+clip_children = 1
+polygon = PackedVector2Array(-37, -46, 39, -46, 27, 52, -27, 52)
+
+[node name="ColorRect" type="ColorRect" parent="MangoFill" unique_id=240060140]
+offset_left = -38.0
+offset_top = -47.0
+offset_right = 40.0
+offset_bottom = 53.0
+pivot_offset = Vector2(0, 100)
+color = Color(0.8627451, 0.62352943, 0, 1)
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=964016341]
 scale = Vector2(0.2, 0.2)

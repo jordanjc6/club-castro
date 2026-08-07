@@ -1,17 +1,23 @@
 extends Area2D
 
-@onready var mango_fill: ColorRect = $MangoFill
+@onready var liquid_fill: ColorRect = $MangoFill/ColorRect
+@onready var liquid_mask: Polygon2D = $MangoFill
 
 var is_dragging: bool = true  # with mouse
 var hovered_coaster: Area2D = null  # check if hovering coaster to place down
 var is_placed: bool = false  # on coaster
 var is_filled: bool = false  # with drink
+var is_filling: bool = false # Prevents double-clicking during animation
 
 func _ready() -> void:
 	# Listen for coaster hover events continuously
 	area_entered.connect(_on_area_entered)
 	area_exited.connect(_on_area_exited)
 	input_event.connect(_on_input_event)  # click on cup
+	
+	# Start with the liquid completely squished to the bottom (invisible)
+	liquid_fill.scale.y = 0.0
+	liquid_mask.visible = false
 
 func _process(_delta: float) -> void:
 	if is_dragging:
@@ -56,14 +62,23 @@ func _on_area_exited(area: Area2D) -> void:
 		hovered_coaster = null
 
 func _try_fill_mango() -> void:
+	if is_filling:
+		return
+		
 	# Look up the active dispenser in the scene tree
 	var dispenser = get_tree().get_first_node_in_group("mango_dispenser")
 	
 	if dispenser != null and dispenser.is_active:
-		mango_fill.visible = true
-		is_filled = true
-		print("Cup filled with Mango!")
+		is_filling = true
+		liquid_mask.visible = true
 		
-		# Optional: Automatically deactivate dispenser after filling 1 cup
-		# dispenser.is_active = false
-		# dispenser._update_modulate()
+		# Create a smooth bottom-to-top pouring animation over 1.2 seconds
+		var tween = create_tween()
+		tween.tween_property(liquid_fill, "scale:y", 1.0, 1.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		
+		# When animation finishes, mark cup as completely filled
+		tween.finished.connect(func():
+			is_filled = true
+			is_filling = false
+			print("Cup fully filled with Mango!")
+		)
