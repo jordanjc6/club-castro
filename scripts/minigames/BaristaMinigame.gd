@@ -13,6 +13,8 @@ extends Node2D
 
 @export var small_cup_scene: PackedScene
 
+@onready var hud: CanvasLayer = $"../../HUD"
+
 # game prompt
 @onready var interaction_area: Area2D = $InteractionArea
 @onready var game_prompt_panel: PanelContainer = $MinigameUI/GamePrompt
@@ -62,6 +64,7 @@ func _ready() -> void:
 #
 func _on_body_entered(body: Node) -> void:
 	print("game area entered by %s" % body)
+	hud.visible = false
 	game_prompt_panel.visible = true
 	game_result_panel.visible = false
 
@@ -73,6 +76,8 @@ func _on_body_exited(body: Node) -> void:
 		return
 	
 	print("game area exited by %s" % body)
+	if body.name == "SinglePlayer":
+		hud.visible = true
 	game_prompt_panel.visible = false
 	
 	# if game is in progress, quit it
