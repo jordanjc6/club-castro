@@ -63,10 +63,14 @@ func _ready() -> void:
 # show local game prompt upon entering game area
 #
 func _on_body_entered(body: Node) -> void:
-	print("game area entered by %s" % body)
-	hud.visible = false
-	game_prompt_panel.visible = true
-	game_result_panel.visible = false
+	var input_sync = body.get_node_or_null("InputSynchronizer")
+		
+	# only show popup for the player that entered
+	if input_sync and input_sync.is_multiplayer_authority():
+		print("game area entered by %s" % body)
+		hud.visible = false
+		game_prompt_panel.visible = true
+		game_result_panel.visible = false
 
 # close local game prompt / quit game upon leaving game area
 #
@@ -75,14 +79,17 @@ func _on_body_exited(body: Node) -> void:
 	if not is_instance_valid(body) or not body.is_inside_tree():
 		return
 	
-	print("game area exited by %s" % body)
-	if body.name == "SinglePlayer":
-		hud.visible = true
-	game_prompt_panel.visible = false
-	
-	# if game is in progress, quit it
-	if game_window.visible:
-		_on_cancel_button_pressed()
+	var input_sync = body.get_node_or_null("InputSynchronizer")
+		
+	# only hide popup for the player that exited
+	if ( (input_sync and input_sync.is_multiplayer_authority()) or body.name == "SinglePlayer"):
+		print("game area exited by %s" % body)
+		if body.name == "SinglePlayer":
+			hud.visible = true
+		game_prompt_panel.visible = false
+		# if game is in progress, quit it
+		if game_window.visible:
+			_on_cancel_button_pressed()
 
 # close local game prompt and request server to join game
 #
@@ -183,15 +190,15 @@ func server_leave_seat(peer_id: int) -> void:
 	
 	# ensure only a player in the game can end the match
 	if seated_players.has(peer_id):
-		var notify_list = seated_players.duplicate()  # store temp list of players in game
-		seated_players.clear()
-		board_state.fill(0)
-		current_turn_idx = 0
+		# 1. Remove ONLY the player who left
+		seated_players.erase(peer_id)
 		
-		# Server pushes cleared state & closes windows for all players in this match
-		for player in notify_list:
+		# 2. Tell ONLY the leaving player to close their game window
+		client_end_game.rpc_id(peer_id, "You left the game")
+		
+		# 3. Sync updated player list to any remaining players
+		for player in seated_players:
 			sync_match_state.rpc_id(player, board_state, current_turn_idx, seated_players)
-			client_end_game.rpc_id(player, "Player %d left the game" % peer_id)
 
 # --- SERVER GAMEPLAY LOGIC ---
 # -----------------------------
