@@ -9,6 +9,14 @@ size = Vector2(71, 111)
 [node name="cup" type="Area2D" unique_id=359205666]
 script = ExtResource("1_kdyx7")
 
+[node name="MangoFill" type="ColorRect" parent="." unique_id=851076021]
+visible = false
+offset_left = -37.0
+offset_top = -55.0
+offset_right = 39.0
+offset_bottom = 55.0
+color = Color(0.99215686, 0.74509805, 0.007843138, 1)
+
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=964016341]
 scale = Vector2(0.2, 0.2)
 texture = ExtResource("1_d62cv")
