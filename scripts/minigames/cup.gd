@@ -8,6 +8,7 @@ var hovered_coaster: Area2D = null  # check if hovering coaster to place down
 var is_placed: bool = false  # on coaster
 var is_filled: bool = false  # with drink
 var is_filling: bool = false # Prevents double-clicking during animation
+var current_coaster: Coaster = null  # Track where this cup is placed
 
 func _ready() -> void:
 	# Listen for coaster hover events continuously
@@ -18,6 +19,11 @@ func _ready() -> void:
 	# Start with the liquid completely squished to the bottom (invisible)
 	liquid_fill.scale.y = 0.0
 	liquid_mask.visible = false
+
+func _exit_tree() -> void:
+	# Automatically frees up the coaster when the cup is deleted or sent
+	if current_coaster != null and is_instance_valid(current_coaster):
+		current_coaster.remove_cup()
 
 func _process(_delta: float) -> void:
 	if is_dragging:
@@ -43,7 +49,9 @@ func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> voi
 func _check_drop() -> void:
 	is_dragging = false
 	
-	if hovered_coaster != null:
+	if hovered_coaster != null and hovered_coaster.is_empty():
+		current_coaster = hovered_coaster
+		current_coaster.place_cup(self)
 		# Success! Snap cup to coaster center
 		var shape_node = hovered_coaster.get_node_or_null("CollisionShape2D")
 		global_position = shape_node.global_position - Vector2(0, 40)

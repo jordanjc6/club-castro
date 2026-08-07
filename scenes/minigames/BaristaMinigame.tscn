@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://b6p7o3lwpal1" path="res://assets/minigames/bbt-barista-game.png" id="2_btron"]
 [ext_resource type="PackedScene" uid="uid://b450rdp2b4yk5" path="res://scenes/minigames/cup.tscn" id="2_u8cd1"]
 [ext_resource type="PackedScene" uid="uid://casxckw0ijbxu" path="res://scenes/minigames/mango_dispenser.tscn" id="4_s5snv"]
+[ext_resource type="Script" uid="uid://b5xcfwn3l20mt" path="res://scripts/minigames/coaster.gd" id="5_6p721"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_00mmp"]
 radius = 61.03278
@@ -151,6 +152,7 @@ position = Vector2(17, 64)
 
 [node name="Coaster1" type="Area2D" parent="MinigameUI/GameWindow/Screen/Coasters" unique_id=457428784 groups=["coasters"]]
 position = Vector2(3, 0)
+script = ExtResource("5_6p721")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/Coasters/Coaster1" unique_id=325637182]
 position = Vector2(505, 588)
@@ -158,6 +160,7 @@ shape = SubResource("CircleShape2D_t5v6p")
 
 [node name="Coaster2" type="Area2D" parent="MinigameUI/GameWindow/Screen/Coasters" unique_id=1629121503 groups=["coasters"]]
 position = Vector2(3, 0)
+script = ExtResource("5_6p721")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/Coasters/Coaster2" unique_id=544384941]
 position = Vector2(690, 591)
@@ -165,6 +168,7 @@ shape = SubResource("CircleShape2D_t5v6p")
 
 [node name="Coaster3" type="Area2D" parent="MinigameUI/GameWindow/Screen/Coasters" unique_id=346633535 groups=["coasters"]]
 position = Vector2(3, 0)
+script = ExtResource("5_6p721")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/Coasters/Coaster3" unique_id=1548798217]
 position = Vector2(872, 588)
