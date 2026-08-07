@@ -36,6 +36,7 @@ var board_state: Array[int] = [0, 0, 0, 0, 0, 0, 0, 0, 0] # 0=empty, 1=Player1 (
 var current_turn_idx: int = 0 # Index of whose turn it is in seated_players
 var am_i_player_one: bool = false
 var result_timer: SceneTreeTimer = null # used to show game result for some seconds
+var is_mango_active: bool = false
 
 func _ready() -> void:
 	# ui popups hidden on startup

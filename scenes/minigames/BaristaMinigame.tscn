@@ -116,6 +116,7 @@ offset_left = -3.0
 offset_top = -2.0
 offset_right = 1285.0
 offset_bottom = 722.0
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_do0cr")
 
 [node name="Screen" type="Panel" parent="MinigameUI/GameWindow" unique_id=1546417429]
@@ -125,6 +126,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxTexture_do0cr")
 
 [node name="SmallCupSpawner" type="Button" parent="MinigameUI/GameWindow/Screen" unique_id=1772568663]
@@ -134,6 +136,16 @@ offset_top = 381.0
 offset_right = 179.0
 offset_bottom = 486.0
 flat = true
+
+[node name="MangoDispenser" parent="MinigameUI/GameWindow/Screen" unique_id=805822949 instance=ExtResource("4_s5snv")]
+position = Vector2(498, 347)
+
+[node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/MangoDispenser" index="0" unique_id=13670146]
+position = Vector2(8.999992, 28.65)
+scale = Vector2(0.28830463, 0.25757363)
+
+[node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/MangoDispenser" index="1" unique_id=706931982]
+position = Vector2(17, 64)
 
 [node name="Coasters" type="Node2D" parent="MinigameUI/GameWindow/Screen" unique_id=1112938180]
 
@@ -157,13 +169,6 @@ position = Vector2(3, 0)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/Coasters/Coaster3" unique_id=1548798217]
 position = Vector2(872, 588)
 shape = SubResource("CircleShape2D_t5v6p")
-
-[node name="Area2D" parent="MinigameUI/GameWindow/Screen" unique_id=805822949 instance=ExtResource("4_s5snv")]
-position = Vector2(496, 346)
-
-[node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/Area2D" index="0" unique_id=13670146]
-position = Vector2(12.00001, 32.000004)
-scale = Vector2(0.28739798, 0.26086953)
 
 [node name="GameResult" type="PanelContainer" parent="MinigameUI" unique_id=1386153806]
 visible = false
@@ -209,4 +214,4 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_yokly")
 theme_override_styles/focus = SubResource("StyleBoxFlat_yokly")
 text = "Close"
 
-[editable path="MinigameUI/GameWindow/Screen/Area2D"]
+[editable path="MinigameUI/GameWindow/Screen/MangoDispenser"]
