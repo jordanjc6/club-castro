@@ -1,5 +1,8 @@
 extends Area2D
 
+enum CupSize { SMALL, MEDIUM, LARGE }
+@export var cup_size: CupSize = CupSize.MEDIUM
+
 @onready var liquid_fill: ColorRect = $MangoFill/ColorRect
 @onready var liquid_mask: Polygon2D = $MangoFill
 
@@ -9,8 +12,17 @@ var is_placed: bool = false  # on coaster
 var is_filled: bool = false  # with drink
 var is_filling: bool = false # Prevents double-clicking during animation
 var current_coaster: Coaster = null  # Track where this cup is placed
+var offset: Vector2 = Vector2.INF
 
 func _ready() -> void:
+	match cup_size:
+		CupSize.SMALL:
+			offset = Vector2(0, 40)
+		CupSize.MEDIUM:
+			offset = Vector2(0, 52)
+		CupSize.LARGE:
+			offset = Vector2(0, 49)
+	
 	# Listen for coaster hover events continuously
 	area_entered.connect(_on_area_entered)
 	area_exited.connect(_on_area_exited)
@@ -54,7 +66,7 @@ func _check_drop() -> void:
 		current_coaster.place_cup(self)
 		# Success! Snap cup to coaster center
 		var shape_node = hovered_coaster.get_node_or_null("CollisionShape2D")
-		global_position = shape_node.global_position - Vector2(0, 40)
+		global_position = shape_node.global_position - offset
 		is_placed = true
 		print("Placed on ", hovered_coaster.name)
 	else:

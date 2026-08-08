@@ -1,13 +1,14 @@
 [gd_scene format=3 uid="uid://b450rdp2b4yk5"]
 
-[ext_resource type="Texture2D" uid="uid://b7kh43gdk61ov" path="res://assets/minigames/cup.png" id="1_d62cv"]
-[ext_resource type="Script" uid="uid://dyreviug0f844" path="res://scripts/minigames/cup.gd" id="1_kdyx7"]
+[ext_resource type="Script" uid="uid://dyreviug0f844" path="res://scripts/minigames/cup.gd" id="1_twqxk"]
+[ext_resource type="Texture2D" uid="uid://b7kh43gdk61ov" path="res://assets/minigames/cup.png" id="2_tfygn"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_d62cv"]
 size = Vector2(71, 111)
 
-[node name="cup" type="Area2D" unique_id=359205666]
-script = ExtResource("1_kdyx7")
+[node name="SmallCup" type="Area2D" unique_id=359205666]
+script = ExtResource("1_twqxk")
+cup_size = 0
 
 [node name="MangoFill" type="Polygon2D" parent="." unique_id=280173564]
 clip_children = 1
@@ -23,7 +24,7 @@ color = Color(0.8627451, 0.62352943, 0, 1)
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=964016341]
 scale = Vector2(0.2, 0.2)
-texture = ExtResource("1_d62cv")
+texture = ExtResource("2_tfygn")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2020401588]
 position = Vector2(0.5, 0.5)

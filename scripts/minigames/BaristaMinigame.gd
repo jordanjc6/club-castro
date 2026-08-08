@@ -12,6 +12,8 @@
 extends Node2D
 
 @export var small_cup_scene: PackedScene
+@export var medium_cup_scene: PackedScene
+@export var large_cup_scene: PackedScene
 
 @onready var hud: CanvasLayer = $"../../HUD"
 
@@ -24,7 +26,9 @@ extends Node2D
 # game window
 @onready var game_window: Control = $MinigameUI/GameWindow
 @onready var screen: Control = $MinigameUI/GameWindow/Screen
-@onready var spawner_button: Control = $MinigameUI/GameWindow/Screen/SmallCupSpawner
+@onready var small_cup_spawner: Control = $MinigameUI/GameWindow/Screen/SmallCupSpawner
+@onready var medium_cup_spawner: Control = $MinigameUI/GameWindow/Screen/MediumCupSpawner
+@onready var large_cup_spawner: Control = $MinigameUI/GameWindow/Screen/LargeCupSpawner
 
 # game result
 @onready var game_result_panel: PanelContainer = $MinigameUI/GameResult
@@ -55,7 +59,9 @@ func _ready() -> void:
 	cancel_button.pressed.connect(_on_cancel_button_pressed)
 	
 	# game window
-	spawner_button.gui_input.connect(_on_spawner_gui_input)
+	small_cup_spawner.gui_input.connect(spawn_small_cup)
+	medium_cup_spawner.gui_input.connect(spawn_medium_cup)
+	large_cup_spawner.gui_input.connect(spawn_large_cup)
 	
 	# game result panel buttons
 	close_result_button.pressed.connect(_on_close_result_button_pressed)
@@ -66,7 +72,7 @@ func _on_body_entered(body: Node) -> void:
 	var input_sync = body.get_node_or_null("InputSynchronizer")
 		
 	# only show popup for the player that entered
-	if input_sync and input_sync.is_multiplayer_authority():
+	if ( (input_sync and input_sync.is_multiplayer_authority()) or body.name == "SinglePlayer"):
 		print("game area entered by %s" % body)
 		hud.visible = false
 		game_prompt_panel.visible = true
@@ -106,19 +112,38 @@ func _on_cancel_button_pressed() -> void:
 	game_window.visible = false
 	server_leave_seat.rpc_id(1, multiplayer.get_unique_id())
 
-func _on_spawner_gui_input(event: InputEvent) -> void:
+func spawn_small_cup(event: InputEvent) -> void:
 	# Trigger on initial left mouse click down
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		_spawn_cup()
-
-func _spawn_cup() -> void:
-	if small_cup_scene == null:
-		push_warning("Small cup scene not assigned in Inspector!")
-		return
+		if small_cup_scene == null:
+			push_warning("Small cup scene not assigned in Inspector!")
+			return
 		
-	var cup_instance = small_cup_scene.instantiate()
-	screen.add_child(cup_instance)
-	cup_instance.global_position = get_global_mouse_position()
+		var cup_instance = small_cup_scene.instantiate()
+		screen.add_child(cup_instance)
+		cup_instance.global_position = get_global_mouse_position()
+
+func spawn_medium_cup(event: InputEvent) -> void:
+	# Trigger on initial left mouse click down
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if medium_cup_scene == null:
+			push_warning("Medium cup scene not assigned in Inspector!")
+			return
+		
+		var cup_instance = medium_cup_scene.instantiate()
+		screen.add_child(cup_instance)
+		cup_instance.global_position = get_global_mouse_position()
+
+func spawn_large_cup(event: InputEvent) -> void:
+	# Trigger on initial left mouse click down
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if large_cup_scene == null:
+			push_warning("Large cup scene not assigned in Inspector!")
+			return
+		
+		var cup_instance = large_cup_scene.instantiate()
+		screen.add_child(cup_instance)
+		cup_instance.global_position = get_global_mouse_position()
 
 # show local game result
 #

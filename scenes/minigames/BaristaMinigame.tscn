@@ -2,7 +2,9 @@
 
 [ext_resource type="Script" uid="uid://dwouxlredwifj" path="res://scripts/minigames/BaristaMinigame.gd" id="1_do0cr"]
 [ext_resource type="Texture2D" uid="uid://b6p7o3lwpal1" path="res://assets/minigames/bbt-barista-game.png" id="2_btron"]
-[ext_resource type="PackedScene" uid="uid://b450rdp2b4yk5" path="res://scenes/minigames/cup.tscn" id="2_u8cd1"]
+[ext_resource type="PackedScene" uid="uid://b450rdp2b4yk5" path="res://scenes/minigames/SmallCup.tscn" id="2_u8cd1"]
+[ext_resource type="PackedScene" uid="uid://mm4k5rlkqqs2" path="res://scenes/minigames/MediumCup.tscn" id="3_27qqn"]
+[ext_resource type="PackedScene" uid="uid://dsst43nregpcf" path="res://scenes/minigames/LargeCup.tscn" id="4_cvn4r"]
 [ext_resource type="PackedScene" uid="uid://casxckw0ijbxu" path="res://scenes/minigames/mango_dispenser.tscn" id="4_s5snv"]
 [ext_resource type="Script" uid="uid://b5xcfwn3l20mt" path="res://scripts/minigames/coaster.gd" id="5_6p721"]
 
@@ -41,6 +43,8 @@ radius = 56.142673
 [node name="BaristaMinigame" type="Node2D" unique_id=2005503400]
 script = ExtResource("1_do0cr")
 small_cup_scene = ExtResource("2_u8cd1")
+medium_cup_scene = ExtResource("3_27qqn")
+large_cup_scene = ExtResource("4_cvn4r")
 
 [node name="InteractionArea" type="Area2D" parent="." unique_id=1306371111]
 collision_layer = 4
@@ -135,6 +139,22 @@ layout_mode = 0
 offset_left = 92.0
 offset_top = 381.0
 offset_right = 179.0
+offset_bottom = 486.0
+flat = true
+
+[node name="MediumCupSpawner" type="Button" parent="MinigameUI/GameWindow/Screen" unique_id=497660527]
+layout_mode = 0
+offset_left = 207.0
+offset_top = 344.0
+offset_right = 294.0
+offset_bottom = 484.0
+flat = true
+
+[node name="LargeCupSpawner" type="Button" parent="MinigameUI/GameWindow/Screen" unique_id=161422219]
+layout_mode = 0
+offset_left = 323.0
+offset_top = 310.0
+offset_right = 430.0
 offset_bottom = 486.0
 flat = true
 
