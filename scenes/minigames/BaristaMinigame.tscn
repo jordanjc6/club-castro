@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://dsst43nregpcf" path="res://scenes/minigames/LargeCup.tscn" id="4_cvn4r"]
 [ext_resource type="PackedScene" uid="uid://casxckw0ijbxu" path="res://scenes/minigames/mango_dispenser.tscn" id="4_s5snv"]
 [ext_resource type="Script" uid="uid://b5xcfwn3l20mt" path="res://scripts/minigames/coaster.gd" id="5_6p721"]
+[ext_resource type="PackedScene" uid="uid://cyxmhhnybjraa" path="res://scenes/minigames/matcha_dispenser.tscn" id="7_n1cwh"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_00mmp"]
 radius = 61.03278
@@ -168,6 +169,15 @@ scale = Vector2(0.28830463, 0.25757363)
 [node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/MangoDispenser" index="1" unique_id=706931982]
 position = Vector2(17, 64)
 
+[node name="MatchaDispenser" parent="MinigameUI/GameWindow/Screen" unique_id=156156222 instance=ExtResource("7_n1cwh")]
+
+[node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/MatchaDispenser" index="0" unique_id=13670146]
+position = Vector2(596.175, 376.5)
+scale = Vector2(0.16795506, 0.15903307)
+
+[node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/MatchaDispenser" index="1" unique_id=706931982]
+position = Vector2(603, 400)
+
 [node name="Coasters" type="Node2D" parent="MinigameUI/GameWindow/Screen" unique_id=1112938180]
 
 [node name="Coaster1" type="Area2D" parent="MinigameUI/GameWindow/Screen/Coasters" unique_id=457428784 groups=["coasters"]]
@@ -239,3 +249,4 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_yokly")
 text = "Close"
 
 [editable path="MinigameUI/GameWindow/Screen/MangoDispenser"]
+[editable path="MinigameUI/GameWindow/Screen/MatchaDispenser"]

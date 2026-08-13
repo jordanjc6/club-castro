@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://cyxmhhnybjraa"]
+
+[ext_resource type="Script" uid="uid://c8b2yup27q1fq" path="res://scripts/minigames/matcha_dispenser.gd" id="1_nrbfb"]
+[ext_resource type="Texture2D" uid="uid://dmyqp2oei08s6" path="res://assets/minigames/matcha-dispenser.png" id="2_nrbfb"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_t5v6p"]
+radius = 45.0
+height = 212.0
+
+[node name="MatchaDispenser" type="Area2D" unique_id=805822949]
+script = ExtResource("1_nrbfb")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=13670146]
+position = Vector2(-2, -22)
+scale = Vector2(0.14331141, 0.14334181)
+texture = ExtResource("2_nrbfb")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=706931982]
+position = Vector2(4, -1)
+shape = SubResource("CapsuleShape2D_t5v6p")

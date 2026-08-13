@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://ceqrpyttj7dgr" path="res://assets/minigames/mango-dispenser.png" id="1_tk0fo"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_t5v6p"]
-radius = 44.0
+radius = 43.0
 height = 214.0
 
 [node name="MangoDispenser" type="Area2D" unique_id=805822949]

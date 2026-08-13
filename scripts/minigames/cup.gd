@@ -57,6 +57,7 @@ func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> voi
 	
 	if is_click or is_touch:
 		_try_fill_mango()
+		_try_fill_matcha()
 
 func _check_drop() -> void:
 	is_dragging = false
@@ -82,7 +83,7 @@ func _on_area_exited(area: Area2D) -> void:
 		hovered_coaster = null
 
 func _try_fill_mango() -> void:
-	if is_filling:
+	if is_filling or is_filled:
 		return
 		
 	# Look up the active dispenser in the scene tree
@@ -101,4 +102,26 @@ func _try_fill_mango() -> void:
 			is_filled = true
 			is_filling = false
 			print("Cup fully filled with Mango!")
+		)
+
+func _try_fill_matcha() -> void:
+	if is_filling or is_filled:
+		return
+		
+	# Look up the active dispenser in the scene tree
+	var dispenser = get_tree().get_first_node_in_group("matcha_dispenser")
+	
+	if dispenser != null and dispenser.is_active:
+		is_filling = true
+		liquid_mask.visible = true
+		
+		# Create a smooth bottom-to-top pouring animation over 1.2 seconds
+		var tween = create_tween()
+		tween.tween_property(liquid_fill, "scale:y", 1.0, 1.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		
+		# When animation finishes, mark cup as completely filled
+		tween.finished.connect(func():
+			is_filled = true
+			is_filling = false
+			print("Cup fully filled with Matcha!")
 		)
