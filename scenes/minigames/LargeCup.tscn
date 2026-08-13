@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dsst43nregpcf"]
 
-[ext_resource type="Script" uid="uid://bbco3egrvla56" path="res://scripts/minigames/cup_new.gd" id="1_a1iq2"]
+[ext_resource type="Script" uid="uid://bbco3egrvla56" path="res://scripts/minigames/cup.gd" id="1_a1iq2"]
 [ext_resource type="Texture2D" uid="uid://b7kh43gdk61ov" path="res://assets/minigames/cup.png" id="2_lybhi"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_d62cv"]
@@ -10,11 +10,11 @@ size = Vector2(90, 146)
 script = ExtResource("1_a1iq2")
 cup_size = 2
 
-[node name="MangoFill" type="Polygon2D" parent="." unique_id=280173564]
+[node name="DrinkFill" type="Polygon2D" parent="." unique_id=280173564]
 clip_children = 1
 polygon = PackedVector2Array(-48, -76, 50, -75, 33, 61, -34, 60)
 
-[node name="ColorRect" type="ColorRect" parent="MangoFill" unique_id=240060140]
+[node name="ColorRect" type="ColorRect" parent="DrinkFill" unique_id=240060140]
 offset_left = -51.0
 offset_top = -82.0
 offset_right = 55.0

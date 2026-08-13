@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://2i85g2idlop8"]
+
+[ext_resource type="Script" uid="uid://dqtuu4cn4uo05" path="res://scripts/minigames/dispenser.gd" id="1_wg8id"]
+[ext_resource type="Texture2D" uid="uid://cuuuexs5dyhc7" path="res://assets/minigames/honeydew-dispenser.png" id="2_wg8id"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_t5v6p"]
+radius = 45.0
+height = 212.0
+
+[node name="HoneydewDispenser" type="Area2D" unique_id=805822949]
+script = ExtResource("1_wg8id")
+flavor = "honeydew"
+liquid_color = Color(0.69411767, 0.99607843, 0.69411767, 1)
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=13670146]
+position = Vector2(-2, -22)
+scale = Vector2(0.14331141, 0.14334181)
+texture = ExtResource("2_wg8id")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=706931982]
+position = Vector2(4, -1)
+shape = SubResource("CapsuleShape2D_t5v6p")

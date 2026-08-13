@@ -10,7 +10,7 @@ height = 212.0
 [node name="MatchaDispenser" type="Area2D" unique_id=805822949]
 script = ExtResource("1_nrbfb")
 flavor = "matcha"
-liquid_color = Color(0.70980394, 0.77254903, 0.54901963, 1)
+liquid_color = Color(0, 0.22352941, 0, 1)
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=13670146]
 position = Vector2(-2, -22)

@@ -8,6 +8,9 @@
 [ext_resource type="PackedScene" uid="uid://casxckw0ijbxu" path="res://scenes/minigames/mango_dispenser.tscn" id="4_s5snv"]
 [ext_resource type="Script" uid="uid://b5xcfwn3l20mt" path="res://scripts/minigames/coaster.gd" id="5_6p721"]
 [ext_resource type="PackedScene" uid="uid://cyxmhhnybjraa" path="res://scenes/minigames/matcha_dispenser.tscn" id="7_n1cwh"]
+[ext_resource type="PackedScene" uid="uid://2i85g2idlop8" path="res://scenes/minigames/honeydew_dispenser.tscn" id="8_yh4ya"]
+[ext_resource type="PackedScene" uid="uid://bx8usnpbry0k2" path="res://scenes/minigames/brownsugar_dispenser.tscn" id="9_5cb16"]
+[ext_resource type="PackedScene" uid="uid://dxusxhc7g524t" path="res://scenes/minigames/taro_dispenser.tscn" id="10_y8frw"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_00mmp"]
 radius = 61.03278
@@ -178,6 +181,33 @@ scale = Vector2(0.16795506, 0.15903307)
 [node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/MatchaDispenser" index="1" unique_id=706931982]
 position = Vector2(603, 400)
 
+[node name="HoneydewDispenser" parent="MinigameUI/GameWindow/Screen" unique_id=921366755 instance=ExtResource("8_yh4ya")]
+
+[node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/HoneydewDispenser" index="0" unique_id=13670146]
+position = Vector2(686, 376)
+scale = Vector2(0.17105258, 0.15945718)
+
+[node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/HoneydewDispenser" index="1" unique_id=706931982]
+position = Vector2(691, 405)
+
+[node name="BrownsugarDispenser" parent="MinigameUI/GameWindow/Screen" unique_id=1878401235 instance=ExtResource("9_5cb16")]
+
+[node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/BrownsugarDispenser" index="0" unique_id=13670146]
+position = Vector2(774, 375.00003)
+scale = Vector2(0.16447361, 0.16072945)
+
+[node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/BrownsugarDispenser" index="1" unique_id=706931982]
+position = Vector2(781, 406)
+
+[node name="TaroDispenser" parent="MinigameUI/GameWindow/Screen" unique_id=574873936 instance=ExtResource("10_y8frw")]
+
+[node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/TaroDispenser" index="0" unique_id=13670146]
+position = Vector2(864, 374.5)
+scale = Vector2(0.17214918, 0.15564035)
+
+[node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/TaroDispenser" index="1" unique_id=706931982]
+position = Vector2(868, 404)
+
 [node name="Coasters" type="Node2D" parent="MinigameUI/GameWindow/Screen" unique_id=1112938180]
 
 [node name="Coaster1" type="Area2D" parent="MinigameUI/GameWindow/Screen/Coasters" unique_id=457428784 groups=["coasters"]]
@@ -250,3 +280,6 @@ text = "Close"
 
 [editable path="MinigameUI/GameWindow/Screen/MangoDispenser"]
 [editable path="MinigameUI/GameWindow/Screen/MatchaDispenser"]
+[editable path="MinigameUI/GameWindow/Screen/HoneydewDispenser"]
+[editable path="MinigameUI/GameWindow/Screen/BrownsugarDispenser"]
+[editable path="MinigameUI/GameWindow/Screen/TaroDispenser"]
