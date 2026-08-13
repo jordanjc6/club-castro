@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://casxckw0ijbxu"]
 
-[ext_resource type="Script" uid="uid://bxa7bybptmvgl" path="res://scripts/minigames/mango_dispenser.gd" id="1_dtvii"]
+[ext_resource type="Script" uid="uid://dqtuu4cn4uo05" path="res://scripts/minigames/dispenser.gd" id="1_dtvii"]
 [ext_resource type="Texture2D" uid="uid://ceqrpyttj7dgr" path="res://assets/minigames/mango-dispenser.png" id="1_tk0fo"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_t5v6p"]
@@ -9,6 +9,7 @@ height = 214.0
 
 [node name="MangoDispenser" type="Area2D" unique_id=805822949]
 script = ExtResource("1_dtvii")
+liquid_color = Color(0.8627451, 0.62352943, 0, 1)
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=13670146]
 scale = Vector2(0.2, 0.2)
