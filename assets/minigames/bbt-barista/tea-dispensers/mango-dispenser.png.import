@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cpm6t3tbvrohl"
-path="res://.godot/imported/pudding-spoon.png-341f44ca889c8e0c679b73697427fc92.ctex"
+uid="uid://ceqrpyttj7dgr"
+path="res://.godot/imported/mango-dispenser.png-f508745bd8086f597e38fd8a567ac84a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/minigames/pudding-spoon.png"
-dest_files=["res://.godot/imported/pudding-spoon.png-341f44ca889c8e0c679b73697427fc92.ctex"]
+source_file="res://assets/minigames/bbt-barista/tea-dispensers/mango-dispenser.png"
+dest_files=["res://.godot/imported/mango-dispenser.png-f508745bd8086f597e38fd8a567ac84a.ctex"]
 
 [params]
 

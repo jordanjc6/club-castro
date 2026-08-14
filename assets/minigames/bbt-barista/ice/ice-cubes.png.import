@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cjyxlnt0856ya"
-path="res://.godot/imported/ice-spoon.png-ac11d312cb929ee88812c4526ed90858.ctex"
+uid="uid://cfocut4bdvtb1"
+path="res://.godot/imported/ice-cubes.png-b744a99824157d3bf361b9fb8939c3d0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/minigames/ice-spoon.png"
-dest_files=["res://.godot/imported/ice-spoon.png-ac11d312cb929ee88812c4526ed90858.ctex"]
+source_file="res://assets/minigames/bbt-barista/ice/ice-cubes.png"
+dest_files=["res://.godot/imported/ice-cubes.png-b744a99824157d3bf361b9fb8939c3d0.ctex"]
 
 [params]
 

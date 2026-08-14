@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://deih27iljuoxf"]
+
+[ext_resource type="Script" uid="uid://bnbt232xjynvv" path="res://scripts/minigames/ice_spoon.gd" id="1_qmail"]
+[ext_resource type="Texture2D" uid="uid://cjyxlnt0856ya" path="res://assets/minigames/bbt-barista/ice/ice-spoon.png" id="2_qmail"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_qmail"]
+radius = 25.923334
+height = 115.853134
+
+[node name="IceSpoon" type="Area2D" unique_id=359205666]
+script = ExtResource("1_qmail")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=964016341]
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("2_qmail")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2020401588]
+position = Vector2(-3.999999, 0)
+rotation = 1.0517262
+shape = SubResource("CapsuleShape2D_qmail")

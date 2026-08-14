@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://butqt1slabjfi"
-path="res://.godot/imported/taro-dispenser.png-ca8f3cfdfc29320abd304cdb4eed71b4.ctex"
+uid="uid://dmyqp2oei08s6"
+path="res://.godot/imported/matcha-dispenser.png-2a8f0cecadb75296be709876e791809d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/minigames/taro-dispenser.png"
-dest_files=["res://.godot/imported/taro-dispenser.png-ca8f3cfdfc29320abd304cdb4eed71b4.ctex"]
+source_file="res://assets/minigames/bbt-barista/tea-dispensers/matcha-dispenser.png"
+dest_files=["res://.godot/imported/matcha-dispenser.png-2a8f0cecadb75296be709876e791809d.ctex"]
 
 [params]
 

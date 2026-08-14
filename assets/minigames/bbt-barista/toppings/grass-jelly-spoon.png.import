@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cwbtwbib1b5ir"
-path="res://.godot/imported/tapioca-spoon.png-59a28a9bcf4f5867c2c57bb0dcc12183.ctex"
+uid="uid://b5tbjuohsta3l"
+path="res://.godot/imported/grass-jelly-spoon.png-40d5a4fefa1d3a063f8b4c25b2086dc8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/minigames/tapioca-spoon.png"
-dest_files=["res://.godot/imported/tapioca-spoon.png-59a28a9bcf4f5867c2c57bb0dcc12183.ctex"]
+source_file="res://assets/minigames/bbt-barista/toppings/grass-jelly-spoon.png"
+dest_files=["res://.godot/imported/grass-jelly-spoon.png-40d5a4fefa1d3a063f8b4c25b2086dc8.ctex"]
 
 [params]
 

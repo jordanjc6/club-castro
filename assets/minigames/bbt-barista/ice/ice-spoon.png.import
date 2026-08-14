@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b6p7o3lwpal1"
-path="res://.godot/imported/bbt-barista-game.png-e89c947426d5bcab022cadddbe543ca6.ctex"
+uid="uid://cjyxlnt0856ya"
+path="res://.godot/imported/ice-spoon.png-ac85c2652e0a4a7f10c2e9849bc1f222.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/minigames/bbt-barista-game.png"
-dest_files=["res://.godot/imported/bbt-barista-game.png-e89c947426d5bcab022cadddbe543ca6.ctex"]
+source_file="res://assets/minigames/bbt-barista/ice/ice-spoon.png"
+dest_files=["res://.godot/imported/ice-spoon.png-ac85c2652e0a4a7f10c2e9849bc1f222.ctex"]
 
 [params]
 

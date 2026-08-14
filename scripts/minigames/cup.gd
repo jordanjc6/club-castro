@@ -6,12 +6,14 @@ enum CupSize { SMALL, MEDIUM, LARGE }
 
 @onready var liquid_fill: ColorRect = $DrinkFill/ColorRect
 @onready var liquid_mask: Polygon2D = $DrinkFill
+@onready var ice_sprite: Sprite2D = $IceSprite # Node displaying your ice graphics
 
 var is_dragging: bool = true
 var hovered_coaster: Area2D = null
 var is_placed: bool = false
 var is_filled: bool = false
 var is_filling: bool = false
+var has_ice: bool = false
 
 # Stores the flavor of the liquid poured into this cup ("mango", "matcha", etc.)
 var current_flavor: String = "" 
@@ -20,6 +22,8 @@ var current_coaster: Coaster = null
 var offset: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
+	add_to_group("cups") # So the spoon's area_entered detects it
+	
 	match cup_size:
 		CupSize.SMALL:
 			offset = Vector2(0, 40)
@@ -36,6 +40,9 @@ func _ready() -> void:
 	liquid_fill.pivot_offset = Vector2(0, liquid_fill.size.y)
 	liquid_fill.scale.y = 0.0
 	liquid_mask.visible = false
+	
+	if ice_sprite:
+		ice_sprite.visible = false
 
 func _exit_tree() -> void:
 	if current_coaster != null and is_instance_valid(current_coaster):
@@ -110,10 +117,25 @@ func _fill_from_dispenser(dispenser: Dispenser) -> void:
 		print("Cup filled! [Size: %s, Flavor: %s]" % [CupSize.keys()[cup_size], current_flavor])
 	)
 
-## Helper function to check cup data when serving an order
+# Add this method to cup.gd:
+func add_ice() -> void:
+	if not is_placed or has_ice:
+		if not is_placed:
+			print("Place the cup on a coaster before adding ice!")
+		elif has_ice:
+			print("Cup already has ice!")
+		return
+	
+	has_ice = true
+	print("Added ice to cup!")
+	if ice_sprite:
+		ice_sprite.visible = true
+
+# Update get_drink_data() in cup.gd:
 func get_drink_data() -> Dictionary:
 	return {
 		"size": cup_size,
 		"flavor": current_flavor,
+		"has_ice": has_ice,
 		"is_filled": is_filled
 	}

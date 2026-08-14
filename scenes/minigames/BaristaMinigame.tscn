@@ -1,12 +1,13 @@
 [gd_scene format=3 uid="uid://blgq5u7jc5i8u"]
 
 [ext_resource type="Script" uid="uid://dwouxlredwifj" path="res://scripts/minigames/BaristaMinigame.gd" id="1_do0cr"]
-[ext_resource type="Texture2D" uid="uid://b6p7o3lwpal1" path="res://assets/minigames/bbt-barista-game.png" id="2_btron"]
 [ext_resource type="PackedScene" uid="uid://b450rdp2b4yk5" path="res://scenes/minigames/SmallCup.tscn" id="2_u8cd1"]
 [ext_resource type="PackedScene" uid="uid://mm4k5rlkqqs2" path="res://scenes/minigames/MediumCup.tscn" id="3_27qqn"]
 [ext_resource type="PackedScene" uid="uid://dsst43nregpcf" path="res://scenes/minigames/LargeCup.tscn" id="4_cvn4r"]
 [ext_resource type="PackedScene" uid="uid://casxckw0ijbxu" path="res://scenes/minigames/mango_dispenser.tscn" id="4_s5snv"]
 [ext_resource type="Script" uid="uid://b5xcfwn3l20mt" path="res://scripts/minigames/coaster.gd" id="5_6p721"]
+[ext_resource type="PackedScene" uid="uid://deih27iljuoxf" path="res://scenes/minigames/IceSpoon.tscn" id="5_rgp3r"]
+[ext_resource type="Texture2D" uid="uid://b6p7o3lwpal1" path="res://assets/minigames/bbt-barista/backgrounds/bbt-barista-game.png" id="6_rgp3r"]
 [ext_resource type="PackedScene" uid="uid://cyxmhhnybjraa" path="res://scenes/minigames/matcha_dispenser.tscn" id="7_n1cwh"]
 [ext_resource type="PackedScene" uid="uid://2i85g2idlop8" path="res://scenes/minigames/honeydew_dispenser.tscn" id="8_yh4ya"]
 [ext_resource type="PackedScene" uid="uid://bx8usnpbry0k2" path="res://scenes/minigames/brownsugar_dispenser.tscn" id="9_5cb16"]
@@ -35,11 +36,10 @@ corner_radius_top_right = 35
 corner_radius_bottom_right = 35
 corner_radius_bottom_left = 35
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_do0cr"]
-draw_center = false
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_fuux7"]
+texture = ExtResource("6_rgp3r")
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_do0cr"]
-texture = ExtResource("2_btron")
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_t5v6p"]
 radius = 56.142673
@@ -49,6 +49,7 @@ script = ExtResource("1_do0cr")
 small_cup_scene = ExtResource("2_u8cd1")
 medium_cup_scene = ExtResource("3_27qqn")
 large_cup_scene = ExtResource("4_cvn4r")
+ice_scene = ExtResource("5_rgp3r")
 
 [node name="InteractionArea" type="Area2D" parent="." unique_id=1306371111]
 collision_layer = 4
@@ -126,7 +127,7 @@ offset_top = -2.0
 offset_right = 1285.0
 offset_bottom = 722.0
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_do0cr")
+theme_override_styles/panel = SubResource("StyleBoxTexture_fuux7")
 
 [node name="Screen" type="Panel" parent="MinigameUI/GameWindow" unique_id=1546417429]
 layout_mode = 1
@@ -138,75 +139,87 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxTexture_do0cr")
 
-[node name="SmallCupSpawner" type="Button" parent="MinigameUI/GameWindow/Screen" unique_id=1772568663]
-layout_mode = 0
+[node name="CupSpawners" type="Node2D" parent="MinigameUI/GameWindow/Screen" unique_id=881950678]
+
+[node name="SmallCupSpawner" type="Button" parent="MinigameUI/GameWindow/Screen/CupSpawners" unique_id=1772568663]
 offset_left = 92.0
 offset_top = 381.0
 offset_right = 179.0
 offset_bottom = 486.0
 flat = true
 
-[node name="MediumCupSpawner" type="Button" parent="MinigameUI/GameWindow/Screen" unique_id=497660527]
-layout_mode = 0
+[node name="MediumCupSpawner" type="Button" parent="MinigameUI/GameWindow/Screen/CupSpawners" unique_id=497660527]
 offset_left = 207.0
 offset_top = 344.0
 offset_right = 294.0
 offset_bottom = 484.0
 flat = true
 
-[node name="LargeCupSpawner" type="Button" parent="MinigameUI/GameWindow/Screen" unique_id=161422219]
-layout_mode = 0
+[node name="LargeCupSpawner" type="Button" parent="MinigameUI/GameWindow/Screen/CupSpawners" unique_id=161422219]
 offset_left = 323.0
 offset_top = 310.0
 offset_right = 430.0
 offset_bottom = 486.0
 flat = true
 
-[node name="MangoDispenser" parent="MinigameUI/GameWindow/Screen" unique_id=805822949 instance=ExtResource("4_s5snv")]
+[node name="TeaDispensers" type="Node2D" parent="MinigameUI/GameWindow/Screen" unique_id=852776572]
+
+[node name="MangoDispenser" parent="MinigameUI/GameWindow/Screen/TeaDispensers" unique_id=805822949 instance=ExtResource("4_s5snv")]
 position = Vector2(498, 347)
 
-[node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/MangoDispenser" index="0" unique_id=13670146]
+[node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser" index="0" unique_id=13670146]
 position = Vector2(8.999992, 28.65)
 scale = Vector2(0.28830463, 0.25757363)
 
-[node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/MangoDispenser" index="1" unique_id=706931982]
+[node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser" index="1" unique_id=706931982]
 position = Vector2(17, 64)
 
-[node name="MatchaDispenser" parent="MinigameUI/GameWindow/Screen" unique_id=156156222 instance=ExtResource("7_n1cwh")]
+[node name="MatchaDispenser" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser" unique_id=156156222 instance=ExtResource("7_n1cwh")]
+position = Vector2(-498, -347)
 
-[node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/MatchaDispenser" index="0" unique_id=13670146]
+[node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser/MatchaDispenser" index="0" unique_id=13670146]
 position = Vector2(596.175, 376.5)
 scale = Vector2(0.16795506, 0.15903307)
 
-[node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/MatchaDispenser" index="1" unique_id=706931982]
+[node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser/MatchaDispenser" index="1" unique_id=706931982]
 position = Vector2(603, 400)
 
-[node name="HoneydewDispenser" parent="MinigameUI/GameWindow/Screen" unique_id=921366755 instance=ExtResource("8_yh4ya")]
+[node name="HoneydewDispenser" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser" unique_id=921366755 instance=ExtResource("8_yh4ya")]
+position = Vector2(-498, -347)
 
-[node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/HoneydewDispenser" index="0" unique_id=13670146]
+[node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser/HoneydewDispenser" index="0" unique_id=13670146]
 position = Vector2(686, 376)
 scale = Vector2(0.17105258, 0.15945718)
 
-[node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/HoneydewDispenser" index="1" unique_id=706931982]
+[node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser/HoneydewDispenser" index="1" unique_id=706931982]
 position = Vector2(691, 405)
 
-[node name="BrownsugarDispenser" parent="MinigameUI/GameWindow/Screen" unique_id=1878401235 instance=ExtResource("9_5cb16")]
+[node name="BrownsugarDispenser" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser" unique_id=1878401235 instance=ExtResource("9_5cb16")]
+position = Vector2(-498, -347)
 
-[node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/BrownsugarDispenser" index="0" unique_id=13670146]
+[node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser/BrownsugarDispenser" index="0" unique_id=13670146]
 position = Vector2(774, 375.00003)
 scale = Vector2(0.16447361, 0.16072945)
 
-[node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/BrownsugarDispenser" index="1" unique_id=706931982]
+[node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser/BrownsugarDispenser" index="1" unique_id=706931982]
 position = Vector2(781, 406)
 
-[node name="TaroDispenser" parent="MinigameUI/GameWindow/Screen" unique_id=574873936 instance=ExtResource("10_y8frw")]
+[node name="TaroDispenser" parent="MinigameUI/GameWindow/Screen/TeaDispensers" unique_id=574873936 instance=ExtResource("10_y8frw")]
 
-[node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/TaroDispenser" index="0" unique_id=13670146]
+[node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/TeaDispensers/TaroDispenser" index="0" unique_id=13670146]
 position = Vector2(864, 374.5)
 scale = Vector2(0.17214918, 0.15564035)
 
-[node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/TaroDispenser" index="1" unique_id=706931982]
+[node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/TeaDispensers/TaroDispenser" index="1" unique_id=706931982]
 position = Vector2(868, 404)
+
+[node name="IceSpawner" type="Button" parent="MinigameUI/GameWindow/Screen" unique_id=1878822087]
+layout_mode = 0
+offset_left = 951.0
+offset_top = 422.0
+offset_right = 1127.0
+offset_bottom = 535.0
+flat = true
 
 [node name="Coasters" type="Node2D" parent="MinigameUI/GameWindow/Screen" unique_id=1112938180]
 
@@ -278,8 +291,8 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_yokly")
 theme_override_styles/focus = SubResource("StyleBoxFlat_yokly")
 text = "Close"
 
-[editable path="MinigameUI/GameWindow/Screen/MangoDispenser"]
-[editable path="MinigameUI/GameWindow/Screen/MatchaDispenser"]
-[editable path="MinigameUI/GameWindow/Screen/HoneydewDispenser"]
-[editable path="MinigameUI/GameWindow/Screen/BrownsugarDispenser"]
-[editable path="MinigameUI/GameWindow/Screen/TaroDispenser"]
+[editable path="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser"]
+[editable path="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser/MatchaDispenser"]
+[editable path="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser/HoneydewDispenser"]
+[editable path="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser/BrownsugarDispenser"]
+[editable path="MinigameUI/GameWindow/Screen/TeaDispensers/TaroDispenser"]

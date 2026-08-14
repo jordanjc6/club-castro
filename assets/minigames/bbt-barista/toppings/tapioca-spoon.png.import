@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b7kh43gdk61ov"
-path="res://.godot/imported/cup.png-68238716c140b8347c445fcb4c039577.ctex"
+uid="uid://cwbtwbib1b5ir"
+path="res://.godot/imported/tapioca-spoon.png-b0e813b4821000603b5d39ae572dd26c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/minigames/cup.png"
-dest_files=["res://.godot/imported/cup.png-68238716c140b8347c445fcb4c039577.ctex"]
+source_file="res://assets/minigames/bbt-barista/toppings/tapioca-spoon.png"
+dest_files=["res://.godot/imported/tapioca-spoon.png-b0e813b4821000603b5d39ae572dd26c.ctex"]
 
 [params]
 

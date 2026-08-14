@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cyjodu1g7p63b"
-path="res://.godot/imported/bbt-barista-game_prototype.jpg-315b6616d3ad4b440b481e8692e05f4e.ctex"
+uid="uid://butqt1slabjfi"
+path="res://.godot/imported/taro-dispenser.png-7ac0281b35c539b3b45387aa9ef85e1c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/minigames/bbt-barista-game_prototype.jpg"
-dest_files=["res://.godot/imported/bbt-barista-game_prototype.jpg-315b6616d3ad4b440b481e8692e05f4e.ctex"]
+source_file="res://assets/minigames/bbt-barista/tea-dispensers/taro-dispenser.png"
+dest_files=["res://.godot/imported/taro-dispenser.png-7ac0281b35c539b3b45387aa9ef85e1c.ctex"]
 
 [params]
 

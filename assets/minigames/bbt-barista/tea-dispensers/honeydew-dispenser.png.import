@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://8570o5eb5ndr"
-path="res://.godot/imported/mango-popping-spoon.png-a886b0ee82697af7526ff9457ecaa2e5.ctex"
+uid="uid://cuuuexs5dyhc7"
+path="res://.godot/imported/honeydew-dispenser.png-5190df1cef70e0cc515410d14cd62b0f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/minigames/mango-popping-spoon.png"
-dest_files=["res://.godot/imported/mango-popping-spoon.png-a886b0ee82697af7526ff9457ecaa2e5.ctex"]
+source_file="res://assets/minigames/bbt-barista/tea-dispensers/honeydew-dispenser.png"
+dest_files=["res://.godot/imported/honeydew-dispenser.png-5190df1cef70e0cc515410d14cd62b0f.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c1i7kconl7et0"
-path="res://.godot/imported/brown-sugar-dispenser.png-55e64d06768e2d63086dda1c671fa81e.ctex"
+uid="uid://8570o5eb5ndr"
+path="res://.godot/imported/mango-popping-spoon.png-038b0f9f0224635f1f5d0c04ae59450b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/minigames/brown-sugar-dispenser.png"
-dest_files=["res://.godot/imported/brown-sugar-dispenser.png-55e64d06768e2d63086dda1c671fa81e.ctex"]
+source_file="res://assets/minigames/bbt-barista/toppings/mango-popping-spoon.png"
+dest_files=["res://.godot/imported/mango-popping-spoon.png-038b0f9f0224635f1f5d0c04ae59450b.ctex"]
 
 [params]
 

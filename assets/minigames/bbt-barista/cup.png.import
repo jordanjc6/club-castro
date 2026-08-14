@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dmyqp2oei08s6"
-path="res://.godot/imported/matcha-dispenser.png-31ee86ebc6fffd4175b74e7bc20b12b0.ctex"
+uid="uid://b7kh43gdk61ov"
+path="res://.godot/imported/cup.png-ebabda72429d3018ccb7cdc77a395fa2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/minigames/matcha-dispenser.png"
-dest_files=["res://.godot/imported/matcha-dispenser.png-31ee86ebc6fffd4175b74e7bc20b12b0.ctex"]
+source_file="res://assets/minigames/bbt-barista/cup.png"
+dest_files=["res://.godot/imported/cup.png-ebabda72429d3018ccb7cdc77a395fa2.ctex"]
 
 [params]
 

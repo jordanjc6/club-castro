@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://sd4t6801fmwr"
-path="res://.godot/imported/bbt-barista-game-without-dispensers.png-f331b13f5b25b2f5890397cf452962ce.ctex"
+uid="uid://b6p7o3lwpal1"
+path="res://.godot/imported/bbt-barista-game.png-ed3453d750f76a4009d24d1b12533193.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/minigames/bbt-barista-game-without-dispensers.png"
-dest_files=["res://.godot/imported/bbt-barista-game-without-dispensers.png-f331b13f5b25b2f5890397cf452962ce.ctex"]
+source_file="res://assets/minigames/bbt-barista/backgrounds/bbt-barista-game.png"
+dest_files=["res://.godot/imported/bbt-barista-game.png-ed3453d750f76a4009d24d1b12533193.ctex"]
 
 [params]
 

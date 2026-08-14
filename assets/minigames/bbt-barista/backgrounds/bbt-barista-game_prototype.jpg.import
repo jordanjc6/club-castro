@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cuuuexs5dyhc7"
-path="res://.godot/imported/honeydew-dispenser.png-0dd1bcd82b90ac1c9560020461f2af9c.ctex"
+uid="uid://cyjodu1g7p63b"
+path="res://.godot/imported/bbt-barista-game_prototype.jpg-ad60e1082d8619cd63e53f0cfbf10391.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/minigames/honeydew-dispenser.png"
-dest_files=["res://.godot/imported/honeydew-dispenser.png-0dd1bcd82b90ac1c9560020461f2af9c.ctex"]
+source_file="res://assets/minigames/bbt-barista/backgrounds/bbt-barista-game_prototype.jpg"
+dest_files=["res://.godot/imported/bbt-barista-game_prototype.jpg-ad60e1082d8619cd63e53f0cfbf10391.ctex"]
 
 [params]
 

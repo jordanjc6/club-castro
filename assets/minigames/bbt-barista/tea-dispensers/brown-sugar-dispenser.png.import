@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b5tbjuohsta3l"
-path="res://.godot/imported/grass-jelly-spoon.png-15634f8613e25dc39c23abd265ee6929.ctex"
+uid="uid://c1i7kconl7et0"
+path="res://.godot/imported/brown-sugar-dispenser.png-34602e213206d015934f36bde64a2721.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/minigames/grass-jelly-spoon.png"
-dest_files=["res://.godot/imported/grass-jelly-spoon.png-15634f8613e25dc39c23abd265ee6929.ctex"]
+source_file="res://assets/minigames/bbt-barista/tea-dispensers/brown-sugar-dispenser.png"
+dest_files=["res://.godot/imported/brown-sugar-dispenser.png-34602e213206d015934f36bde64a2721.ctex"]
 
 [params]
 

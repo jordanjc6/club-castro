@@ -14,6 +14,7 @@ extends Node2D
 @export var small_cup_scene: PackedScene
 @export var medium_cup_scene: PackedScene
 @export var large_cup_scene: PackedScene
+@export var ice_scene: PackedScene
 
 @onready var hud: CanvasLayer = $"../../HUD"
 
@@ -26,9 +27,10 @@ extends Node2D
 # game window
 @onready var game_window: Control = $MinigameUI/GameWindow
 @onready var screen: Control = $MinigameUI/GameWindow/Screen
-@onready var small_cup_spawner: Control = $MinigameUI/GameWindow/Screen/SmallCupSpawner
-@onready var medium_cup_spawner: Control = $MinigameUI/GameWindow/Screen/MediumCupSpawner
-@onready var large_cup_spawner: Control = $MinigameUI/GameWindow/Screen/LargeCupSpawner
+@onready var small_cup_spawner: Control = $MinigameUI/GameWindow/Screen/CupSpawners/SmallCupSpawner
+@onready var medium_cup_spawner: Control = $MinigameUI/GameWindow/Screen/CupSpawners/MediumCupSpawner
+@onready var large_cup_spawner: Control = $MinigameUI/GameWindow/Screen/CupSpawners/LargeCupSpawner
+@onready var ice_spawner: Control = $MinigameUI/GameWindow/Screen/IceSpawner
 
 # game result
 @onready var game_result_panel: PanelContainer = $MinigameUI/GameResult
@@ -63,6 +65,7 @@ func _ready() -> void:
 	small_cup_spawner.gui_input.connect(spawn_small_cup)
 	medium_cup_spawner.gui_input.connect(spawn_medium_cup)
 	large_cup_spawner.gui_input.connect(spawn_large_cup)
+	ice_spawner.gui_input.connect(spawn_ice)
 	
 	# game result panel buttons
 	close_result_button.pressed.connect(_on_close_result_button_pressed)
@@ -145,6 +148,17 @@ func spawn_large_cup(event: InputEvent) -> void:
 		var cup_instance = large_cup_scene.instantiate()
 		screen.add_child(cup_instance)
 		cup_instance.global_position = get_global_mouse_position()
+
+func spawn_ice(event: InputEvent) -> void:
+	# Trigger on initial left mouse click down
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if ice_scene == null:
+			push_warning("Ice scene not assigned in Inspector!")
+			return
+		
+		var ice_instance = ice_scene.instantiate()
+		screen.add_child(ice_instance)
+		ice_instance.global_position = get_global_mouse_position()
 
 # show local game result
 #
