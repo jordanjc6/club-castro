@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://bxra3mo4r7ynl"]
+
+[ext_resource type="Script" uid="uid://buh1ht1pn0t1p" path="res://scripts/minigames/topping_spoon.gd" id="1_bb654"]
+[ext_resource type="Texture2D" uid="uid://8570o5eb5ndr" path="res://assets/minigames/bbt-barista/toppings/mango-popping-spoon.png" id="2_bb654"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_qmail"]
+radius = 25.923334
+height = 115.853134
+
+[node name="PoppingBobaSpoon" type="Area2D" unique_id=359205666]
+script = ExtResource("1_bb654")
+topping_type = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=964016341]
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("2_bb654")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2020401588]
+position = Vector2(-60, 14)
+rotation = 1.566767
+shape = SubResource("CapsuleShape2D_qmail")

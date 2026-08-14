@@ -2,6 +2,9 @@ extends Area2D
 
 enum CupSize { SMALL, MEDIUM, LARGE }
 
+const TOPPING_SCRIPT = preload("res://scripts/minigames/topping_spoon.gd")
+const TOPPINGS = TOPPING_SCRIPT.Topping
+
 ## Cup Configuration
 @export var cup_size: CupSize = CupSize.MEDIUM
 ## How far down (in pixels) the ice sits when the cup is empty
@@ -141,8 +144,6 @@ func _fill_from_dispenser(dispenser: Dispenser) -> void:
 		print("Cup filled! [Size: %s, Flavor: %s]" % [CupSize.keys()[cup_size], current_flavor])
 	)
 
-# --- ICE ADDITION LOGIC ---
-
 func add_ice() -> void:
 	if not is_placed or has_ice:
 		if not is_placed:
@@ -178,6 +179,21 @@ func add_ice() -> void:
 		else:
 			# Cup is empty -> Place ice at the bottom
 			ice_sprite.position = ice_bottom_pos
+
+func add_topping(topping: TOPPINGS) -> void:
+	match topping:
+		TOPPINGS.TAPIOCA:
+			print("tapioca added to cup!")
+			return
+		TOPPINGS.POPPING_BOBA:
+			print("popping boba added to cup!")
+			return
+		TOPPINGS.GRASS_JELLY:
+			print("grass jelly added to cup!")
+			return
+		TOPPINGS.PUDDING:
+			print("pudding added to cup!")
+			return
 
 # --- ORDER VALIDATION READOUT ---
 

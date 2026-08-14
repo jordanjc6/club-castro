@@ -7,10 +7,14 @@
 [ext_resource type="PackedScene" uid="uid://casxckw0ijbxu" path="res://scenes/minigames/mango_dispenser.tscn" id="4_s5snv"]
 [ext_resource type="Script" uid="uid://b5xcfwn3l20mt" path="res://scripts/minigames/coaster.gd" id="5_6p721"]
 [ext_resource type="PackedScene" uid="uid://deih27iljuoxf" path="res://scenes/minigames/IceSpoon.tscn" id="5_rgp3r"]
+[ext_resource type="PackedScene" uid="uid://dgnkgvipecb3h" path="res://scenes/minigames/TapiocaSpoon.tscn" id="6_aadw0"]
 [ext_resource type="Texture2D" uid="uid://b6p7o3lwpal1" path="res://assets/minigames/bbt-barista/backgrounds/bbt-barista-game.png" id="6_rgp3r"]
 [ext_resource type="PackedScene" uid="uid://cyxmhhnybjraa" path="res://scenes/minigames/matcha_dispenser.tscn" id="7_n1cwh"]
+[ext_resource type="PackedScene" uid="uid://bxra3mo4r7ynl" path="res://scenes/minigames/PoppingBobaSpoon.tscn" id="7_u8qoq"]
+[ext_resource type="PackedScene" uid="uid://ccqra3eqddj2o" path="res://scenes/minigames/GrassJellySpoon.tscn" id="8_je2ua"]
 [ext_resource type="PackedScene" uid="uid://2i85g2idlop8" path="res://scenes/minigames/honeydew_dispenser.tscn" id="8_yh4ya"]
 [ext_resource type="PackedScene" uid="uid://bx8usnpbry0k2" path="res://scenes/minigames/brownsugar_dispenser.tscn" id="9_5cb16"]
+[ext_resource type="PackedScene" uid="uid://b4x57ki4hcav2" path="res://scenes/minigames/PuddingSpoon.tscn" id="9_hsd2r"]
 [ext_resource type="PackedScene" uid="uid://dxusxhc7g524t" path="res://scenes/minigames/taro_dispenser.tscn" id="10_y8frw"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_00mmp"]
@@ -50,6 +54,10 @@ small_cup_scene = ExtResource("2_u8cd1")
 medium_cup_scene = ExtResource("3_27qqn")
 large_cup_scene = ExtResource("4_cvn4r")
 ice_scene = ExtResource("5_rgp3r")
+tapioca_scene = ExtResource("6_aadw0")
+popping_boba_scene = ExtResource("7_u8qoq")
+grass_jelly_scene = ExtResource("8_je2ua")
+pudding_scene = ExtResource("9_hsd2r")
 
 [node name="InteractionArea" type="Area2D" parent="." unique_id=1306371111]
 collision_layer = 4
@@ -219,6 +227,36 @@ offset_left = 951.0
 offset_top = 422.0
 offset_right = 1127.0
 offset_bottom = 535.0
+flat = true
+
+[node name="ToppingSpawners" type="Node2D" parent="MinigameUI/GameWindow/Screen" unique_id=1233312970]
+
+[node name="TapiocaSpawner" type="Button" parent="MinigameUI/GameWindow/Screen/ToppingSpawners" unique_id=1025214253]
+offset_left = 366.0
+offset_top = 35.0
+offset_right = 518.0
+offset_bottom = 165.0
+flat = true
+
+[node name="PoppingBobaSpawner" type="Button" parent="MinigameUI/GameWindow/Screen/ToppingSpawners" unique_id=34380039]
+offset_left = 602.0
+offset_top = 34.0
+offset_right = 754.0
+offset_bottom = 164.0
+flat = true
+
+[node name="GrassJellySpawner" type="Button" parent="MinigameUI/GameWindow/Screen/ToppingSpawners" unique_id=216856117]
+offset_left = 828.0
+offset_top = 35.0
+offset_right = 980.0
+offset_bottom = 165.0
+flat = true
+
+[node name="PuddingSpawner" type="Button" parent="MinigameUI/GameWindow/Screen/ToppingSpawners" unique_id=1964644973]
+offset_left = 1052.0
+offset_top = 31.0
+offset_right = 1204.0
+offset_bottom = 161.0
 flat = true
 
 [node name="Coasters" type="Node2D" parent="MinigameUI/GameWindow/Screen" unique_id=1112938180]

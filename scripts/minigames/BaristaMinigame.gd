@@ -15,6 +15,10 @@ extends Node2D
 @export var medium_cup_scene: PackedScene
 @export var large_cup_scene: PackedScene
 @export var ice_scene: PackedScene
+@export var tapioca_scene: PackedScene
+@export var popping_boba_scene: PackedScene
+@export var grass_jelly_scene: PackedScene
+@export var pudding_scene: PackedScene
 
 @onready var hud: CanvasLayer = $"../../HUD"
 
@@ -31,6 +35,10 @@ extends Node2D
 @onready var medium_cup_spawner: Control = $MinigameUI/GameWindow/Screen/CupSpawners/MediumCupSpawner
 @onready var large_cup_spawner: Control = $MinigameUI/GameWindow/Screen/CupSpawners/LargeCupSpawner
 @onready var ice_spawner: Control = $MinigameUI/GameWindow/Screen/IceSpawner
+@onready var tapioca_spawner: Control = $MinigameUI/GameWindow/Screen/ToppingSpawners/TapiocaSpawner
+@onready var popping_boba_spawner: Control = $MinigameUI/GameWindow/Screen/ToppingSpawners/PoppingBobaSpawner
+@onready var grass_jelly_spawner: Control = $MinigameUI/GameWindow/Screen/ToppingSpawners/GrassJellySpawner
+@onready var pudding_spawner: Control = $MinigameUI/GameWindow/Screen/ToppingSpawners/PuddingSpawner
 
 # game result
 @onready var game_result_panel: PanelContainer = $MinigameUI/GameResult
@@ -66,6 +74,10 @@ func _ready() -> void:
 	medium_cup_spawner.gui_input.connect(spawn_medium_cup)
 	large_cup_spawner.gui_input.connect(spawn_large_cup)
 	ice_spawner.gui_input.connect(spawn_ice)
+	tapioca_spawner.gui_input.connect(spawn_tapioca)
+	popping_boba_spawner.gui_input.connect(spawn_popping_boba)
+	grass_jelly_spawner.gui_input.connect(spawn_grass_jelly)
+	pudding_spawner.gui_input.connect(spawn_pudding)
 	
 	# game result panel buttons
 	close_result_button.pressed.connect(_on_close_result_button_pressed)
@@ -159,6 +171,50 @@ func spawn_ice(event: InputEvent) -> void:
 		var ice_instance = ice_scene.instantiate()
 		screen.add_child(ice_instance)
 		ice_instance.global_position = get_global_mouse_position()
+
+func spawn_tapioca(event: InputEvent) -> void:
+	# Trigger on initial left mouse click down
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if tapioca_scene == null:
+			push_warning("tapioca scene not assigned in Inspector!")
+			return
+		
+		var tapioca_instance = tapioca_scene.instantiate()
+		screen.add_child(tapioca_instance)
+		tapioca_instance.global_position = get_global_mouse_position()
+
+func spawn_popping_boba(event: InputEvent) -> void:
+	# Trigger on initial left mouse click down
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if popping_boba_scene == null:
+			push_warning("popping boba scene not assigned in Inspector!")
+			return
+		
+		var popping_boba_instance = popping_boba_scene.instantiate()
+		screen.add_child(popping_boba_instance)
+		popping_boba_instance.global_position = get_global_mouse_position()
+
+func spawn_grass_jelly(event: InputEvent) -> void:
+	# Trigger on initial left mouse click down
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if grass_jelly_scene == null:
+			push_warning("Ice scene not assigned in Inspector!")
+			return
+		
+		var grass_jelly_instance = grass_jelly_scene.instantiate()
+		screen.add_child(grass_jelly_instance)
+		grass_jelly_instance.global_position = get_global_mouse_position()
+
+func spawn_pudding(event: InputEvent) -> void:
+	# Trigger on initial left mouse click down
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if pudding_scene == null:
+			push_warning("Ice scene not assigned in Inspector!")
+			return
+		
+		var pudding_instance = pudding_scene.instantiate()
+		screen.add_child(pudding_instance)
+		pudding_instance.global_position = get_global_mouse_position()
 
 # show local game result
 #

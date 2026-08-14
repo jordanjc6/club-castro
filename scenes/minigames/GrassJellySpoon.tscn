@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://ccqra3eqddj2o"]
+
+[ext_resource type="Script" uid="uid://buh1ht1pn0t1p" path="res://scripts/minigames/topping_spoon.gd" id="1_a51y5"]
+[ext_resource type="Texture2D" uid="uid://b5tbjuohsta3l" path="res://assets/minigames/bbt-barista/toppings/grass-jelly-spoon.png" id="2_a51y5"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_qmail"]
+radius = 25.923334
+height = 115.853134
+
+[node name="GrassJellySpoon" type="Area2D" unique_id=359205666]
+script = ExtResource("1_a51y5")
+topping_type = 2
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=964016341]
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("2_a51y5")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2020401588]
+position = Vector2(-60, 14)
+rotation = 1.566767
+shape = SubResource("CapsuleShape2D_qmail")

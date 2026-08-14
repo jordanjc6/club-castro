@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://b4x57ki4hcav2"]
+
+[ext_resource type="Script" uid="uid://buh1ht1pn0t1p" path="res://scripts/minigames/topping_spoon.gd" id="1_gbrv0"]
+[ext_resource type="Texture2D" uid="uid://cpm6t3tbvrohl" path="res://assets/minigames/bbt-barista/toppings/pudding-spoon.png" id="2_gbrv0"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_qmail"]
+radius = 30.991688
+height = 115.853134
+
+[node name="PuddingSpoon" type="Area2D" unique_id=359205666]
+script = ExtResource("1_gbrv0")
+topping_type = 3
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=964016341]
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("2_gbrv0")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2020401588]
+position = Vector2(-60, 11)
+rotation = 1.566767
+shape = SubResource("CapsuleShape2D_qmail")
