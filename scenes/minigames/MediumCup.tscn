@@ -1,13 +1,15 @@
 [gd_scene format=3 uid="uid://mm4k5rlkqqs2"]
 
 [ext_resource type="Script" uid="uid://bbco3egrvla56" path="res://scripts/minigames/cup.gd" id="1_1c4to"]
-[ext_resource type="Texture2D" uid="uid://b7kh43gdk61ov" path="res://assets/minigames/cup.png" id="2_icllv"]
+[ext_resource type="Texture2D" uid="uid://b7kh43gdk61ov" path="res://assets/minigames/bbt-barista/cup.png" id="2_icllv"]
+[ext_resource type="Texture2D" uid="uid://cfocut4bdvtb1" path="res://assets/minigames/bbt-barista/ice/ice-cubes.png" id="3_icllv"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_d62cv"]
 size = Vector2(81, 126)
 
 [node name="MediumCup" type="Area2D" unique_id=359205666]
 script = ExtResource("1_1c4to")
+ice_bottom_offset = 82.0
 
 [node name="DrinkFill" type="Polygon2D" parent="." unique_id=280173564]
 clip_children = 1
@@ -29,3 +31,9 @@ texture = ExtResource("2_icllv")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2020401588]
 position = Vector2(0.5, 2)
 shape = SubResource("RectangleShape2D_d62cv")
+
+[node name="IceSprite" type="Sprite2D" parent="." unique_id=1146134283]
+modulate = Color(1, 1, 1, 0.7254902)
+position = Vector2(-2.000001, -40)
+scale = Vector2(0.08082387, 0.08177084)
+texture = ExtResource("3_icllv")
