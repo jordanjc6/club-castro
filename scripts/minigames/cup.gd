@@ -25,6 +25,7 @@ var is_placed: bool = false
 var is_filled: bool = false
 var is_filling: bool = false
 var has_ice: bool = false
+var toppings_added: Array[TOPPINGS] = []
 
 ## Drink Data
 var current_flavor: String = "" 
@@ -181,19 +182,26 @@ func add_ice() -> void:
 			ice_sprite.position = ice_bottom_pos
 
 func add_topping(topping: TOPPINGS) -> void:
+	if not is_placed:
+		print("Must place cup on a coaster before adding toppings!")
+		return
+	elif toppings_added.has(topping):
+		print("Cup already has %s!" % topping)
+		return
+	
+	# check topping sprite exists and where to place it depending on juice level
 	match topping:
 		TOPPINGS.TAPIOCA:
-			print("tapioca added to cup!")
 			return
 		TOPPINGS.POPPING_BOBA:
-			print("popping boba added to cup!")
 			return
 		TOPPINGS.GRASS_JELLY:
-			print("grass jelly added to cup!")
 			return
 		TOPPINGS.PUDDING:
-			print("pudding added to cup!")
 			return
+	
+	toppings_added.append(topping)
+	print("%s added to cup!" % topping)
 
 # --- ORDER VALIDATION READOUT ---
 
