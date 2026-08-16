@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bbco3egrvla56" path="res://scripts/minigames/cup.gd" id="1_1c4to"]
 [ext_resource type="Texture2D" uid="uid://b7kh43gdk61ov" path="res://assets/minigames/bbt-barista/cup.png" id="2_icllv"]
 [ext_resource type="Texture2D" uid="uid://cfocut4bdvtb1" path="res://assets/minigames/bbt-barista/ice/ice-cubes.png" id="3_icllv"]
+[ext_resource type="Texture2D" uid="uid://d0fnxd2kp77pm" path="res://assets/minigames/bbt-barista/toppings/tapioca.png" id="3_sdk3q"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_d62cv"]
 size = Vector2(81, 126)
@@ -31,6 +32,161 @@ texture = ExtResource("2_icllv")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2020401588]
 position = Vector2(0.5, 2)
 shape = SubResource("RectangleShape2D_d62cv")
+
+[node name="Tapioca" type="Node2D" parent="." unique_id=1081472477]
+
+[node name="row1" type="Node2D" parent="Tapioca" unique_id=598796159]
+position = Vector2(0, -1)
+
+[node name="TapiocaSprite" type="Sprite2D" parent="Tapioca/row1" unique_id=1110196468]
+position = Vector2(-25, 0)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite2" type="Sprite2D" parent="Tapioca/row1" unique_id=46466248]
+position = Vector2(-12.000001, 1)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite3" type="Sprite2D" parent="Tapioca/row1" unique_id=1056394331]
+position = Vector2(0, -1)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite4" type="Sprite2D" parent="Tapioca/row1" unique_id=1031998481]
+position = Vector2(13.000001, -1)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite5" type="Sprite2D" parent="Tapioca/row1" unique_id=33387238]
+position = Vector2(25.000002, 0)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="row2" type="Node2D" parent="Tapioca" unique_id=1004432307]
+position = Vector2(7, 10)
+
+[node name="TapiocaSprite" type="Sprite2D" parent="Tapioca/row2" unique_id=63018874]
+position = Vector2(-22, 1)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite2" type="Sprite2D" parent="Tapioca/row2" unique_id=1186206054]
+position = Vector2(-9.000001, 0)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite3" type="Sprite2D" parent="Tapioca/row2" unique_id=921125420]
+position = Vector2(5, 0)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite4" type="Sprite2D" parent="Tapioca/row2" unique_id=1194970178]
+position = Vector2(18, 0)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite5" type="Sprite2D" parent="Tapioca/row2" unique_id=1245604560]
+position = Vector2(-33, 0)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="row3" type="Node2D" parent="Tapioca" unique_id=1349831442]
+position = Vector2(4, 21)
+
+[node name="TapiocaSprite" type="Sprite2D" parent="Tapioca/row3" unique_id=1518992851]
+position = Vector2(-25, 0)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite2" type="Sprite2D" parent="Tapioca/row3" unique_id=465932614]
+position = Vector2(-12.000001, 1)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite3" type="Sprite2D" parent="Tapioca/row3" unique_id=1984260333]
+position = Vector2(0, -1)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite4" type="Sprite2D" parent="Tapioca/row3" unique_id=1357774366]
+position = Vector2(13.000001, -1)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="row4" type="Node2D" parent="Tapioca" unique_id=64652948]
+position = Vector2(8, 32)
+
+[node name="TapiocaSprite" type="Sprite2D" parent="Tapioca/row4" unique_id=543695855]
+position = Vector2(-20, 1)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite2" type="Sprite2D" parent="Tapioca/row4" unique_id=850154451]
+position = Vector2(-9.000001, 1)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite3" type="Sprite2D" parent="Tapioca/row4" unique_id=1675386195]
+position = Vector2(3, 0)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite4" type="Sprite2D" parent="Tapioca/row4" unique_id=1937462489]
+position = Vector2(15, -1)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite5" type="Sprite2D" parent="Tapioca/row4" unique_id=535238742]
+position = Vector2(-32, 0)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="row5" type="Node2D" parent="Tapioca" unique_id=1942768873]
+position = Vector2(6, 44)
+
+[node name="TapiocaSprite" type="Sprite2D" parent="Tapioca/row5" unique_id=622092499]
+position = Vector2(-25, 0)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite2" type="Sprite2D" parent="Tapioca/row5" unique_id=892369552]
+position = Vector2(-12.000001, 1)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite3" type="Sprite2D" parent="Tapioca/row5" unique_id=354384319]
+position = Vector2(0, -1)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite4" type="Sprite2D" parent="Tapioca/row5" unique_id=949457894]
+position = Vector2(13.000001, -1)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="row6" type="Node2D" parent="Tapioca" unique_id=1182907189]
+position = Vector2(4, 55)
+
+[node name="TapiocaSprite" type="Sprite2D" parent="Tapioca/row6" unique_id=171894588]
+position = Vector2(-25, 0)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite2" type="Sprite2D" parent="Tapioca/row6" unique_id=1466987000]
+position = Vector2(-12.000001, 1)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite3" type="Sprite2D" parent="Tapioca/row6" unique_id=722207956]
+position = Vector2(0, -1)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
+
+[node name="TapiocaSprite4" type="Sprite2D" parent="Tapioca/row6" unique_id=2032767078]
+position = Vector2(13.000001, -1)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_sdk3q")
 
 [node name="IceSprite" type="Sprite2D" parent="." unique_id=1146134283]
 modulate = Color(1, 1, 1, 0.7254902)

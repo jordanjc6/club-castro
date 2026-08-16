@@ -14,6 +14,8 @@ const TOPPINGS = TOPPING_SCRIPT.Topping
 @export var tapioca_row3_bottom_offset: float = 15
 @export var tapioca_row4_bottom_offset: float = 5
 @export var tapioca_row5_bottom_offset: float = 0
+@export var tapioca_row6_bottom_offset: float = 0
+@export var tapioca_row7_bottom_offset: float = 28
 
 ## Fill Animation Settings
 const FILL_DURATION: float = 1.2
@@ -53,6 +55,10 @@ var tapioca_row4_top_pos: Vector2 = Vector2.ZERO
 var tapioca_row4_bottom_pos: Vector2 = Vector2.ZERO
 var tapioca_row5_top_pos: Vector2 = Vector2.ZERO
 var tapioca_row5_bottom_pos: Vector2 = Vector2.ZERO
+var tapioca_row6_top_pos: Vector2 = Vector2.ZERO
+var tapioca_row6_bottom_pos: Vector2 = Vector2.ZERO
+var tapioca_row7_top_pos: Vector2 = Vector2.ZERO
+var tapioca_row7_bottom_pos: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
@@ -104,6 +110,16 @@ func _ready() -> void:
 		tapioca_row5_top_pos = tapioca_bunch.get_node("row5").position
 		tapioca_row5_bottom_pos = tapioca_row5_top_pos + Vector2(0, tapioca_row5_bottom_offset)
 		tapioca_bunch.get_node("row5").visible = false
+		
+		if tapioca_bunch.get_node_or_null("row6"):
+			tapioca_row6_top_pos = tapioca_bunch.get_node("row6").position
+			tapioca_row6_bottom_pos = tapioca_row6_top_pos + Vector2(0, tapioca_row6_bottom_offset)
+			tapioca_bunch.get_node("row6").visible = false
+		
+		if tapioca_bunch.get_node_or_null("row7"):
+			tapioca_row7_top_pos = tapioca_bunch.get_node("row7").position
+			tapioca_row7_bottom_pos = tapioca_row7_top_pos + Vector2(0, tapioca_row7_bottom_offset)
+			tapioca_bunch.get_node("row7").visible = false
 
 func _exit_tree() -> void:
 	# Free up coaster space if deleted
@@ -185,6 +201,12 @@ func _fill_from_dispenser(dispenser: Dispenser) -> void:
 		tween.tween_property(tapioca_bunch.get_node("row3"), "position", tapioca_row3_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(tapioca_bunch.get_node("row4"), "position", tapioca_row4_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(tapioca_bunch.get_node("row5"), "position", tapioca_row5_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		
+		if tapioca_bunch.get_node_or_null("row6"):
+			tween.tween_property(tapioca_bunch.get_node("row6"), "position", tapioca_row6_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		
+		if tapioca_bunch.get_node_or_null("row7"):
+			tween.tween_property(tapioca_bunch.get_node("row7"), "position", tapioca_row7_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	
 	tween.chain().finished.connect(func():
 		is_filled = true
@@ -257,6 +279,10 @@ func add_tapioca() -> void:
 		tapioca_bunch.get_node("row3").visible = true
 		tapioca_bunch.get_node("row4").visible = true
 		tapioca_bunch.get_node("row5").visible = true
+		if tapioca_bunch.get_node_or_null("row6"):
+			tapioca_bunch.get_node("row6").visible = true
+		if tapioca_bunch.get_node_or_null("row7"):
+			tapioca_bunch.get_node("row7").visible = true
 		
 		if is_filling:
 			# Calculate current surface position using scale.y
@@ -268,6 +294,10 @@ func add_tapioca() -> void:
 			tapioca_bunch.get_node("row3").position = tapioca_row3_bottom_pos.lerp(tapioca_row3_top_pos, current_fill_ratio)
 			tapioca_bunch.get_node("row4").position = tapioca_row4_bottom_pos.lerp(tapioca_row4_top_pos, current_fill_ratio)
 			tapioca_bunch.get_node("row5").position = tapioca_row5_bottom_pos.lerp(tapioca_row5_top_pos, current_fill_ratio)
+			if tapioca_bunch.get_node_or_null("row6"):
+				tapioca_bunch.get_node("row6").position = tapioca_row6_bottom_pos.lerp(tapioca_row6_top_pos, current_fill_ratio)
+			if tapioca_bunch.get_node_or_null("row7"):
+				tapioca_bunch.get_node("row7").position = tapioca_row7_bottom_pos.lerp(tapioca_row7_top_pos, current_fill_ratio)
 			
 			# Animate ice floating up for the remaining duration of the pour
 			var remaining_fill_ratio: float = 1.0 - current_fill_ratio
@@ -280,6 +310,10 @@ func add_tapioca() -> void:
 				tween.tween_property(tapioca_bunch.get_node("row3"), "position", tapioca_row3_top_pos, remaining_time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 				tween.tween_property(tapioca_bunch.get_node("row4"), "position", tapioca_row4_top_pos, remaining_time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 				tween.tween_property(tapioca_bunch.get_node("row5"), "position", tapioca_row5_top_pos, remaining_time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+				if tapioca_bunch.get_node_or_null("row6"):
+					tween.tween_property(tapioca_bunch.get_node("row6"), "position", tapioca_row6_top_pos, remaining_time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+				if tapioca_bunch.get_node_or_null("row7"):
+					tween.tween_property(tapioca_bunch.get_node("row7"), "position", tapioca_row7_top_pos, remaining_time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 				
 		elif is_filled:
 			# Cup is already full -> Place ice at the top surface
@@ -288,6 +322,10 @@ func add_tapioca() -> void:
 			tapioca_bunch.get_node("row3").position = tapioca_row3_top_pos
 			tapioca_bunch.get_node("row4").position = tapioca_row4_top_pos
 			tapioca_bunch.get_node("row5").position = tapioca_row5_top_pos
+			if tapioca_bunch.get_node_or_null("row6"):
+				tapioca_bunch.get_node("row6").position = tapioca_row6_top_pos
+			if tapioca_bunch.get_node_or_null("row7"):
+				tapioca_bunch.get_node("row7").position = tapioca_row7_top_pos
 		else:
 			# Cup is empty -> Place ice at the bottom
 			tapioca_bunch.get_node("row1").position = tapioca_row1_bottom_pos
@@ -295,6 +333,10 @@ func add_tapioca() -> void:
 			tapioca_bunch.get_node("row3").position = tapioca_row3_bottom_pos
 			tapioca_bunch.get_node("row4").position = tapioca_row4_bottom_pos
 			tapioca_bunch.get_node("row5").position = tapioca_row5_bottom_pos
+			if tapioca_bunch.get_node_or_null("row6"):
+				tapioca_bunch.get_node("row6").position = tapioca_row6_bottom_pos
+			if tapioca_bunch.get_node_or_null("row7"):
+				tapioca_bunch.get_node("row7").position = tapioca_row7_bottom_pos
 
 # --- ORDER VALIDATION READOUT ---
 
