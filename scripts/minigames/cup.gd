@@ -9,6 +9,11 @@ const TOPPINGS = TOPPING_SCRIPT.Topping
 @export var cup_size: CupSize = CupSize.MEDIUM
 ## How far down (in pixels) the ice sits when the cup is empty
 @export var ice_bottom_offset: float = 65.0 
+@export var tapioca_row1_bottom_offset: float = 25
+@export var tapioca_row2_bottom_offset: float = 20
+@export var tapioca_row3_bottom_offset: float = 15
+@export var tapioca_row4_bottom_offset: float = 5
+@export var tapioca_row5_bottom_offset: float = 0
 
 ## Fill Animation Settings
 const FILL_DURATION: float = 1.2
@@ -17,6 +22,7 @@ const FILL_DURATION: float = 1.2
 @onready var liquid_fill: ColorRect = $DrinkFill/ColorRect
 @onready var liquid_mask: Polygon2D = $DrinkFill
 @onready var ice_sprite: Sprite2D = $IceSprite
+@onready var tapioca_bunch: Node2D = $Tapioca
 
 ## State Flags
 var is_dragging: bool = true
@@ -35,6 +41,19 @@ var offset: Vector2 = Vector2.ZERO
 ## Ice Positioning Vectors
 var ice_top_pos: Vector2 = Vector2.ZERO
 var ice_bottom_pos: Vector2 = Vector2.ZERO
+
+## Tapioca Positioning Vectors
+var tapioca_row1_top_pos: Vector2 = Vector2.ZERO
+var tapioca_row1_bottom_pos: Vector2 = Vector2.ZERO
+var tapioca_row2_top_pos: Vector2 = Vector2.ZERO
+var tapioca_row2_bottom_pos: Vector2 = Vector2.ZERO
+var tapioca_row3_top_pos: Vector2 = Vector2.ZERO
+var tapioca_row3_bottom_pos: Vector2 = Vector2.ZERO
+var tapioca_row4_top_pos: Vector2 = Vector2.ZERO
+var tapioca_row4_bottom_pos: Vector2 = Vector2.ZERO
+var tapioca_row5_top_pos: Vector2 = Vector2.ZERO
+var tapioca_row5_bottom_pos: Vector2 = Vector2.ZERO
+
 
 func _ready() -> void:
 	# Add to group so ice spoon can detect this cup
@@ -64,6 +83,27 @@ func _ready() -> void:
 		ice_top_pos = ice_sprite.position
 		ice_bottom_pos = ice_top_pos + Vector2(0, ice_bottom_offset)
 		ice_sprite.visible = false
+	
+	if tapioca_bunch:
+		tapioca_row1_top_pos = tapioca_bunch.get_node("row1").position
+		tapioca_row1_bottom_pos = tapioca_row1_top_pos + Vector2(0, tapioca_row1_bottom_offset)
+		tapioca_bunch.get_node("row1").visible = false
+		
+		tapioca_row2_top_pos = tapioca_bunch.get_node("row2").position
+		tapioca_row2_bottom_pos = tapioca_row2_top_pos + Vector2(0, tapioca_row2_bottom_offset)
+		tapioca_bunch.get_node("row2").visible = false
+		
+		tapioca_row3_top_pos = tapioca_bunch.get_node("row3").position
+		tapioca_row3_bottom_pos = tapioca_row3_top_pos + Vector2(0, tapioca_row3_bottom_offset)
+		tapioca_bunch.get_node("row3").visible = false
+		
+		tapioca_row4_top_pos = tapioca_bunch.get_node("row4").position
+		tapioca_row4_bottom_pos = tapioca_row4_top_pos + Vector2(0, tapioca_row4_bottom_offset)
+		tapioca_bunch.get_node("row4").visible = false
+		
+		tapioca_row5_top_pos = tapioca_bunch.get_node("row5").position
+		tapioca_row5_bottom_pos = tapioca_row5_top_pos + Vector2(0, tapioca_row5_bottom_offset)
+		tapioca_bunch.get_node("row5").visible = false
 
 func _exit_tree() -> void:
 	# Free up coaster space if deleted
@@ -139,6 +179,13 @@ func _fill_from_dispenser(dispenser: Dispenser) -> void:
 	if has_ice and ice_sprite:
 		tween.tween_property(ice_sprite, "position", ice_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	
+	if toppings_added.has(TOPPINGS.TAPIOCA) and tapioca_bunch:
+		tween.tween_property(tapioca_bunch.get_node("row1"), "position", tapioca_row1_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(tapioca_bunch.get_node("row2"), "position", tapioca_row2_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(tapioca_bunch.get_node("row3"), "position", tapioca_row3_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(tapioca_bunch.get_node("row4"), "position", tapioca_row4_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(tapioca_bunch.get_node("row5"), "position", tapioca_row5_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	
 	tween.chain().finished.connect(func():
 		is_filled = true
 		is_filling = false
@@ -186,13 +233,13 @@ func add_topping(topping: TOPPINGS) -> void:
 		print("Must place cup on a coaster before adding toppings!")
 		return
 	elif toppings_added.has(topping):
-		print("Cup already has %s!" % topping)
+		print("Cup already has %s!" % TOPPINGS.keys()[topping])
 		return
 	
 	# check topping sprite exists and where to place it depending on juice level
 	match topping:
 		TOPPINGS.TAPIOCA:
-			return
+			add_tapioca()
 		TOPPINGS.POPPING_BOBA:
 			return
 		TOPPINGS.GRASS_JELLY:
@@ -201,7 +248,53 @@ func add_topping(topping: TOPPINGS) -> void:
 			return
 	
 	toppings_added.append(topping)
-	print("%s added to cup!" % topping)
+	print("%s added to cup!" % TOPPINGS.keys()[topping])
+
+func add_tapioca() -> void:
+	if tapioca_bunch:
+		tapioca_bunch.get_node("row1").visible = true
+		tapioca_bunch.get_node("row2").visible = true
+		tapioca_bunch.get_node("row3").visible = true
+		tapioca_bunch.get_node("row4").visible = true
+		tapioca_bunch.get_node("row5").visible = true
+		
+		if is_filling:
+			# Calculate current surface position using scale.y
+			var current_fill_ratio: float = liquid_fill.scale.y
+			
+			# Snap ice to current liquid level
+			tapioca_bunch.get_node("row1").position = tapioca_row1_bottom_pos.lerp(tapioca_row1_top_pos, current_fill_ratio)
+			tapioca_bunch.get_node("row2").position = tapioca_row2_bottom_pos.lerp(tapioca_row2_top_pos, current_fill_ratio)
+			tapioca_bunch.get_node("row3").position = tapioca_row3_bottom_pos.lerp(tapioca_row3_top_pos, current_fill_ratio)
+			tapioca_bunch.get_node("row4").position = tapioca_row4_bottom_pos.lerp(tapioca_row4_top_pos, current_fill_ratio)
+			tapioca_bunch.get_node("row5").position = tapioca_row5_bottom_pos.lerp(tapioca_row5_top_pos, current_fill_ratio)
+			
+			# Animate ice floating up for the remaining duration of the pour
+			var remaining_fill_ratio: float = 1.0 - current_fill_ratio
+			var remaining_time: float = FILL_DURATION * remaining_fill_ratio
+			
+			if remaining_time > 0:
+				var tween = create_tween()
+				tween.tween_property(tapioca_bunch.get_node("row1"), "position", tapioca_row1_top_pos, remaining_time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+				tween.tween_property(tapioca_bunch.get_node("row2"), "position", tapioca_row2_top_pos, remaining_time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+				tween.tween_property(tapioca_bunch.get_node("row3"), "position", tapioca_row3_top_pos, remaining_time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+				tween.tween_property(tapioca_bunch.get_node("row4"), "position", tapioca_row4_top_pos, remaining_time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+				tween.tween_property(tapioca_bunch.get_node("row5"), "position", tapioca_row5_top_pos, remaining_time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+				
+		elif is_filled:
+			# Cup is already full -> Place ice at the top surface
+			tapioca_bunch.get_node("row1").position = tapioca_row1_top_pos
+			tapioca_bunch.get_node("row2").position = tapioca_row2_top_pos
+			tapioca_bunch.get_node("row3").position = tapioca_row3_top_pos
+			tapioca_bunch.get_node("row4").position = tapioca_row4_top_pos
+			tapioca_bunch.get_node("row5").position = tapioca_row5_top_pos
+		else:
+			# Cup is empty -> Place ice at the bottom
+			tapioca_bunch.get_node("row1").position = tapioca_row1_bottom_pos
+			tapioca_bunch.get_node("row2").position = tapioca_row2_bottom_pos
+			tapioca_bunch.get_node("row3").position = tapioca_row3_bottom_pos
+			tapioca_bunch.get_node("row4").position = tapioca_row4_bottom_pos
+			tapioca_bunch.get_node("row5").position = tapioca_row5_bottom_pos
 
 # --- ORDER VALIDATION READOUT ---
 
