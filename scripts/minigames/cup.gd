@@ -9,6 +9,8 @@ const TOPPINGS = TOPPING_SCRIPT.Topping
 @export var cup_size: CupSize = CupSize.MEDIUM
 ## How far down (in pixels) the ice sits when the cup is empty
 @export var ice_bottom_offset: float = 65.0 
+
+# tapioca
 @export var tapioca_row1_bottom_offset: float = 25
 @export var tapioca_row2_bottom_offset: float = 20
 @export var tapioca_row3_bottom_offset: float = 15
@@ -16,6 +18,14 @@ const TOPPINGS = TOPPING_SCRIPT.Topping
 @export var tapioca_row5_bottom_offset: float = 0
 @export var tapioca_row6_bottom_offset: float = 0
 @export var tapioca_row7_bottom_offset: float = 28
+
+# mango popping boba
+@export var mango_row1_bottom_offset: float = 25
+@export var mango_row2_bottom_offset: float = 20
+@export var mango_row3_bottom_offset: float = 15
+@export var mango_row4_bottom_offset: float = 5
+@export var mango_row5_bottom_offset: float = 0
+@export var mango_row6_bottom_offset: float = 28
 
 ## Fill Animation Settings
 const FILL_DURATION: float = 1.2
@@ -25,6 +35,7 @@ const FILL_DURATION: float = 1.2
 @onready var liquid_mask: Polygon2D = $DrinkFill
 @onready var ice_sprite: Sprite2D = $IceSprite
 @onready var tapioca_bunch: Node2D = $Tapioca
+@onready var mango_bunch: Node2D = $PoppingBoba
 
 ## State Flags
 var is_dragging: bool = true
@@ -59,6 +70,20 @@ var tapioca_row6_top_pos: Vector2 = Vector2.ZERO
 var tapioca_row6_bottom_pos: Vector2 = Vector2.ZERO
 var tapioca_row7_top_pos: Vector2 = Vector2.ZERO
 var tapioca_row7_bottom_pos: Vector2 = Vector2.ZERO
+
+## Tapioca Positioning Vectors
+var mango_row1_top_pos: Vector2 = Vector2.ZERO
+var mango_row1_bottom_pos: Vector2 = Vector2.ZERO
+var mango_row2_top_pos: Vector2 = Vector2.ZERO
+var mango_row2_bottom_pos: Vector2 = Vector2.ZERO
+var mango_row3_top_pos: Vector2 = Vector2.ZERO
+var mango_row3_bottom_pos: Vector2 = Vector2.ZERO
+var mango_row4_top_pos: Vector2 = Vector2.ZERO
+var mango_row4_bottom_pos: Vector2 = Vector2.ZERO
+var mango_row5_top_pos: Vector2 = Vector2.ZERO
+var mango_row5_bottom_pos: Vector2 = Vector2.ZERO
+var mango_row6_top_pos: Vector2 = Vector2.ZERO
+var mango_row6_bottom_pos: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
@@ -120,6 +145,33 @@ func _ready() -> void:
 			tapioca_row7_top_pos = tapioca_bunch.get_node("row7").position
 			tapioca_row7_bottom_pos = tapioca_row7_top_pos + Vector2(0, tapioca_row7_bottom_offset)
 			tapioca_bunch.get_node("row7").visible = false
+	
+	if mango_bunch:
+		mango_row1_top_pos = mango_bunch.get_node("row1").position
+		mango_row1_bottom_pos = mango_row1_top_pos + Vector2(0, mango_row1_bottom_offset)
+		mango_bunch.get_node("row1").visible = false
+		
+		mango_row2_top_pos = mango_bunch.get_node("row2").position
+		mango_row2_bottom_pos = mango_row2_top_pos + Vector2(0, mango_row2_bottom_offset)
+		mango_bunch.get_node("row2").visible = false
+		
+		mango_row3_top_pos = mango_bunch.get_node("row3").position
+		mango_row3_bottom_pos = mango_row3_top_pos + Vector2(0, mango_row3_bottom_offset)
+		mango_bunch.get_node("row3").visible = false
+		
+		mango_row4_top_pos = mango_bunch.get_node("row4").position
+		mango_row4_bottom_pos = mango_row4_top_pos + Vector2(0, mango_row4_bottom_offset)
+		mango_bunch.get_node("row4").visible = false
+		
+		if mango_bunch.get_node_or_null("row5"):
+			mango_row5_top_pos = mango_bunch.get_node("row5").position
+			mango_row5_bottom_pos = mango_row5_top_pos + Vector2(0, mango_row5_bottom_offset)
+			mango_bunch.get_node("row5").visible = false
+		
+		if mango_bunch.get_node_or_null("row6"):
+			mango_row6_top_pos = mango_bunch.get_node("row6").position
+			mango_row6_bottom_pos = mango_row6_top_pos + Vector2(0, mango_row6_bottom_offset)
+			mango_bunch.get_node("row6").visible = false
 
 func _exit_tree() -> void:
 	# Free up coaster space if deleted
@@ -208,6 +260,16 @@ func _fill_from_dispenser(dispenser: Dispenser) -> void:
 		if tapioca_bunch.get_node_or_null("row7"):
 			tween.tween_property(tapioca_bunch.get_node("row7"), "position", tapioca_row7_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	
+	if toppings_added.has(TOPPINGS.POPPING_BOBA) and mango_bunch:
+		tween.tween_property(mango_bunch.get_node("row1"), "position", mango_row1_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(mango_bunch.get_node("row2"), "position", mango_row2_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(mango_bunch.get_node("row3"), "position", mango_row3_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(mango_bunch.get_node("row4"), "position", mango_row4_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		if mango_bunch.get_node_or_null("row5"):
+			tween.tween_property(mango_bunch.get_node("row5"), "position", mango_row5_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		if mango_bunch.get_node_or_null("row6"):
+			tween.tween_property(mango_bunch.get_node("row6"), "position", mango_row6_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	
 	tween.chain().finished.connect(func():
 		is_filled = true
 		is_filling = false
@@ -263,7 +325,7 @@ func add_topping(topping: TOPPINGS) -> void:
 		TOPPINGS.TAPIOCA:
 			add_tapioca()
 		TOPPINGS.POPPING_BOBA:
-			return
+			add_popping_boba()
 		TOPPINGS.GRASS_JELLY:
 			return
 		TOPPINGS.PUDDING:
@@ -337,6 +399,67 @@ func add_tapioca() -> void:
 				tapioca_bunch.get_node("row6").position = tapioca_row6_bottom_pos
 			if tapioca_bunch.get_node_or_null("row7"):
 				tapioca_bunch.get_node("row7").position = tapioca_row7_bottom_pos
+
+func add_popping_boba() -> void:
+	if mango_bunch:
+		mango_bunch.get_node("row1").visible = true
+		mango_bunch.get_node("row2").visible = true
+		mango_bunch.get_node("row3").visible = true
+		mango_bunch.get_node("row4").visible = true
+		if mango_bunch.get_node_or_null("row5"):
+			mango_bunch.get_node("row5").visible = true
+		if mango_bunch.get_node_or_null("row6"):
+			mango_bunch.get_node("row6").visible = true
+		
+		if is_filling:
+			# Calculate current surface position using scale.y
+			var current_fill_ratio: float = liquid_fill.scale.y
+			
+			# Snap ice to current liquid level
+			mango_bunch.get_node("row1").position = mango_row1_bottom_pos.lerp(mango_row1_top_pos, current_fill_ratio)
+			mango_bunch.get_node("row2").position = mango_row2_bottom_pos.lerp(mango_row2_top_pos, current_fill_ratio)
+			mango_bunch.get_node("row3").position = mango_row3_bottom_pos.lerp(mango_row3_top_pos, current_fill_ratio)
+			mango_bunch.get_node("row4").position = mango_row4_bottom_pos.lerp(mango_row4_top_pos, current_fill_ratio)
+			if mango_bunch.get_node_or_null("row5"):
+				mango_bunch.get_node("row5").position = mango_row5_bottom_pos.lerp(mango_row5_top_pos, current_fill_ratio)
+			if mango_bunch.get_node_or_null("row6"):
+				mango_bunch.get_node("row6").position = mango_row6_bottom_pos.lerp(mango_row6_top_pos, current_fill_ratio)
+			
+			# Animate ice floating up for the remaining duration of the pour
+			var remaining_fill_ratio: float = 1.0 - current_fill_ratio
+			var remaining_time: float = FILL_DURATION * remaining_fill_ratio
+			
+			if remaining_time > 0:
+				var tween = create_tween()
+				tween.tween_property(mango_bunch.get_node("row1"), "position", mango_row1_top_pos, remaining_time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+				tween.tween_property(mango_bunch.get_node("row2"), "position", mango_row2_top_pos, remaining_time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+				tween.tween_property(mango_bunch.get_node("row3"), "position", mango_row3_top_pos, remaining_time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+				tween.tween_property(mango_bunch.get_node("row4"), "position", mango_row4_top_pos, remaining_time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+				if mango_bunch.get_node_or_null("row5"):
+					tween.tween_property(mango_bunch.get_node("row5"), "position", mango_row5_top_pos, remaining_time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+				if mango_bunch.get_node_or_null("row6"):
+					tween.tween_property(mango_bunch.get_node("row6"), "position", mango_row6_top_pos, remaining_time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+				
+		elif is_filled:
+			# Cup is already full -> Place ice at the top surface
+			mango_bunch.get_node("row1").position = mango_row1_top_pos
+			mango_bunch.get_node("row2").position = mango_row2_top_pos
+			mango_bunch.get_node("row3").position = mango_row3_top_pos
+			mango_bunch.get_node("row4").position = mango_row4_top_pos
+			if mango_bunch.get_node_or_null("row5"):
+				mango_bunch.get_node("row5").position = mango_row5_top_pos
+			if mango_bunch.get_node_or_null("row6"):
+				mango_bunch.get_node("row6").position = mango_row6_top_pos
+		else:
+			# Cup is empty -> Place ice at the bottom
+			mango_bunch.get_node("row1").position = mango_row1_bottom_pos
+			mango_bunch.get_node("row2").position = mango_row2_bottom_pos
+			mango_bunch.get_node("row3").position = mango_row3_bottom_pos
+			mango_bunch.get_node("row4").position = mango_row4_bottom_pos
+			if mango_bunch.get_node_or_null("row5"):
+				mango_bunch.get_node("row5").position = mango_row5_bottom_pos
+			if mango_bunch.get_node_or_null("row6"):
+				mango_bunch.get_node("row6").position = mango_row6_bottom_pos
 
 # --- ORDER VALIDATION READOUT ---
 

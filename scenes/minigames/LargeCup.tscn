@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bbco3egrvla56" path="res://scripts/minigames/cup.gd" id="1_a1iq2"]
 [ext_resource type="Texture2D" uid="uid://b7kh43gdk61ov" path="res://assets/minigames/bbt-barista/cup.png" id="2_lybhi"]
+[ext_resource type="Texture2D" uid="uid://cg1fagxwlhgtu" path="res://assets/minigames/bbt-barista/toppings/mango-popping-boba.png" id="3_hnpyb"]
 [ext_resource type="Texture2D" uid="uid://cfocut4bdvtb1" path="res://assets/minigames/bbt-barista/ice/ice-cubes.png" id="3_lybhi"]
 [ext_resource type="Texture2D" uid="uid://d0fnxd2kp77pm" path="res://assets/minigames/bbt-barista/toppings/tapioca.png" id="3_wbv42"]
 
@@ -33,6 +34,171 @@ texture = ExtResource("2_lybhi")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2020401588]
 position = Vector2(2, -8)
 shape = SubResource("RectangleShape2D_d62cv")
+
+[node name="PoppingBoba" type="Node2D" parent="." unique_id=282571232]
+
+[node name="row1" type="Node2D" parent="PoppingBoba" unique_id=1993668086]
+
+[node name="BobaSprite" type="Sprite2D" parent="PoppingBoba/row1" unique_id=113196389]
+position = Vector2(-22.999996, -0.9999981)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite2" type="Sprite2D" parent="PoppingBoba/row1" unique_id=770812584]
+position = Vector2(-12.000001, -1.9999999)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite3" type="Sprite2D" parent="PoppingBoba/row1" unique_id=865328622]
+z_index = 1
+position = Vector2(-9.536743e-07, -2)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite4" type="Sprite2D" parent="PoppingBoba/row1" unique_id=1659754926]
+z_index = 1
+position = Vector2(24.999996, -1)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite5" type="Sprite2D" parent="PoppingBoba/row1" unique_id=1678104257]
+position = Vector2(13.000001, -2)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="row2" type="Node2D" parent="PoppingBoba" unique_id=1117774071]
+position = Vector2(0, 13)
+
+[node name="BobaSprite" type="Sprite2D" parent="PoppingBoba/row2" unique_id=756313180]
+position = Vector2(-22.999996, -0.9999981)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite2" type="Sprite2D" parent="PoppingBoba/row2" unique_id=444793136]
+z_index = 1
+position = Vector2(-12.000001, -1.9999999)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite3" type="Sprite2D" parent="PoppingBoba/row2" unique_id=1706579938]
+z_index = 1
+position = Vector2(-9.536743e-07, -2)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite4" type="Sprite2D" parent="PoppingBoba/row2" unique_id=1963483445]
+position = Vector2(24.999996, -1)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite5" type="Sprite2D" parent="PoppingBoba/row2" unique_id=1400885416]
+position = Vector2(13.000001, -2)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="row3" type="Node2D" parent="PoppingBoba" unique_id=1529985470]
+position = Vector2(5, 24)
+
+[node name="BobaSprite" type="Sprite2D" parent="PoppingBoba/row3" unique_id=1360609653]
+z_index = 1
+position = Vector2(-22.999996, -0.9999981)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite2" type="Sprite2D" parent="PoppingBoba/row3" unique_id=1584883426]
+position = Vector2(-12.000001, -1.9999999)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite3" type="Sprite2D" parent="PoppingBoba/row3" unique_id=742263951]
+position = Vector2(-9.536743e-07, -2)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite5" type="Sprite2D" parent="PoppingBoba/row3" unique_id=343184849]
+z_index = 1
+position = Vector2(13.000001, -2)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="row4" type="Node2D" parent="PoppingBoba" unique_id=503534666]
+position = Vector2(1, 37)
+
+[node name="BobaSprite" type="Sprite2D" parent="PoppingBoba/row4" unique_id=1686355964]
+z_index = 1
+position = Vector2(-22.999996, -0.9999981)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite2" type="Sprite2D" parent="PoppingBoba/row4" unique_id=487438737]
+position = Vector2(-12, -4.9999995)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite3" type="Sprite2D" parent="PoppingBoba/row4" unique_id=1022140593]
+z_index = 1
+position = Vector2(-9.536743e-07, -2)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite5" type="Sprite2D" parent="PoppingBoba/row4" unique_id=1860958688]
+z_index = 1
+position = Vector2(15, -2)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="row5" type="Node2D" parent="PoppingBoba" unique_id=631181317]
+position = Vector2(3, 48)
+
+[node name="BobaSprite" type="Sprite2D" parent="PoppingBoba/row5" unique_id=849871765]
+position = Vector2(-22.999996, -0.9999981)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite2" type="Sprite2D" parent="PoppingBoba/row5" unique_id=834223200]
+position = Vector2(-10, -1.9999998)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite3" type="Sprite2D" parent="PoppingBoba/row5" unique_id=1155700980]
+z_index = 1
+position = Vector2(-9.536743e-07, -2)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite5" type="Sprite2D" parent="PoppingBoba/row5" unique_id=2101292540]
+position = Vector2(15, -2)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="row6" type="Node2D" parent="PoppingBoba" unique_id=1920826714]
+position = Vector2(8, -11)
+
+[node name="BobaSprite" type="Sprite2D" parent="PoppingBoba/row6" unique_id=1671805250]
+position = Vector2(-41, -2)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite2" type="Sprite2D" parent="PoppingBoba/row6" unique_id=230980330]
+position = Vector2(-14, -2.9999998)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite3" type="Sprite2D" parent="PoppingBoba/row6" unique_id=916692038]
+position = Vector2(-9.536743e-07, -2)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite5" type="Sprite2D" parent="PoppingBoba/row6" unique_id=990900173]
+z_index = 1
+position = Vector2(15, -2)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
+
+[node name="BobaSprite6" type="Sprite2D" parent="PoppingBoba/row6" unique_id=1647353545]
+position = Vector2(25, -1.0000002)
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("3_hnpyb")
 
 [node name="Tapioca" type="Node2D" parent="." unique_id=2027519466]
 
