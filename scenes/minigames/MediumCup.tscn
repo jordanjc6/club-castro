@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://cg1fagxwlhgtu" path="res://assets/minigames/bbt-barista/toppings/mango-popping-boba.png" id="3_82d22"]
 [ext_resource type="Texture2D" uid="uid://cfocut4bdvtb1" path="res://assets/minigames/bbt-barista/ice/ice-cubes.png" id="3_icllv"]
 [ext_resource type="Texture2D" uid="uid://d0fnxd2kp77pm" path="res://assets/minigames/bbt-barista/toppings/tapioca.png" id="3_sdk3q"]
+[ext_resource type="Texture2D" uid="uid://bbkccqv7y5k38" path="res://assets/minigames/bbt-barista/toppings/pudding.png" id="5_77mml"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_d62cv"]
 size = Vector2(81, 126)
@@ -325,8 +326,15 @@ position = Vector2(13.000001, -1)
 scale = Vector2(0.15, 0.15)
 texture = ExtResource("3_sdk3q")
 
+[node name="PuddingSprite" type="Sprite2D" parent="." unique_id=1464389256]
+z_index = 1
+position = Vector2(2.3841858e-07, 50.000004)
+scale = Vector2(0.17, 0.17)
+texture = ExtResource("5_77mml")
+
 [node name="IceSprite" type="Sprite2D" parent="." unique_id=1146134283]
 modulate = Color(1, 1, 1, 0.7254902)
+z_index = 1
 position = Vector2(-2.000001, -40)
 scale = Vector2(0.08082387, 0.08177084)
 texture = ExtResource("3_icllv")

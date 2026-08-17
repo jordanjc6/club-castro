@@ -34,6 +34,7 @@ const FILL_DURATION: float = 1.2
 @onready var liquid_fill: ColorRect = $DrinkFill/ColorRect
 @onready var liquid_mask: Polygon2D = $DrinkFill
 @onready var ice_sprite: Sprite2D = $IceSprite
+@onready var pudding_sprite: Sprite2D = $PuddingSprite
 @onready var tapioca_bunch: Node2D = $Tapioca
 @onready var mango_bunch: Node2D = $PoppingBoba
 
@@ -114,6 +115,9 @@ func _ready() -> void:
 		ice_top_pos = ice_sprite.position
 		ice_bottom_pos = ice_top_pos + Vector2(0, ice_bottom_offset)
 		ice_sprite.visible = false
+	
+	if pudding_sprite:
+		pudding_sprite.visible = false
 	
 	if tapioca_bunch:
 		tapioca_row1_top_pos = tapioca_bunch.get_node("row1").position
@@ -329,7 +333,7 @@ func add_topping(topping: TOPPINGS) -> void:
 		TOPPINGS.GRASS_JELLY:
 			return
 		TOPPINGS.PUDDING:
-			return
+			pudding_sprite.visible = true
 	
 	toppings_added.append(topping)
 	print("%s added to cup!" % TOPPINGS.keys()[topping])
