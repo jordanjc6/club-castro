@@ -11,6 +11,15 @@
 
 extends Node2D
 
+const CUP_SCRIPT = preload("res://scripts/minigames/cup.gd")
+const CUP_SIZES = CUP_SCRIPT.CupSize
+
+const DISPENSER_SCRIPT = preload("res://scripts/minigames/dispenser.gd")
+const FLAVORS = DISPENSER_SCRIPT.DrinkFlavor
+
+const TOPPING_SCRIPT = preload("res://scripts/minigames/topping_spoon.gd")
+const TOPPINGS = TOPPING_SCRIPT.Topping
+
 @export var small_cup_scene: PackedScene
 @export var medium_cup_scene: PackedScene
 @export var large_cup_scene: PackedScene
@@ -19,6 +28,8 @@ extends Node2D
 @export var popping_boba_scene: PackedScene
 @export var grass_jelly_scene: PackedScene
 @export var pudding_scene: PackedScene
+@export var correct_drink_tex: Texture2D
+@export var incorrect_drink_tex: Texture2D
 
 @onready var hud: CanvasLayer = $"../../HUD"
 
@@ -39,9 +50,23 @@ extends Node2D
 @onready var popping_boba_spawner: Control = $MinigameUI/GameWindow/Screen/ToppingSpawners/PoppingBobaSpawner
 @onready var grass_jelly_spawner: Control = $MinigameUI/GameWindow/Screen/ToppingSpawners/GrassJellySpawner
 @onready var pudding_spawner: Control = $MinigameUI/GameWindow/Screen/ToppingSpawners/PuddingSpawner
+@onready var drink_status_icon: TextureRect = $MinigameUI/GameWindow/Screen/Coasters/Coaster1/DrinkStatusIcon
 
 # send drink buttons
 @onready var send_drink1_btn: Button = $MinigameUI/GameWindow/Screen/Coasters/Coaster1/SendButton
+
+# drink orders
+var orders: Array[Dictionary] = [
+	{
+		"size": CUP_SIZES.SMALL,
+		"flavor": FLAVORS.MANGO,
+		"has_ice": false,
+		"has_tapioca": false,
+		"has_popping_boba": false,
+		"has_grass_jelly": false,
+		"has_pudding": false
+	}
+]
 
 # game result
 @onready var game_result_panel: PanelContainer = $MinigameUI/GameResult
@@ -57,6 +82,7 @@ var am_i_player_one: bool = false
 var result_timer: SceneTreeTimer = null # used to show game result for some seconds
 var is_mango_active: bool = false
 var is_matcha_active: bool = false
+var drink_status_toaster_tween: Tween
 
 func _ready() -> void:
 	# ui popups hidden on startup
@@ -243,13 +269,40 @@ func send_drink(drink_id: int):
 		print("Submitted Drink #%d: " % drink_id, drink_data)
 		# Returns: {"size": 1, "flavor": "Mango", "has_ice": true, "toppings": [0, 2]}
 
-		# TODO: Validate drink_data against your active order list here
+		var drink_is_valid = validate_drink(drink_data)
+		show_send_drink_status_toaster(drink_is_valid)
 
 		# Remove the cup from the workspace
 		drink.queue_free()
 		coaster_node.remove_cup()
 	else:
 		print("No drink on Coaster #%d to send!" % drink_id)
+
+func validate_drink(drink: Dictionary):
+	return drink in orders
+
+func show_send_drink_status_toaster(isSuccess: bool):
+	if isSuccess:
+		print("order complete!")
+	else:
+		print("bad drink!")
+		
+	# 1. Set texture based on status
+	drink_status_icon.texture = correct_drink_tex if isSuccess else incorrect_drink_tex
+	
+	# 2. Reset visibility/opacity
+	drink_status_icon.modulate.a = 1.0
+	drink_status_icon.show()
+
+	# 3. Cancel running animation if player triggers multiple quickly
+	if drink_status_toaster_tween and drink_status_toaster_tween.is_running():
+		drink_status_toaster_tween.kill()
+
+	# 4. Hold full opacity for 0.8s, then fade out over 0.3s
+	drink_status_toaster_tween = create_tween()
+	drink_status_toaster_tween.tween_interval(0.8)
+	drink_status_toaster_tween.tween_property(drink_status_icon, "modulate:a", 0.0, 0.3)
+	drink_status_toaster_tween.finished.connect(drink_status_icon.hide)
 
 # show local game result
 #

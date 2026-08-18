@@ -2,6 +2,9 @@ extends Area2D
 
 enum CupSize { SMALL, MEDIUM, LARGE }
 
+const DISPENSER_SCRIPT = preload("res://scripts/minigames/dispenser.gd")
+const FLAVORS = DISPENSER_SCRIPT.DrinkFlavor
+
 const TOPPING_SCRIPT = preload("res://scripts/minigames/topping_spoon.gd")
 const TOPPINGS = TOPPING_SCRIPT.Topping
 
@@ -48,11 +51,15 @@ var is_filled: bool = false
 var is_filling: bool = false
 
 ## Drink Data
-var current_flavor: String = "" 
+var current_flavor: FLAVORS = FLAVORS.NONE
 var current_coaster: Coaster = null
 var offset: Vector2 = Vector2.ZERO
 var has_ice: bool = false
 var toppings_added: Array[TOPPINGS] = []
+var has_tapioca: bool = false
+var has_popping_boba: bool = false
+var has_grass_jelly: bool = false
+var has_pudding: bool = false
 
 ## Ice Positioning Vectors
 var ice_top_pos: Vector2 = Vector2.ZERO
@@ -262,10 +269,10 @@ func _fill_from_dispenser(dispenser: Dispenser) -> void:
 	if has_ice and ice_sprite:
 		tween.tween_property(ice_sprite, "position", ice_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	
-	if toppings_added.has(TOPPINGS.GRASS_JELLY) and grass_jelly:
+	if has_grass_jelly and grass_jelly:
 		tween.tween_property(grass_jelly, "position", grass_jelly_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	
-	if toppings_added.has(TOPPINGS.TAPIOCA) and tapioca_bunch:
+	if has_tapioca and tapioca_bunch:
 		tween.tween_property(tapioca_bunch.get_node("row1"), "position", tapioca_row1_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(tapioca_bunch.get_node("row2"), "position", tapioca_row2_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(tapioca_bunch.get_node("row3"), "position", tapioca_row3_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
@@ -278,7 +285,7 @@ func _fill_from_dispenser(dispenser: Dispenser) -> void:
 		if tapioca_bunch.get_node_or_null("row7"):
 			tween.tween_property(tapioca_bunch.get_node("row7"), "position", tapioca_row7_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	
-	if toppings_added.has(TOPPINGS.POPPING_BOBA) and mango_bunch:
+	if has_popping_boba and mango_bunch:
 		tween.tween_property(mango_bunch.get_node("row1"), "position", mango_row1_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(mango_bunch.get_node("row2"), "position", mango_row2_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(mango_bunch.get_node("row3"), "position", mango_row3_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
@@ -291,7 +298,7 @@ func _fill_from_dispenser(dispenser: Dispenser) -> void:
 	tween.chain().finished.connect(func():
 		is_filled = true
 		is_filling = false
-		print("Cup filled! [Size: %s, Flavor: %s]" % [CupSize.keys()[cup_size], current_flavor])
+		print("Cup filled! [Size: %s, Flavor: %s]" % [CupSize.keys()[cup_size], FLAVORS.keys()[current_flavor]])
 	)
 
 func add_ice() -> void:
@@ -347,12 +354,14 @@ func add_topping(topping: TOPPINGS) -> void:
 		TOPPINGS.GRASS_JELLY:
 			add_grass_jelly()
 		TOPPINGS.PUDDING:
+			has_pudding = true
 			pudding_sprite.visible = true
 	
 	toppings_added.append(topping)
 	print("%s added to cup!" % TOPPINGS.keys()[topping])
 
 func add_tapioca() -> void:
+	has_tapioca = true
 	if tapioca_bunch:
 		tapioca_bunch.get_node("row1").visible = true
 		tapioca_bunch.get_node("row2").visible = true
@@ -419,6 +428,7 @@ func add_tapioca() -> void:
 				tapioca_bunch.get_node("row7").position = tapioca_row7_bottom_pos
 
 func add_popping_boba() -> void:
+	has_popping_boba = true
 	if mango_bunch:
 		mango_bunch.get_node("row1").visible = true
 		mango_bunch.get_node("row2").visible = true
@@ -480,6 +490,7 @@ func add_popping_boba() -> void:
 				mango_bunch.get_node("row6").position = mango_row6_bottom_pos
 
 func add_grass_jelly() -> void:
+	has_grass_jelly = true
 	grass_jelly.visible = true
 	
 	if is_filling:
@@ -510,5 +521,8 @@ func get_drink_data() -> Dictionary:
 		"size": cup_size,
 		"flavor": current_flavor,
 		"has_ice": has_ice,
-		"toppings": toppings_added
+		"has_tapioca": has_tapioca,
+		"has_popping_boba": has_popping_boba,
+		"has_grass_jelly": has_grass_jelly,
+		"has_pudding": has_pudding
 	}

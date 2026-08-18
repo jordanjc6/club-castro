@@ -1,8 +1,10 @@
 class_name Dispenser
 extends Area2D
 
+enum DrinkFlavor { NONE, MANGO, MATCHA, HONEYDEW, BROWNSUGAR, TARO }
+
 ## Configure these in the Godot Inspector for each dispenser!
-@export var flavor: String = "mango"
+@export var flavor: DrinkFlavor = DrinkFlavor.MANGO
 @export var liquid_color: Color = Color(1.0, 0.6, 0.0) # Mango orange/yellow
 
 var is_active: bool = false
