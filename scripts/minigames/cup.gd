@@ -46,13 +46,13 @@ var hovered_coaster: Area2D = null
 var is_placed: bool = false
 var is_filled: bool = false
 var is_filling: bool = false
-var has_ice: bool = false
-var toppings_added: Array[TOPPINGS] = []
 
 ## Drink Data
 var current_flavor: String = "" 
 var current_coaster: Coaster = null
 var offset: Vector2 = Vector2.ZERO
+var has_ice: bool = false
+var toppings_added: Array[TOPPINGS] = []
 
 ## Ice Positioning Vectors
 var ice_top_pos: Vector2 = Vector2.ZERO
@@ -510,5 +510,5 @@ func get_drink_data() -> Dictionary:
 		"size": cup_size,
 		"flavor": current_flavor,
 		"has_ice": has_ice,
-		"is_filled": is_filled
+		"toppings": toppings_added
 	}

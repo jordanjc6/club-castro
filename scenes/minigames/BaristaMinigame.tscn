@@ -269,6 +269,13 @@ script = ExtResource("5_6p721")
 position = Vector2(505, 588)
 shape = SubResource("CircleShape2D_t5v6p")
 
+[node name="SendButton" type="Button" parent="MinigameUI/GameWindow/Screen/Coasters/Coaster1" unique_id=1551016097]
+offset_left = 444.0
+offset_top = 635.0
+offset_right = 566.0
+offset_bottom = 712.0
+text = "SEND"
+
 [node name="Coaster2" type="Area2D" parent="MinigameUI/GameWindow/Screen/Coasters" unique_id=1629121503 groups=["coasters"]]
 position = Vector2(3, 0)
 script = ExtResource("5_6p721")

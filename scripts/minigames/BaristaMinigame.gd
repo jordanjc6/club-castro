@@ -40,6 +40,9 @@ extends Node2D
 @onready var grass_jelly_spawner: Control = $MinigameUI/GameWindow/Screen/ToppingSpawners/GrassJellySpawner
 @onready var pudding_spawner: Control = $MinigameUI/GameWindow/Screen/ToppingSpawners/PuddingSpawner
 
+# send drink buttons
+@onready var send_drink1_btn: Button = $MinigameUI/GameWindow/Screen/Coasters/Coaster1/SendButton
+
 # game result
 @onready var game_result_panel: PanelContainer = $MinigameUI/GameResult
 @onready var game_result_label: Label = $MinigameUI/GameResult/VBoxContainer/Label
@@ -78,6 +81,9 @@ func _ready() -> void:
 	popping_boba_spawner.gui_input.connect(spawn_popping_boba)
 	grass_jelly_spawner.gui_input.connect(spawn_grass_jelly)
 	pudding_spawner.gui_input.connect(spawn_pudding)
+	
+	# send drink buttons
+	send_drink1_btn.pressed.connect(send_drink.bind(1))
 	
 	# game result panel buttons
 	close_result_button.pressed.connect(_on_close_result_button_pressed)
@@ -215,6 +221,35 @@ func spawn_pudding(event: InputEvent) -> void:
 		var pudding_instance = pudding_scene.instantiate()
 		screen.add_child(pudding_instance)
 		pudding_instance.global_position = get_global_mouse_position()
+
+func send_drink(drink_id: int):
+	# Dynamically get the coaster node (Coaster1, Coaster2, Coaster3)
+	var coaster_node = get_node_or_null("MinigameUI/GameWindow/Screen/Coasters/Coaster" + str(drink_id))
+	
+	if not coaster_node:
+		push_warning("Coaster%d node not found!" % drink_id)
+		return
+	
+	# Check if a cup is sitting on this coaster
+	var drink = coaster_node.current_cup
+	if drink != null:
+		# Block submission if the cup is actively filling
+		if drink.is_filling:
+			print("Cannot send drink while it is filling!")
+			return
+		
+		var drink_data: Dictionary = drink.get_drink_data()
+		
+		print("Submitted Drink #%d: " % drink_id, drink_data)
+		# Returns: {"size": 1, "flavor": "Mango", "has_ice": true, "toppings": [0, 2]}
+
+		# TODO: Validate drink_data against your active order list here
+
+		# Remove the cup from the workspace
+		drink.queue_free()
+		coaster_node.remove_cup()
+	else:
+		print("No drink on Coaster #%d to send!" % drink_id)
 
 # show local game result
 #
