@@ -50,10 +50,14 @@ const TOPPINGS = TOPPING_SCRIPT.Topping
 @onready var popping_boba_spawner: Control = $MinigameUI/GameWindow/Screen/ToppingSpawners/PoppingBobaSpawner
 @onready var grass_jelly_spawner: Control = $MinigameUI/GameWindow/Screen/ToppingSpawners/GrassJellySpawner
 @onready var pudding_spawner: Control = $MinigameUI/GameWindow/Screen/ToppingSpawners/PuddingSpawner
-@onready var drink_status_icon: TextureRect = $MinigameUI/GameWindow/Screen/Coasters/Coaster1/DrinkStatusIcon
+@onready var drink_status_icon1: TextureRect = $MinigameUI/GameWindow/Screen/Coasters/Coaster1/DrinkStatusIcon
+@onready var drink_status_icon2: TextureRect = $MinigameUI/GameWindow/Screen/Coasters/Coaster2/DrinkStatusIcon
+@onready var drink_status_icon3: TextureRect = $MinigameUI/GameWindow/Screen/Coasters/Coaster3/DrinkStatusIcon
 
 # send drink buttons
 @onready var send_drink1_btn: Button = $MinigameUI/GameWindow/Screen/Coasters/Coaster1/SendButton
+@onready var send_drink2_btn: Button = $MinigameUI/GameWindow/Screen/Coasters/Coaster2/SendButton
+@onready var send_drink3_btn: Button = $MinigameUI/GameWindow/Screen/Coasters/Coaster3/SendButton
 
 # drink orders
 var orders: Array[Dictionary] = [
@@ -82,7 +86,10 @@ var am_i_player_one: bool = false
 var result_timer: SceneTreeTimer = null # used to show game result for some seconds
 var is_mango_active: bool = false
 var is_matcha_active: bool = false
-var drink_status_toaster_tween: Tween
+var drink_status_toaster_tween1: Tween
+var drink_status_toaster_tween2: Tween
+var drink_status_toaster_tween3: Tween
+
 
 func _ready() -> void:
 	# ui popups hidden on startup
@@ -107,9 +114,14 @@ func _ready() -> void:
 	popping_boba_spawner.gui_input.connect(spawn_popping_boba)
 	grass_jelly_spawner.gui_input.connect(spawn_grass_jelly)
 	pudding_spawner.gui_input.connect(spawn_pudding)
+	drink_status_icon1.visible = false
+	drink_status_icon2.visible = false
+	drink_status_icon3.visible = false
 	
 	# send drink buttons
 	send_drink1_btn.pressed.connect(send_drink.bind(1))
+	send_drink2_btn.pressed.connect(send_drink.bind(2))
+	send_drink3_btn.pressed.connect(send_drink.bind(3))
 	
 	# game result panel buttons
 	close_result_button.pressed.connect(_on_close_result_button_pressed)
@@ -270,7 +282,7 @@ func send_drink(drink_id: int):
 		# Returns: {"size": 1, "flavor": "Mango", "has_ice": true, "toppings": [0, 2]}
 
 		var drink_is_valid = validate_drink(drink_data)
-		show_send_drink_status_toaster(drink_is_valid)
+		show_send_drink_status_toaster(drink_id, drink_is_valid)
 
 		# Remove the cup from the workspace
 		drink.queue_free()
@@ -281,28 +293,64 @@ func send_drink(drink_id: int):
 func validate_drink(drink: Dictionary):
 	return drink in orders
 
-func show_send_drink_status_toaster(isSuccess: bool):
+func show_send_drink_status_toaster(drinkNum: int, isSuccess: bool):
 	if isSuccess:
 		print("order complete!")
 	else:
 		print("bad drink!")
-		
-	# 1. Set texture based on status
-	drink_status_icon.texture = correct_drink_tex if isSuccess else incorrect_drink_tex
 	
-	# 2. Reset visibility/opacity
-	drink_status_icon.modulate.a = 1.0
-	drink_status_icon.show()
+	match drinkNum:
+		1:
+			# 1. Set texture based on status
+			drink_status_icon1.texture = correct_drink_tex if isSuccess else incorrect_drink_tex
+			
+			# 2. Reset visibility/opacity
+			drink_status_icon1.modulate.a = 1.0
+			drink_status_icon1.show()
 
-	# 3. Cancel running animation if player triggers multiple quickly
-	if drink_status_toaster_tween and drink_status_toaster_tween.is_running():
-		drink_status_toaster_tween.kill()
+			# 3. Cancel running animation if player triggers multiple quickly
+			if drink_status_toaster_tween1 and drink_status_toaster_tween1.is_running():
+				drink_status_toaster_tween1.kill()
 
-	# 4. Hold full opacity for 0.8s, then fade out over 0.3s
-	drink_status_toaster_tween = create_tween()
-	drink_status_toaster_tween.tween_interval(0.8)
-	drink_status_toaster_tween.tween_property(drink_status_icon, "modulate:a", 0.0, 0.3)
-	drink_status_toaster_tween.finished.connect(drink_status_icon.hide)
+			# 4. Hold full opacity for 0.8s, then fade out over 0.3s
+			drink_status_toaster_tween1 = create_tween()
+			drink_status_toaster_tween1.tween_interval(0.8)
+			drink_status_toaster_tween1.tween_property(drink_status_icon1, "modulate:a", 0.0, 0.3)
+			drink_status_toaster_tween1.finished.connect(drink_status_icon1.hide)
+		2:
+			# 1. Set texture based on status
+			drink_status_icon2.texture = correct_drink_tex if isSuccess else incorrect_drink_tex
+			
+			# 2. Reset visibility/opacity
+			drink_status_icon2.modulate.a = 1.0
+			drink_status_icon2.show()
+
+			# 3. Cancel running animation if player triggers multiple quickly
+			if drink_status_toaster_tween2 and drink_status_toaster_tween2.is_running():
+				drink_status_toaster_tween2.kill()
+
+			# 4. Hold full opacity for 0.8s, then fade out over 0.3s
+			drink_status_toaster_tween2 = create_tween()
+			drink_status_toaster_tween2.tween_interval(0.8)
+			drink_status_toaster_tween2.tween_property(drink_status_icon2, "modulate:a", 0.0, 0.3)
+			drink_status_toaster_tween2.finished.connect(drink_status_icon2.hide)
+		3:
+			# 1. Set texture based on status
+			drink_status_icon3.texture = correct_drink_tex if isSuccess else incorrect_drink_tex
+			
+			# 2. Reset visibility/opacity
+			drink_status_icon3.modulate.a = 1.0
+			drink_status_icon3.show()
+
+			# 3. Cancel running animation if player triggers multiple quickly
+			if drink_status_toaster_tween3 and drink_status_toaster_tween3.is_running():
+				drink_status_toaster_tween3.kill()
+
+			# 4. Hold full opacity for 0.8s, then fade out over 0.3s
+			drink_status_toaster_tween3 = create_tween()
+			drink_status_toaster_tween3.tween_interval(0.8)
+			drink_status_toaster_tween3.tween_property(drink_status_icon3, "modulate:a", 0.0, 0.3)
+			drink_status_toaster_tween3.finished.connect(drink_status_icon3.hide)
 
 # show local game result
 #

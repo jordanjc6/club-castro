@@ -15,9 +15,9 @@
 [ext_resource type="PackedScene" uid="uid://2i85g2idlop8" path="res://scenes/minigames/honeydew_dispenser.tscn" id="8_yh4ya"]
 [ext_resource type="PackedScene" uid="uid://bx8usnpbry0k2" path="res://scenes/minigames/brownsugar_dispenser.tscn" id="9_5cb16"]
 [ext_resource type="PackedScene" uid="uid://b4x57ki4hcav2" path="res://scenes/minigames/PuddingSpoon.tscn" id="9_hsd2r"]
-[ext_resource type="Texture2D" uid="uid://cmk4e4g1w0xry" path="res://assets/minigames/bbt-barista/drink-status-icons/check-symbol-4794_64.png" id="10_je2ua"]
 [ext_resource type="PackedScene" uid="uid://dxusxhc7g524t" path="res://scenes/minigames/taro_dispenser.tscn" id="10_y8frw"]
-[ext_resource type="Texture2D" uid="uid://bp5k8nxp47kj1" path="res://assets/minigames/bbt-barista/drink-status-icons/error-10379_64.png" id="11_hsd2r"]
+[ext_resource type="Texture2D" uid="uid://csqq61o3s7m4j" path="res://assets/minigames/bbt-barista/drink-status-icons/error-10379_128.png" id="11_je2ua"]
+[ext_resource type="Texture2D" uid="uid://jrwgg6bk2fyh" path="res://assets/minigames/bbt-barista/drink-status-icons/check-symbol-4794_128.png" id="19_hsd2r"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_00mmp"]
 radius = 61.03278
@@ -60,8 +60,8 @@ tapioca_scene = ExtResource("6_aadw0")
 popping_boba_scene = ExtResource("7_u8qoq")
 grass_jelly_scene = ExtResource("8_je2ua")
 pudding_scene = ExtResource("9_hsd2r")
-correct_drink_tex = ExtResource("10_je2ua")
-incorrect_drink_tex = ExtResource("11_hsd2r")
+correct_drink_tex = ExtResource("19_hsd2r")
+incorrect_drink_tex = ExtResource("11_je2ua")
 
 [node name="InteractionArea" type="Area2D" parent="." unique_id=1306371111]
 collision_layer = 4
@@ -286,12 +286,12 @@ theme_override_font_sizes/font_size = 33
 text = "Send"
 
 [node name="DrinkStatusIcon" type="TextureRect" parent="MinigameUI/GameWindow/Screen/Coasters/Coaster1" unique_id=1853096188]
-offset_left = 467.00003
-offset_top = 524.0
-offset_right = 531.0
-offset_bottom = 588.0
-scale = Vector2(1.2, 1.2)
-texture = ExtResource("10_je2ua")
+offset_left = 478.0
+offset_top = 537.0
+offset_right = 606.0
+offset_bottom = 665.0
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("19_hsd2r")
 
 [node name="Coaster2" type="Area2D" parent="MinigameUI/GameWindow/Screen/Coasters" unique_id=1629121503 groups=["coasters"]]
 position = Vector2(3, 0)
@@ -301,6 +301,22 @@ script = ExtResource("5_6p721")
 position = Vector2(690, 591)
 shape = SubResource("CircleShape2D_t5v6p")
 
+[node name="SendButton" type="Button" parent="MinigameUI/GameWindow/Screen/Coasters/Coaster2" unique_id=529780703]
+offset_left = 630.0
+offset_top = 636.0
+offset_right = 752.0
+offset_bottom = 713.0
+theme_override_font_sizes/font_size = 33
+text = "Send"
+
+[node name="DrinkStatusIcon" type="TextureRect" parent="MinigameUI/GameWindow/Screen/Coasters/Coaster2" unique_id=2052725412]
+offset_left = 664.0
+offset_top = 538.0
+offset_right = 792.0
+offset_bottom = 666.0
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("19_hsd2r")
+
 [node name="Coaster3" type="Area2D" parent="MinigameUI/GameWindow/Screen/Coasters" unique_id=346633535 groups=["coasters"]]
 position = Vector2(3, 0)
 script = ExtResource("5_6p721")
@@ -308,6 +324,22 @@ script = ExtResource("5_6p721")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/Coasters/Coaster3" unique_id=1548798217]
 position = Vector2(872, 588)
 shape = SubResource("CircleShape2D_t5v6p")
+
+[node name="SendButton" type="Button" parent="MinigameUI/GameWindow/Screen/Coasters/Coaster3" unique_id=1949183556]
+offset_left = 813.0
+offset_top = 636.0
+offset_right = 935.0
+offset_bottom = 713.0
+theme_override_font_sizes/font_size = 33
+text = "Send"
+
+[node name="DrinkStatusIcon" type="TextureRect" parent="MinigameUI/GameWindow/Screen/Coasters/Coaster3" unique_id=1300504183]
+offset_left = 847.0
+offset_top = 538.0
+offset_right = 975.0
+offset_bottom = 666.0
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("19_hsd2r")
 
 [node name="GameResult" type="PanelContainer" parent="MinigameUI" unique_id=1386153806]
 visible = false
