@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://cfocut4bdvtb1" path="res://assets/minigames/bbt-barista/ice/ice-cubes.png" id="3_lybhi"]
 [ext_resource type="Texture2D" uid="uid://d0fnxd2kp77pm" path="res://assets/minigames/bbt-barista/toppings/tapioca.png" id="3_wbv42"]
 [ext_resource type="Texture2D" uid="uid://bbkccqv7y5k38" path="res://assets/minigames/bbt-barista/toppings/pudding.png" id="5_imagf"]
+[ext_resource type="Texture2D" uid="uid://c7vhghqslmfv8" path="res://assets/minigames/bbt-barista/toppings/grass-jelly.png" id="7_g2q68"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_d62cv"]
 size = Vector2(90, 146)
@@ -411,3 +412,55 @@ z_index = 1
 position = Vector2(1.9073486e-06, -54)
 scale = Vector2(0.09048296, 0.0936198)
 texture = ExtResource("3_lybhi")
+
+[node name="GrassJelly" type="Node2D" parent="." unique_id=1163242916]
+position = Vector2(0, -11)
+scale = Vector2(1.2, 1.2)
+
+[node name="jelly" type="Sprite2D" parent="GrassJelly" unique_id=1385562604]
+z_index = 1
+position = Vector2(-21, -3)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("7_g2q68")
+
+[node name="jelly2" type="Sprite2D" parent="GrassJelly" unique_id=1910043653]
+z_index = 1
+position = Vector2(-5, -1.0000007)
+rotation = -0.8220501
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("7_g2q68")
+
+[node name="jelly3" type="Sprite2D" parent="GrassJelly" unique_id=289879612]
+z_index = 1
+position = Vector2(9, -2.0000002)
+rotation = 0.46949357
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("7_g2q68")
+
+[node name="jelly4" type="Sprite2D" parent="GrassJelly" unique_id=495255105]
+z_index = 1
+position = Vector2(22, -2.0000005)
+rotation = 1.8779743
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("7_g2q68")
+
+[node name="jelly5" type="Sprite2D" parent="GrassJelly" unique_id=59082240]
+z_index = 1
+position = Vector2(-19, -8)
+rotation = 1.8779743
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("7_g2q68")
+
+[node name="jelly6" type="Sprite2D" parent="GrassJelly" unique_id=1369515713]
+z_index = 1
+position = Vector2(6, -7)
+rotation = 1.8779743
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("7_g2q68")
+
+[node name="jelly7" type="Sprite2D" parent="GrassJelly" unique_id=221042632]
+z_index = 1
+position = Vector2(21, -4)
+rotation = 0.35081118
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("7_g2q68")

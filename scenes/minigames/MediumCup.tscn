@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://cfocut4bdvtb1" path="res://assets/minigames/bbt-barista/ice/ice-cubes.png" id="3_icllv"]
 [ext_resource type="Texture2D" uid="uid://d0fnxd2kp77pm" path="res://assets/minigames/bbt-barista/toppings/tapioca.png" id="3_sdk3q"]
 [ext_resource type="Texture2D" uid="uid://bbkccqv7y5k38" path="res://assets/minigames/bbt-barista/toppings/pudding.png" id="5_77mml"]
+[ext_resource type="Texture2D" uid="uid://c7vhghqslmfv8" path="res://assets/minigames/bbt-barista/toppings/grass-jelly.png" id="7_usnbg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_d62cv"]
 size = Vector2(81, 126)
@@ -13,6 +14,7 @@ size = Vector2(81, 126)
 [node name="MediumCup" type="Area2D" unique_id=359205666]
 script = ExtResource("1_1c4to")
 ice_bottom_offset = 82.0
+grass_jelly_bottom_offset = 58.0
 
 [node name="DrinkFill" type="Polygon2D" parent="." unique_id=280173564]
 clip_children = 1
@@ -338,3 +340,54 @@ z_index = 1
 position = Vector2(-2.000001, -40)
 scale = Vector2(0.08082387, 0.08177084)
 texture = ExtResource("3_icllv")
+
+[node name="GrassJelly" type="Node2D" parent="." unique_id=1707047753]
+scale = Vector2(1.1, 1.1)
+
+[node name="jelly" type="Sprite2D" parent="GrassJelly" unique_id=1985310799]
+z_index = 1
+position = Vector2(-21, -3)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("7_usnbg")
+
+[node name="jelly2" type="Sprite2D" parent="GrassJelly" unique_id=720909045]
+z_index = 1
+position = Vector2(-5, -1.0000007)
+rotation = -0.8220501
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("7_usnbg")
+
+[node name="jelly3" type="Sprite2D" parent="GrassJelly" unique_id=1422742930]
+z_index = 1
+position = Vector2(9, -2.0000002)
+rotation = 0.46949357
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("7_usnbg")
+
+[node name="jelly4" type="Sprite2D" parent="GrassJelly" unique_id=334816606]
+z_index = 1
+position = Vector2(22, -2.0000005)
+rotation = 1.8779743
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("7_usnbg")
+
+[node name="jelly5" type="Sprite2D" parent="GrassJelly" unique_id=1449560760]
+z_index = 1
+position = Vector2(-19, -8)
+rotation = 1.8779743
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("7_usnbg")
+
+[node name="jelly6" type="Sprite2D" parent="GrassJelly" unique_id=1044224365]
+z_index = 1
+position = Vector2(6, -7)
+rotation = 1.8779743
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("7_usnbg")
+
+[node name="jelly7" type="Sprite2D" parent="GrassJelly" unique_id=596981895]
+z_index = 1
+position = Vector2(21, -4)
+rotation = 0.35081118
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("7_usnbg")

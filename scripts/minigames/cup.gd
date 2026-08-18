@@ -9,6 +9,7 @@ const TOPPINGS = TOPPING_SCRIPT.Topping
 @export var cup_size: CupSize = CupSize.MEDIUM
 ## How far down (in pixels) the ice sits when the cup is empty
 @export var ice_bottom_offset: float = 65.0 
+@export var grass_jelly_bottom_offset: float = 65.0 
 
 # tapioca
 @export var tapioca_row1_bottom_offset: float = 25
@@ -34,6 +35,7 @@ const FILL_DURATION: float = 1.2
 @onready var liquid_fill: ColorRect = $DrinkFill/ColorRect
 @onready var liquid_mask: Polygon2D = $DrinkFill
 @onready var ice_sprite: Sprite2D = $IceSprite
+@onready var grass_jelly: Node2D = $GrassJelly
 @onready var pudding_sprite: Sprite2D = $PuddingSprite
 @onready var tapioca_bunch: Node2D = $Tapioca
 @onready var mango_bunch: Node2D = $PoppingBoba
@@ -55,6 +57,10 @@ var offset: Vector2 = Vector2.ZERO
 ## Ice Positioning Vectors
 var ice_top_pos: Vector2 = Vector2.ZERO
 var ice_bottom_pos: Vector2 = Vector2.ZERO
+
+## Grass Jelly Positioning Vectors
+var grass_jelly_top_pos: Vector2 = Vector2.ZERO
+var grass_jelly_bottom_pos: Vector2 = Vector2.ZERO
 
 ## Tapioca Positioning Vectors
 var tapioca_row1_top_pos: Vector2 = Vector2.ZERO
@@ -115,6 +121,11 @@ func _ready() -> void:
 		ice_top_pos = ice_sprite.position
 		ice_bottom_pos = ice_top_pos + Vector2(0, ice_bottom_offset)
 		ice_sprite.visible = false
+	
+	if grass_jelly:
+		grass_jelly_top_pos = grass_jelly.position
+		grass_jelly_bottom_pos = grass_jelly_top_pos + Vector2(0, grass_jelly_bottom_offset)
+		grass_jelly.visible = false
 	
 	if pudding_sprite:
 		pudding_sprite.visible = false
@@ -251,6 +262,9 @@ func _fill_from_dispenser(dispenser: Dispenser) -> void:
 	if has_ice and ice_sprite:
 		tween.tween_property(ice_sprite, "position", ice_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	
+	if toppings_added.has(TOPPINGS.GRASS_JELLY) and grass_jelly:
+		tween.tween_property(grass_jelly, "position", grass_jelly_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	
 	if toppings_added.has(TOPPINGS.TAPIOCA) and tapioca_bunch:
 		tween.tween_property(tapioca_bunch.get_node("row1"), "position", tapioca_row1_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(tapioca_bunch.get_node("row2"), "position", tapioca_row2_top_pos, FILL_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
@@ -331,7 +345,7 @@ func add_topping(topping: TOPPINGS) -> void:
 		TOPPINGS.POPPING_BOBA:
 			add_popping_boba()
 		TOPPINGS.GRASS_JELLY:
-			return
+			add_grass_jelly()
 		TOPPINGS.PUDDING:
 			pudding_sprite.visible = true
 	
@@ -464,6 +478,30 @@ func add_popping_boba() -> void:
 				mango_bunch.get_node("row5").position = mango_row5_bottom_pos
 			if mango_bunch.get_node_or_null("row6"):
 				mango_bunch.get_node("row6").position = mango_row6_bottom_pos
+
+func add_grass_jelly() -> void:
+	grass_jelly.visible = true
+	
+	if is_filling:
+			# Calculate current surface position using scale.y
+			var current_fill_ratio: float = liquid_fill.scale.y
+			
+			# Snap ice to current liquid level
+			grass_jelly.position = grass_jelly_bottom_pos.lerp(grass_jelly_top_pos, current_fill_ratio)
+			
+			# Animate ice floating up for the remaining duration of the pour
+			var remaining_fill_ratio: float = 1.0 - current_fill_ratio
+			var remaining_time: float = FILL_DURATION * remaining_fill_ratio
+			
+			if remaining_time > 0:
+				var tween = create_tween()
+				tween.tween_property(grass_jelly, "position", grass_jelly_top_pos, remaining_time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	elif is_filled:
+		# Cup is already full -> Place ice at the top surface
+		grass_jelly.position = grass_jelly_top_pos
+	else:
+		# Cup is empty -> Place ice at the bottom
+		grass_jelly.position = grass_jelly_bottom_pos
 
 # --- ORDER VALIDATION READOUT ---
 
