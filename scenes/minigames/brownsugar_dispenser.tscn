@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bx8usnpbry0k2"]
 
 [ext_resource type="Script" uid="uid://dqtuu4cn4uo05" path="res://scripts/minigames/dispenser.gd" id="1_ghled"]
-[ext_resource type="Texture2D" uid="uid://c1i7kconl7et0" path="res://assets/minigames/brown-sugar-dispenser.png" id="2_ghled"]
+[ext_resource type="Texture2D" uid="uid://c1i7kconl7et0" path="res://assets/minigames/bbt-barista/tea-dispensers/brown-sugar-dispenser.png" id="2_ghled"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_t5v6p"]
 radius = 45.0
@@ -9,7 +9,7 @@ height = 212.0
 
 [node name="BrownsugarDispenser" type="Area2D" unique_id=805822949]
 script = ExtResource("1_ghled")
-flavor = "brownsugar"
+flavor = 4
 liquid_color = Color(0.78039217, 0.5568628, 0.3372549, 1)
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=13670146]

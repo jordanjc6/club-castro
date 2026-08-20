@@ -12,9 +12,19 @@
 size = Vector2(71, 111)
 
 [node name="SmallCup" type="Area2D" unique_id=359205666]
+collision_priority = 2.0
+priority = 1
 script = ExtResource("1_twqxk")
 cup_size = 1
 grass_jelly_bottom_offset = 50.0
+
+[node name="ClickBlocker" type="Control" parent="." unique_id=1216511459]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -36.0
+offset_top = -51.0
+offset_right = 38.0
+offset_bottom = 54.0
 
 [node name="DrinkFill" type="Polygon2D" parent="." unique_id=280173564]
 clip_children = 1

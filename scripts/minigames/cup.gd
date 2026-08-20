@@ -35,6 +35,7 @@ const TOPPINGS = TOPPING_SCRIPT.Topping
 const FILL_DURATION: float = 1.2
 
 ## Node References
+@onready var click_blocker: Control = $ClickBlocker
 @onready var liquid_fill: ColorRect = $DrinkFill/ColorRect
 @onready var liquid_mask: Polygon2D = $DrinkFill
 @onready var ice_sprite: Sprite2D = $IceSprite
@@ -117,6 +118,7 @@ func _ready() -> void:
 	area_entered.connect(_on_area_entered)
 	area_exited.connect(_on_area_exited)
 	input_event.connect(_on_input_event)
+	click_blocker.gui_input.connect(_on_click_blocker_gui_input)
 	
 	# Set pivot to bottom so fill scales upward
 	liquid_fill.pivot_offset = Vector2(0, liquid_fill.size.y)
@@ -236,6 +238,7 @@ func _on_area_exited(area: Area2D) -> void:
 # --- DISPENSER / DRINK FILL LOGIC ---
 
 func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
+	get_viewport().set_input_as_handled()
 	if not is_placed or is_filled or is_filling:
 		return
 		
@@ -243,8 +246,23 @@ func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> voi
 	var is_touch = event is InputEventScreenTouch and event.pressed
 	
 	if is_click or is_touch:
-		get_viewport().set_input_as_handled()
 		_try_fill()
+
+func _on_click_blocker_gui_input(event: InputEvent) -> void:
+	get_viewport().set_input_as_handled()
+	if not is_placed or is_filled or is_filling:
+		return
+		
+	var is_click = event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed
+	var is_touch = event is InputEventScreenTouch and event.pressed
+	
+	if is_click or is_touch:
+		# 1. Consumes the input so background Area2D nodes/dispensers never see it
+		get_viewport().set_input_as_handled()
+		
+		# 2. Try filling the cup
+		if is_placed and not is_filled and not is_filling:
+			_try_fill()
 
 func _try_fill() -> void:
 	var dispensers = get_tree().get_nodes_in_group("dispenser")

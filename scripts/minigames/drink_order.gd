@@ -39,8 +39,34 @@ func set_order(order: Dictionary) -> void:
 	_update_order_display()
 
 func _update_order_display() -> void:
-	if order_number:
-		order_number.text = "Size: %s\nFlavor: %s\nIce: %s" % [drink_order["size"], drink_order["flavor"], drink_order["has_ice"]]
+	if not order_number:
+		return
+
+	# Convert enum integer values (e.g. 1, 2) to readable formatted text ("Small", "Mango")
+	var size_str: String = CUP_SIZES.keys()[drink_order["size"]].capitalize()
+	var flavor_str: String = FLAVORS.keys()[drink_order["flavor"]].capitalize()
+	var ice_str: String = "Yes" if drink_order["has_ice"] else "No"
+
+	# Build active toppings list
+	var active_toppings: Array[String] = []
+	if drink_order.get("has_tapioca", false):
+		active_toppings.append("Tapioca")
+	if drink_order.get("has_popping_boba", false):
+		active_toppings.append("Popping Boba")
+	if drink_order.get("has_grass_jelly", false):
+		active_toppings.append("Grass Jelly")
+	if drink_order.get("has_pudding", false):
+		active_toppings.append("Pudding")
+
+	var toppings_str: String = ", ".join(active_toppings) if active_toppings.size() > 0 else "None"
+
+	# Display formatted order details
+	order_number.text = "Size: %s\nFlavor: %s\nIce: %s\nToppings: %s" % [
+		size_str,
+		flavor_str,
+		ice_str,
+		toppings_str
+	]
 
 func _on_ticket_pressed() -> void:
 	print("show order popup")

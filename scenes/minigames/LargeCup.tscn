@@ -12,9 +12,19 @@
 size = Vector2(90, 146)
 
 [node name="LargeCup" type="Area2D" unique_id=359205666]
+collision_priority = 2.0
+priority = 1
 script = ExtResource("1_a1iq2")
 cup_size = 3
 ice_bottom_offset = 90.0
+
+[node name="ClickBlocker" type="Control" parent="." unique_id=747494911]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -48.0
+offset_top = -83.0
+offset_right = 51.0
+offset_bottom = 65.0
 
 [node name="DrinkFill" type="Polygon2D" parent="." unique_id=280173564]
 clip_children = 1

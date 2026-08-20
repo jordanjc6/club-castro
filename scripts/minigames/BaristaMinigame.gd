@@ -62,17 +62,8 @@ const TOPPINGS = TOPPING_SCRIPT.Topping
 @onready var send_drink3_btn: Button = $MinigameUI/GameWindow/Screen/Coasters/Coaster3/SendButton
 
 # drink orders
-var orders: Array[Dictionary] = [
-	{
-		"size": CUP_SIZES.SMALL,
-		"flavor": FLAVORS.MANGO,
-		"has_ice": false,
-		"has_tapioca": false,
-		"has_popping_boba": false,
-		"has_grass_jelly": false,
-		"has_pudding": false
-	}
-]
+var orders: Array[Dictionary] = []
+var order_timer: Timer
 
 # game result
 @onready var game_result_panel: PanelContainer = $MinigameUI/GameResult
@@ -119,9 +110,6 @@ func _ready() -> void:
 	drink_status_icon1.visible = false
 	drink_status_icon2.visible = false
 	drink_status_icon3.visible = false
-	spawn_drink_order()
-	spawn_drink_order()
-	spawn_drink_order()
 	
 	# send drink buttons
 	send_drink1_btn.pressed.connect(send_drink.bind(1))
@@ -176,6 +164,58 @@ func _on_cancel_button_pressed() -> void:
 	game_prompt_panel.visible = false
 	game_window.visible = false
 	server_leave_seat.rpc_id(1, multiplayer.get_unique_id())
+
+func start_orders_timer() -> void:
+	# generate one order and start order timer
+	generate_random_order()
+	spawn_drink_order()
+	order_timer = Timer.new()
+	order_timer.wait_time = 10.0
+	order_timer.autostart = true
+	order_timer.timeout.connect(_on_order_timer_timeout)
+	add_child(order_timer)
+
+func _on_order_timer_timeout() -> void:
+	generate_random_order()
+	spawn_drink_order()
+
+func generate_random_order() -> void:
+	# get random drink order
+	var rand_size: CUP_SIZES = [CUP_SIZES.SMALL, CUP_SIZES.MEDIUM, CUP_SIZES.LARGE].pick_random()
+	var rand_flavor: FLAVORS = [FLAVORS.MANGO, FLAVORS.MATCHA, FLAVORS.HONEYDEW, FLAVORS.TARO].pick_random() 
+	var rand_ice: bool = [true, false].pick_random()
+	var rand_tapioca: bool = [true, false].pick_random()
+	var rand_boba: bool = [true, false].pick_random()
+	var rand_jelly: bool = [true, false].pick_random()
+	var rand_pudding: bool = [true, false].pick_random()
+
+	# Save data to tracking array for validation
+	var order = {
+		"size": rand_size,
+		"flavor": rand_flavor,
+		"has_ice": rand_ice,
+		"has_tapioca": rand_tapioca,
+		"has_popping_boba": rand_boba,
+		"has_grass_jelly": rand_jelly,
+		"has_pudding": rand_pudding
+	}
+	orders.append(order)
+
+func spawn_drink_order() -> void:
+	var current_on_screen = orders_container.get_child_count()
+	
+	# Fill remaining open rack spots (up to 3 max) with undisplayed orders from queue
+	while current_on_screen < 3 and current_on_screen < orders.size():
+		var order_data = orders[current_on_screen]
+		
+		var new_ticket = drink_order_scene.instantiate()
+		orders_container.add_child(new_ticket)
+		new_ticket.set_order(order_data)
+		
+		# Set rack X position: Spot 0 = 40px, Spot 1 = 140px, Spot 2 = 240px
+		new_ticket.position = Vector2(40 + (current_on_screen * 100), 175)
+		
+		current_on_screen += 1
 
 func spawn_small_cup(event: InputEvent) -> void:
 	# Trigger on initial left mouse click down
@@ -266,34 +306,83 @@ func spawn_pudding(event: InputEvent) -> void:
 		pudding_instance.global_position = get_global_mouse_position()
 
 func send_drink(drink_id: int):
-	# Dynamically get the coaster node (Coaster1, Coaster2, Coaster3)
 	var coaster_node = get_node_or_null("MinigameUI/GameWindow/Screen/Coasters/Coaster" + str(drink_id))
-	
-	if not coaster_node:
-		push_warning("Coaster%d node not found!" % drink_id)
+	if not coaster_node or coaster_node.current_cup == null:
 		return
 	
-	# Check if a cup is sitting on this coaster
 	var drink = coaster_node.current_cup
-	if drink != null:
-		# Block submission if the cup is actively filling
-		if drink.is_filling:
-			print("Cannot send drink while it is filling!")
-			return
-		
-		var drink_data: Dictionary = drink.get_drink_data()
-		
-		print("Submitted Drink #%d: " % drink_id, drink_data)
-		# Returns: {"size": 1, "flavor": "Mango", "has_ice": true, "toppings": [0, 2]}
+	if drink.is_filling:
+		print("Cannot send drink while it is filling!")
+		return
+	
+	var drink_data: Dictionary = drink.get_drink_data()
+	var is_valid = check_and_fulfill_order(drink_data)
+	
+	show_send_drink_status_toaster(drink_id, is_valid)
 
-		var drink_is_valid = validate_drink(drink_data)
-		show_send_drink_status_toaster(drink_id, drink_is_valid)
+	drink.queue_free()
+	coaster_node.remove_cup()
 
-		# Remove the cup from the workspace
-		drink.queue_free()
-		coaster_node.remove_cup()
-	else:
-		print("No drink on Coaster #%d to send!" % drink_id)
+func check_and_fulfill_order(submitted_drink: Dictionary) -> bool:
+	# Only check the top 3 orders that are currently displayed on the rack
+	var visible_count: int = min(3, orders.size())
+	
+	for i in range(visible_count):
+		if matches_order(submitted_drink, orders[i]):
+			# 1. Remove order from tracking array
+			orders.remove_at(i)
+			
+			# 2. Rebuild ticket UI rack (clears old nodes & pulls next pending order)
+			_rebuild_ticket_ui()
+			return true
+			
+	return false
+
+func matches_order(d1: Dictionary, d2: Dictionary) -> bool:
+	print("sent: %s\n order: %s\n" % [d1, d2])
+	for key in d2.keys():
+		if not d1.has(key) or d1[key] != d2[key]:
+			return false
+	return true
+
+func _rebuild_ticket_ui() -> void:
+	# Clear current ticket nodes from screen
+	for child in orders_container.get_children():
+		orders_container.remove_child(child)
+		child.queue_free()
+	
+	# Render the first 3 orders in queue
+	spawn_drink_order()
+
+#func send_drink(drink_id: int):
+	## Dynamically get the coaster node (Coaster1, Coaster2, Coaster3)
+	#var coaster_node = get_node_or_null("MinigameUI/GameWindow/Screen/Coasters/Coaster" + str(drink_id))
+	#
+	#if not coaster_node:
+		#push_warning("Coaster%d node not found!" % drink_id)
+		#return
+	#
+	## Check if a cup is sitting on this coaster
+	#var drink = coaster_node.current_cup
+	#if drink != null:
+		## Block submission if the cup is actively filling
+		#if drink.is_filling:
+			#print("Cannot send drink while it is filling!")
+			#return
+		#
+		#var drink_data: Dictionary = drink.get_drink_data()
+		#
+		#print("Submitted Drink #%d: " % drink_id, drink_data)
+		## Returns: {"size": 1, "flavor": "Mango", "has_ice": true, "toppings": [0, 2]}
+#
+		#var drink_is_valid = validate_drink(drink_data)
+		#show_send_drink_status_toaster(drink_id, drink_is_valid)
+#
+		## Remove the cup from the workspace
+		#drink.queue_free()
+		#coaster_node.remove_cup()
+	#else:
+		#print("No drink on Coaster #%d to send!" % drink_id)
 
 func validate_drink(drink: Dictionary):
 	return drink in orders
@@ -356,43 +445,6 @@ func show_send_drink_status_toaster(drinkNum: int, isSuccess: bool):
 			drink_status_toaster_tween3.tween_interval(0.8)
 			drink_status_toaster_tween3.tween_property(drink_status_icon3, "modulate:a", 0.0, 0.3)
 			drink_status_toaster_tween3.finished.connect(drink_status_icon3.hide)
-
-func spawn_drink_order() -> void:
-	# get random drink order
-	var rand_size: CUP_SIZES = [CUP_SIZES.SMALL, CUP_SIZES.MEDIUM, CUP_SIZES.LARGE].pick_random()
-	var rand_flavor: FLAVORS = [FLAVORS.MANGO, FLAVORS.MATCHA, FLAVORS.HONEYDEW, FLAVORS.TARO].pick_random() 
-	var rand_ice: bool = [true, false].pick_random()
-	var rand_tapioca: bool = [true, false].pick_random()
-	var rand_boba: bool = [true, false].pick_random()
-	var rand_jelly: bool = [true, false].pick_random()
-	var rand_pudding: bool = [true, false].pick_random()
-
-	# Save data to tracking array for validation
-	var order = {
-		"size": rand_size,
-		"flavor": rand_flavor,
-		"has_ice": rand_ice,
-		"has_tapioca": rand_tapioca,
-		"has_popping_boba": rand_boba,
-		"has_grass_jelly": rand_jelly,
-		"has_pudding": rand_pudding
-	}
-	orders.append(order)
-	
-	# instantiate and add drink order ticket to screen
-	var new_order = drink_order_scene.instantiate()
-	orders_container.add_child(new_order)
-	
-	# Pass customized drink specs
-	new_order.set_order(order)
-	
-	# set ticket position
-	var order_count = orders_container.get_child_count() - 1
-	print("order count: %s" % (order_count + 1))
-	match order_count:
-		0: new_order.position = Vector2(40 + (order_count * 105), 175)
-		1: new_order.position = Vector2(40 + (order_count * 100), 175)
-		2: new_order.position = Vector2(40 + (order_count * 100), 175)
 
 # show local game result
 #
@@ -545,6 +597,7 @@ func client_open_game(is_p1: bool) -> void:
 	game_window.visible = true
 	result_timer = null
 	print("%d opened game" % multiplayer.get_unique_id())
+	start_orders_timer()
 
 # set local game state variables to match server's master copies
 #

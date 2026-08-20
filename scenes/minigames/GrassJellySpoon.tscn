@@ -9,7 +9,7 @@ height = 115.853134
 
 [node name="GrassJellySpoon" type="Area2D" unique_id=359205666]
 script = ExtResource("1_a51y5")
-topping_type = 2
+topping_type = 3
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=964016341]
 scale = Vector2(0.1, 0.1)

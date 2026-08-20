@@ -190,7 +190,6 @@ position = Vector2(17, 64)
 
 [node name="MatchaDispenser" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser" unique_id=156156222 instance=ExtResource("7_n1cwh")]
 position = Vector2(-498, -347)
-flavor = 1
 
 [node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser/MatchaDispenser" index="0" unique_id=13670146]
 position = Vector2(596.175, 376.5)
@@ -201,7 +200,6 @@ position = Vector2(603, 400)
 
 [node name="HoneydewDispenser" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser" unique_id=921366755 instance=ExtResource("8_yh4ya")]
 position = Vector2(-498, -347)
-flavor = 2
 
 [node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser/HoneydewDispenser" index="0" unique_id=13670146]
 position = Vector2(686, 376)
@@ -212,7 +210,6 @@ position = Vector2(691, 405)
 
 [node name="BrownsugarDispenser" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser" unique_id=1878401235 instance=ExtResource("9_5cb16")]
 position = Vector2(-498, -347)
-flavor = 3
 
 [node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser/BrownsugarDispenser" index="0" unique_id=13670146]
 position = Vector2(774, 375.00003)
@@ -222,7 +219,6 @@ scale = Vector2(0.16447361, 0.16072945)
 position = Vector2(781, 406)
 
 [node name="TaroDispenser" parent="MinigameUI/GameWindow/Screen/TeaDispensers" unique_id=574873936 instance=ExtResource("10_y8frw")]
-flavor = 4
 
 [node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/TeaDispensers/TaroDispenser" index="0" unique_id=13670146]
 position = Vector2(864, 374.5)
