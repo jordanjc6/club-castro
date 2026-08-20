@@ -30,6 +30,7 @@ const TOPPINGS = TOPPING_SCRIPT.Topping
 @export var pudding_scene: PackedScene
 @export var correct_drink_tex: Texture2D
 @export var incorrect_drink_tex: Texture2D
+@export var drink_order_scene = preload("res://scenes/minigames/DrinkOrder.tscn")
 
 @onready var hud: CanvasLayer = $"../../HUD"
 
@@ -53,6 +54,7 @@ const TOPPINGS = TOPPING_SCRIPT.Topping
 @onready var drink_status_icon1: TextureRect = $MinigameUI/GameWindow/Screen/Coasters/Coaster1/DrinkStatusIcon
 @onready var drink_status_icon2: TextureRect = $MinigameUI/GameWindow/Screen/Coasters/Coaster2/DrinkStatusIcon
 @onready var drink_status_icon3: TextureRect = $MinigameUI/GameWindow/Screen/Coasters/Coaster3/DrinkStatusIcon
+@onready var orders_container = $MinigameUI/GameWindow/Screen/Orders
 
 # send drink buttons
 @onready var send_drink1_btn: Button = $MinigameUI/GameWindow/Screen/Coasters/Coaster1/SendButton
@@ -117,6 +119,9 @@ func _ready() -> void:
 	drink_status_icon1.visible = false
 	drink_status_icon2.visible = false
 	drink_status_icon3.visible = false
+	spawn_drink_order()
+	spawn_drink_order()
+	spawn_drink_order()
 	
 	# send drink buttons
 	send_drink1_btn.pressed.connect(send_drink.bind(1))
@@ -351,6 +356,43 @@ func show_send_drink_status_toaster(drinkNum: int, isSuccess: bool):
 			drink_status_toaster_tween3.tween_interval(0.8)
 			drink_status_toaster_tween3.tween_property(drink_status_icon3, "modulate:a", 0.0, 0.3)
 			drink_status_toaster_tween3.finished.connect(drink_status_icon3.hide)
+
+func spawn_drink_order() -> void:
+	# get random drink order
+	var rand_size: CUP_SIZES = [CUP_SIZES.SMALL, CUP_SIZES.MEDIUM, CUP_SIZES.LARGE].pick_random()
+	var rand_flavor: FLAVORS = [FLAVORS.MANGO, FLAVORS.MATCHA, FLAVORS.HONEYDEW, FLAVORS.TARO].pick_random() 
+	var rand_ice: bool = [true, false].pick_random()
+	var rand_tapioca: bool = [true, false].pick_random()
+	var rand_boba: bool = [true, false].pick_random()
+	var rand_jelly: bool = [true, false].pick_random()
+	var rand_pudding: bool = [true, false].pick_random()
+
+	# Save data to tracking array for validation
+	var order = {
+		"size": rand_size,
+		"flavor": rand_flavor,
+		"has_ice": rand_ice,
+		"has_tapioca": rand_tapioca,
+		"has_popping_boba": rand_boba,
+		"has_grass_jelly": rand_jelly,
+		"has_pudding": rand_pudding
+	}
+	orders.append(order)
+	
+	# instantiate and add drink order ticket to screen
+	var new_order = drink_order_scene.instantiate()
+	orders_container.add_child(new_order)
+	
+	# Pass customized drink specs
+	new_order.set_order(order)
+	
+	# set ticket position
+	var order_count = orders_container.get_child_count() - 1
+	print("order count: %s" % (order_count + 1))
+	match order_count:
+		0: new_order.position = Vector2(40 + (order_count * 105), 175)
+		1: new_order.position = Vector2(40 + (order_count * 100), 175)
+		2: new_order.position = Vector2(40 + (order_count * 100), 175)
 
 # show local game result
 #

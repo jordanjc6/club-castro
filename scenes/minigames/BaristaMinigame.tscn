@@ -151,6 +151,8 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxTexture_do0cr")
 
+[node name="Orders" type="Node2D" parent="MinigameUI/GameWindow/Screen" unique_id=899888879]
+
 [node name="CupSpawners" type="Node2D" parent="MinigameUI/GameWindow/Screen" unique_id=881950678]
 
 [node name="SmallCupSpawner" type="Button" parent="MinigameUI/GameWindow/Screen/CupSpawners" unique_id=1772568663]

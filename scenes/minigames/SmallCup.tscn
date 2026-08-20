@@ -13,7 +13,7 @@ size = Vector2(71, 111)
 
 [node name="SmallCup" type="Area2D" unique_id=359205666]
 script = ExtResource("1_twqxk")
-cup_size = 0
+cup_size = 1
 grass_jelly_bottom_offset = 50.0
 
 [node name="DrinkFill" type="Polygon2D" parent="." unique_id=280173564]

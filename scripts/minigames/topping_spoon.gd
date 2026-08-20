@@ -1,6 +1,6 @@
 extends Area2D
 
-enum Topping { TAPIOCA, POPPING_BOBA, GRASS_JELLY, PUDDING }
+enum Topping { NONE, TAPIOCA, POPPING_BOBA, GRASS_JELLY, PUDDING }
 
 @export var topping_type: Topping = Topping.TAPIOCA
 

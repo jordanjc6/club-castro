@@ -1,6 +1,6 @@
 extends Area2D
 
-enum CupSize { SMALL, MEDIUM, LARGE }
+enum CupSize { NONE, SMALL, MEDIUM, LARGE }
 
 const DISPENSER_SCRIPT = preload("res://scripts/minigames/dispenser.gd")
 const FLAVORS = DISPENSER_SCRIPT.DrinkFlavor
