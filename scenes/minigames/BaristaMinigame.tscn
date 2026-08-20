@@ -366,6 +366,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="GameResult" type="PanelContainer" parent="MinigameUI" unique_id=1386153806]
+visible = false
 anchors_preset = -1
 anchor_left = 0.07300001
 anchor_top = 0.16100001

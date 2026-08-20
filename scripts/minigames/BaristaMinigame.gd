@@ -9,6 +9,12 @@
 # there is no removing a wrong action on an order, just need to send it to remove
 # it from work space
 
+# todo:
+#1 clear drinks from coaster on game over
+#2 update order popup display, only hide on clicking an order
+#3 create timer between game ending and being prompted to click to exit
+#4 disable monkey movement on joining game
+
 extends Node2D
 
 const CUP_SCRIPT = preload("res://scripts/minigames/cup.gd")
@@ -532,6 +538,8 @@ func _on_screen_overlay_gui_input(event: InputEvent) -> void:
 		# Close result panel & reset
 		game_result_panel.visible = false
 		game_window.visible = false
+		screen_overlay.visible = false
+		result_overlay.visible = false
 		reset_match_state()
 
 # --- SERVER LOBBY LOGIC ---
