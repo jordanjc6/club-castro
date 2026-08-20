@@ -151,6 +151,24 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxTexture_do0cr")
 
+[node name="TimerLabel" type="Label" parent="MinigameUI/GameWindow/Screen" unique_id=89217815]
+layout_mode = 0
+offset_left = 19.0
+offset_top = 14.0
+offset_right = 118.0
+offset_bottom = 83.0
+theme_override_font_sizes/font_size = 50
+text = "2:00"
+
+[node name="ScoreLabel" type="Label" parent="MinigameUI/GameWindow/Screen" unique_id=1770127784]
+layout_mode = 0
+offset_left = 19.0
+offset_top = 80.0
+offset_right = 118.0
+offset_bottom = 149.0
+theme_override_font_sizes/font_size = 28
+text = "Orders: 0"
+
 [node name="Orders" type="Node2D" parent="MinigameUI/GameWindow/Screen" unique_id=899888879]
 
 [node name="CupSpawners" type="Node2D" parent="MinigameUI/GameWindow/Screen" unique_id=881950678]
@@ -339,8 +357,15 @@ offset_bottom = 666.0
 scale = Vector2(0.4, 0.4)
 texture = ExtResource("19_hsd2r")
 
+[node name="Overlay" type="Control" parent="MinigameUI/GameWindow" unique_id=1397088031]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
 [node name="GameResult" type="PanelContainer" parent="MinigameUI" unique_id=1386153806]
-visible = false
 anchors_preset = -1
 anchor_left = 0.07300001
 anchor_top = 0.16100001
@@ -362,26 +387,8 @@ text = "<Game Result>"
 label_settings = SubResource("LabelSettings_nibfx")
 horizontal_alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MinigameUI/GameResult/VBoxContainer" unique_id=1548872913]
-custom_minimum_size = Vector2(0, 100)
+[node name="Overlay" type="Control" parent="MinigameUI/GameResult" unique_id=876460029]
 layout_mode = 2
-size_flags_vertical = 6
-theme_override_constants/separation = 75
-alignment = 1
-
-[node name="CloseButton" type="Button" parent="MinigameUI/GameResult/VBoxContainer/HBoxContainer" unique_id=647496552]
-custom_minimum_size = Vector2(200, 100)
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 42
-theme_override_styles/normal = SubResource("StyleBoxFlat_yokly")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_yokly")
-theme_override_styles/hover = SubResource("StyleBoxFlat_yokly")
-theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_yokly")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_yokly")
-theme_override_styles/focus = SubResource("StyleBoxFlat_yokly")
-text = "Close"
 
 [editable path="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser"]
 [editable path="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser/MatchaDispenser"]

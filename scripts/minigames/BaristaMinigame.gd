@@ -42,7 +42,10 @@ const TOPPINGS = TOPPING_SCRIPT.Topping
 
 # game window
 @onready var game_window: Control = $MinigameUI/GameWindow
+@onready var screen_overlay: Control = $MinigameUI/GameWindow/Overlay # doesn't include game result area
 @onready var screen: Control = $MinigameUI/GameWindow/Screen
+@onready var timer_label: Label = $MinigameUI/GameWindow/Screen/TimerLabel
+@onready var score_label: Label = $MinigameUI/GameWindow/Screen/ScoreLabel
 @onready var small_cup_spawner: Control = $MinigameUI/GameWindow/Screen/CupSpawners/SmallCupSpawner
 @onready var medium_cup_spawner: Control = $MinigameUI/GameWindow/Screen/CupSpawners/MediumCupSpawner
 @onready var large_cup_spawner: Control = $MinigameUI/GameWindow/Screen/CupSpawners/LargeCupSpawner
@@ -65,10 +68,15 @@ const TOPPINGS = TOPPING_SCRIPT.Topping
 var orders: Array[Dictionary] = []
 var order_timer: Timer
 
+# --- MATCH TIMING & SCORE ---
+var match_time_left: float = 120.0 # 2 minutes in seconds
+var orders_completed: int = 0
+var is_match_running: bool = false
+
 # game result
 @onready var game_result_panel: PanelContainer = $MinigameUI/GameResult
+@onready var result_overlay: Control = $MinigameUI/GameResult/Overlay # handles clicks inside game result panel
 @onready var game_result_label: Label = $MinigameUI/GameResult/VBoxContainer/Label
-@onready var close_result_button: Button = $MinigameUI/GameResult/VBoxContainer/HBoxContainer/CloseButton
 
 # --- MATCH VARIABLES (Unique per table instance) ---
 # ---------------------------------------------------
@@ -77,12 +85,20 @@ var board_state: Array[int] = [0, 0, 0, 0, 0, 0, 0, 0, 0] # 0=empty, 1=Player1 (
 var current_turn_idx: int = 0 # Index of whose turn it is in seated_players
 var am_i_player_one: bool = false
 var result_timer: SceneTreeTimer = null # used to show game result for some seconds
-var is_mango_active: bool = false
-var is_matcha_active: bool = false
 var drink_status_toaster_tween1: Tween
 var drink_status_toaster_tween2: Tween
 var drink_status_toaster_tween3: Tween
 
+
+func _process(delta: float) -> void:
+	if is_match_running:
+		match_time_left -= delta
+		
+		if match_time_left <= 0:
+			match_time_left = 0
+			_end_match()
+			
+		_update_timer_display()
 
 func _ready() -> void:
 	# ui popups hidden on startup
@@ -99,6 +115,8 @@ func _ready() -> void:
 	cancel_button.pressed.connect(_on_cancel_button_pressed)
 	
 	# game window
+	screen_overlay.visible = false
+	result_overlay.visible = false
 	small_cup_spawner.gui_input.connect(spawn_small_cup)
 	medium_cup_spawner.gui_input.connect(spawn_medium_cup)
 	large_cup_spawner.gui_input.connect(spawn_large_cup)
@@ -117,7 +135,8 @@ func _ready() -> void:
 	send_drink3_btn.pressed.connect(send_drink.bind(3))
 	
 	# game result panel buttons
-	close_result_button.pressed.connect(_on_close_result_button_pressed)
+	screen_overlay.gui_input.connect(_on_screen_overlay_gui_input)
+	result_overlay.gui_input.connect(_on_screen_overlay_gui_input)
 
 # show local game prompt upon entering game area
 #
@@ -164,6 +183,49 @@ func _on_cancel_button_pressed() -> void:
 	game_prompt_panel.visible = false
 	game_window.visible = false
 	server_leave_seat.rpc_id(1, multiplayer.get_unique_id())
+
+# Start game session timer & reset score
+func _start_match() -> void:
+	orders_completed = 0
+	match_time_left = 120.0
+	is_match_running = true
+	start_orders_timer()
+	_update_score_display()
+
+func _update_timer_display() -> void:
+	if timer_label:
+		var minutes: int = int(match_time_left) / 60
+		var seconds: int = int(match_time_left) % 60
+		timer_label.text = "%02d:%02d" % [minutes, seconds]
+
+func _update_score_display() -> void:
+	if score_label:
+		score_label.text = "Orders: %d" % orders_completed
+
+func reset_match_state() -> void:
+	is_match_running = false
+	order_timer.stop()
+	order_timer = null
+	orders = []
+	match_time_left = 120.0
+	orders_completed = 0
+	seated_players = []
+	result_timer = null
+	game_prompt_panel.visible = false
+	drink_status_icon1.visible = false
+	drink_status_icon2.visible = false
+	drink_status_icon3.visible = false
+	# Clear all displayed ticket nodes
+	for child in orders_container.get_children():
+		child.queue_free()
+
+func _end_match() -> void:
+	is_match_running = false
+	order_timer.stop()
+	
+	# Display final game results panel
+	var result_msg = "Time's Up!\nOrders Completed: %d" % orders_completed
+	show_game_result(result_msg)
 
 func start_orders_timer() -> void:
 	# generate one order and start order timer
@@ -332,6 +394,10 @@ func check_and_fulfill_order(submitted_drink: Dictionary) -> bool:
 			# 1. Remove order from tracking array
 			orders.remove_at(i)
 			
+			# Increment score & update counter text
+			orders_completed += 1
+			_update_score_display()
+			
 			# 2. Rebuild ticket UI rack (clears old nodes & pulls next pending order)
 			_rebuild_ticket_ui()
 			return true
@@ -451,26 +517,22 @@ func show_send_drink_status_toaster(drinkNum: int, isSuccess: bool):
 @rpc("authority", "call_local", "reliable")
 func show_game_result(message: String) -> void:
 	print("show game result for %d" % multiplayer.get_unique_id())
-	game_result_label.text = message
+	game_result_label.text = message + "\n\n Click anywhere to exit..."
 	game_result_panel.visible = true
-	
-	# show result for a set amount of time..
-	
-	# Create and store timer
-	var this_timer = get_tree().create_timer(5.0)
-	result_timer = this_timer
-	await this_timer.timeout
-	
-	# Only hide if this timer is STILL active and hasn't been cancelled/replaced
-	if result_timer == this_timer:
-		game_result_panel.visible = false
-		result_timer = null
+	screen_overlay.visible = true
+	result_overlay.visible = true
 
-# close local game result
-#
-func _on_close_result_button_pressed() -> void:
-	print("%d closed game result" % multiplayer.get_unique_id())
-	game_result_panel.visible = false
+func _on_screen_overlay_gui_input(event: InputEvent) -> void:
+	var is_click = event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed
+	var is_touch = event is InputEventScreenTouch and event.pressed
+	
+	if is_click or is_touch:
+		get_viewport().set_input_as_handled()
+		
+		# Close result panel & reset
+		game_result_panel.visible = false
+		game_window.visible = false
+		reset_match_state()
 
 # --- SERVER LOBBY LOGIC ---
 # --------------------------
@@ -597,7 +659,7 @@ func client_open_game(is_p1: bool) -> void:
 	game_window.visible = true
 	result_timer = null
 	print("%d opened game" % multiplayer.get_unique_id())
-	start_orders_timer()
+	_start_match()
 
 # set local game state variables to match server's master copies
 #
