@@ -1,8 +1,10 @@
 extends CharacterBody2D
-# test
+
 const SPEED = 300.0
 const JUMP_VELOCITY = -400.0
 var direction
+
+var is_movement_disabled: bool = false
 
 # Define your grid size based on your game resolution (e.g., 1152x648 or 1920x1080)
 const GRID_SIZE = Vector2(1280, 720)
@@ -30,6 +32,8 @@ func play_teleport_fade() -> void:
 	animation_player.play("fade_from_black")
 
 func _physics_process(delta: float) -> void:
+	if is_movement_disabled:
+		return
 	direction = Input.get_vector("walk-left", "walk-right", "walk-backward", "walk-forward")
 	
 	if direction != Vector2.ZERO:
@@ -89,3 +93,9 @@ func update_walk_animation(dir: Vector2) -> void:
 	elif dir.x != 0:
 		monkey.play("walking-side")
 		monkey.flip_h = (dir.x < 0)
+
+func set_movement_disabled(disabled: bool) -> void:
+	is_movement_disabled = disabled
+	if disabled:
+		velocity = Vector2.ZERO
+		monkey.stop()

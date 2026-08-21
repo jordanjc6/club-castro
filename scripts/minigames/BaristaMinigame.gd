@@ -9,12 +9,6 @@
 # there is no removing a wrong action on an order, just need to send it to remove
 # it from work space
 
-# todo:
-#1 clear drinks from coaster on game over
-#2 update order popup display, only hide on clicking an order
-#3 create timer between game ending and being prompted to click to exit
-#4 disable monkey movement on joining game
-
 extends Node2D
 
 const CUP_SCRIPT = preload("res://scripts/minigames/cup.gd")
@@ -139,10 +133,6 @@ func _ready() -> void:
 	send_drink1_btn.pressed.connect(send_drink.bind(1))
 	send_drink2_btn.pressed.connect(send_drink.bind(2))
 	send_drink3_btn.pressed.connect(send_drink.bind(3))
-	
-	# game result panel buttons
-	screen_overlay.gui_input.connect(_on_screen_overlay_gui_input)
-	result_overlay.gui_input.connect(_on_screen_overlay_gui_input)
 
 # show local game prompt upon entering game area
 #
@@ -158,20 +148,39 @@ func _on_body_entered(body: Node) -> void:
 
 # close local game prompt / quit game upon leaving game area
 #
+#func _on_body_exited(body: Node) -> void:
+	## ignore if it wasn't a player that interacted
+	#if not is_instance_valid(body) or not body.is_inside_tree():
+		#return
+	#
+	#var input_sync = body.get_node_or_null("InputSynchronizer")
+		#
+	## only hide popup for the player that exited
+	#if ( (input_sync and input_sync.is_multiplayer_authority()) or body.name == "SinglePlayer"):
+		#print("game area exited by %s" % body)
+		#if body.name == "SinglePlayer":
+			#hud.visible = true
+		#game_prompt_panel.visible = false
+		## if game is in progress, quit it
+		#if game_window.visible:
+			#_on_cancel_button_pressed()
+
 func _on_body_exited(body: Node) -> void:
-	# ignore if it wasn't a player that interacted
 	if not is_instance_valid(body) or not body.is_inside_tree():
 		return
 	
-	var input_sync = body.get_node_or_null("InputSynchronizer")
-		
-	# only hide popup for the player that exited
-	if ( (input_sync and input_sync.is_multiplayer_authority()) or body.name == "SinglePlayer"):
-		print("game area exited by %s" % body)
-		if body.name == "SinglePlayer":
-			hud.visible = true
+	if body.name == "SinglePlayer":
+		hud.visible = true
 		game_prompt_panel.visible = false
-		# if game is in progress, quit it
+		if game_window.visible:
+			_on_cancel_button_pressed()
+		return
+
+	var input_sync = body.get_node_or_null("InputSynchronizer")
+	# Check is_inside_tree on input_sync before calling authority
+	if input_sync and input_sync.is_inside_tree() and input_sync.is_multiplayer_authority():
+		print("game area exited by %s" % body)
+		game_prompt_panel.visible = false
 		if game_window.visible:
 			_on_cancel_button_pressed()
 
@@ -209,6 +218,8 @@ func _update_score_display() -> void:
 		score_label.text = "Orders: %d" % orders_completed
 
 func reset_match_state() -> void:
+	screen_overlay.gui_input.disconnect(_on_screen_overlay_gui_input)
+	result_overlay.gui_input.disconnect(_on_screen_overlay_gui_input)
 	is_match_running = false
 	order_timer.stop()
 	order_timer = null
@@ -224,6 +235,16 @@ func reset_match_state() -> void:
 	# Clear all displayed ticket nodes
 	for child in orders_container.get_children():
 		child.queue_free()
+	# Clear all spawned cup nodes
+	for child in screen.get_children():
+		if child.get_script() == CUP_SCRIPT:
+			child.queue_free()
+	# Clear active dispenser
+	for dispenser in get_tree().get_nodes_in_group("dispenser"):
+		dispenser.is_active = false
+		if dispenser.has_method("_update_modulate"):
+			dispenser._update_modulate()
+	set_local_player_movement_disabled(false)
 
 func _end_match() -> void:
 	is_match_running = false
@@ -426,36 +447,6 @@ func _rebuild_ticket_ui() -> void:
 	# Render the first 3 orders in queue
 	spawn_drink_order()
 
-#func send_drink(drink_id: int):
-	## Dynamically get the coaster node (Coaster1, Coaster2, Coaster3)
-	#var coaster_node = get_node_or_null("MinigameUI/GameWindow/Screen/Coasters/Coaster" + str(drink_id))
-	#
-	#if not coaster_node:
-		#push_warning("Coaster%d node not found!" % drink_id)
-		#return
-	#
-	## Check if a cup is sitting on this coaster
-	#var drink = coaster_node.current_cup
-	#if drink != null:
-		## Block submission if the cup is actively filling
-		#if drink.is_filling:
-			#print("Cannot send drink while it is filling!")
-			#return
-		#
-		#var drink_data: Dictionary = drink.get_drink_data()
-		#
-		#print("Submitted Drink #%d: " % drink_id, drink_data)
-		## Returns: {"size": 1, "flavor": "Mango", "has_ice": true, "toppings": [0, 2]}
-#
-		#var drink_is_valid = validate_drink(drink_data)
-		#show_send_drink_status_toaster(drink_id, drink_is_valid)
-#
-		## Remove the cup from the workspace
-		#drink.queue_free()
-		#coaster_node.remove_cup()
-	#else:
-		#print("No drink on Coaster #%d to send!" % drink_id)
-
 func validate_drink(drink: Dictionary):
 	return drink in orders
 
@@ -523,10 +514,15 @@ func show_send_drink_status_toaster(drinkNum: int, isSuccess: bool):
 @rpc("authority", "call_local", "reliable")
 func show_game_result(message: String) -> void:
 	print("show game result for %d" % multiplayer.get_unique_id())
-	game_result_label.text = message + "\n\n Click anywhere to exit..."
+	game_result_label.text = message
 	game_result_panel.visible = true
 	screen_overlay.visible = true
 	result_overlay.visible = true
+	
+	await get_tree().create_timer(4.0).timeout
+	game_result_label.text = message + "\n\n Click anywhere to exit..."
+	screen_overlay.gui_input.connect(_on_screen_overlay_gui_input)
+	result_overlay.gui_input.connect(_on_screen_overlay_gui_input)
 
 func _on_screen_overlay_gui_input(event: InputEvent) -> void:
 	var is_click = event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed
@@ -596,65 +592,6 @@ func server_leave_seat(peer_id: int) -> void:
 		for player in seated_players:
 			sync_match_state.rpc_id(player, board_state, current_turn_idx, seated_players)
 
-# --- SERVER GAMEPLAY LOGIC ---
-# -----------------------------
-
-# callback for when button/space on game board pressed
-# register the move and check for win cond'ns
-#
-@rpc("any_peer", "call_local", "reliable")
-func server_submit_move(cell_idx: int) -> void:
-	return 
-	#if not multiplayer.is_server(): return
-	#var moving_peer = multiplayer.get_remote_sender_id()
-	#
-	## ignore click if space is already fileld, not enough players, or not their turn
-	#if seated_players.size() < 2 or moving_peer != seated_players[current_turn_idx]:
-		#return
-	#if board_state[cell_idx] != 0:
-		#return
-	#
-	## set 1 for player 1 (X), 2 for player 2 (O)
-	#var marker = 1 if current_turn_idx == 0 else 2
-	#board_state[cell_idx] = marker
-	#
-	## Check Win / Draw
-	#if check_win_condition(marker) or not board_state.has(0):
-		#var p1 = seated_players[0]
-		#var p2 = seated_players[1]
-		#
-		#var is_draw = not check_win_condition(marker)
-		#var p1_msg = "It's a Draw!" if is_draw else ("You Win!" if current_turn_idx == 0 else "You Lose!")
-		#var p2_msg = "It's a Draw!" if is_draw else ("You Win!" if current_turn_idx == 1 else "You Lose!")
-#
-		## Reset server state first
-		#board_state.fill(0)
-		#current_turn_idx = 0
-		#seated_players.clear()
-		#
-		## Sync cleared state to both clients before ending game
-		#sync_match_state.rpc_id(p1, board_state, current_turn_idx, seated_players)
-		#sync_match_state.rpc_id(p2, board_state, current_turn_idx, seated_players)
-		#client_end_game.rpc_id(p1, p1_msg)
-		#client_end_game.rpc_id(p2, p2_msg)
-		#show_game_result.rpc_id(p1, p1_msg)
-		#show_game_result.rpc_id(p2, p2_msg)
-		#return
-	#
-	## set next player's turn and sync players' match states
-	#current_turn_idx = 1 if current_turn_idx == 0 else 0
-	#sync_match_state.rpc_id(seated_players[0], board_state, current_turn_idx, seated_players)
-	#sync_match_state.rpc_id(seated_players[1], board_state, current_turn_idx, seated_players)
-
-# check win cond'ns for tic-tac-toe
-#
-func check_win_condition(m: int) -> bool:
-	return true
-	#var b = board_state
-	#return ((b[0]==m and b[1]==m and b[2]==m) or (b[3]==m and b[4]==m and b[5]==m) or (b[6]==m and b[7]==m and b[8]==m) or
-			#(b[0]==m and b[3]==m and b[6]==m) or (b[1]==m and b[4]==m and b[7]==m) or (b[2]==m and b[5]==m and b[8]==m) or
-			#(b[0]==m and b[4]==m and b[8]==m) or (b[2]==m and b[4]==m and b[6]==m))
-
 # --- CLIENT SYNC LOGIC ---
 # -------------------------
 
@@ -662,6 +599,7 @@ func check_win_condition(m: int) -> bool:
 #
 @rpc("authority", "call_local", "reliable")
 func client_open_game(is_p1: bool) -> void:
+	set_local_player_movement_disabled(true)
 	am_i_player_one = is_p1
 	game_prompt_panel.visible = false
 	game_window.visible = true
@@ -676,8 +614,6 @@ func sync_match_state(server_board: Array, server_turn_idx: int, server_seated_p
 	board_state = server_board
 	current_turn_idx = server_turn_idx
 	seated_players = server_seated_players
-	update_ui_grid()
-	update_player_labels()
 	print("sync match state for %d" % multiplayer.get_unique_id())
 
 # reset game state and close local game window
@@ -689,49 +625,35 @@ func client_end_game(result_text: String) -> void:
 	result_timer = null
 	board_state.fill(0)
 	seated_players.clear()
-	update_ui_grid()
-	update_player_labels()
 
-# set Xs and Os in UI according to board state
-# only enable empty buttons/spaces for player's turn
-#
-func update_ui_grid() -> void:
-	return
-	#var grid_container = game_window.get_node_or_null("VBoxContainer/CenterContainer/GridContainer")
-	#if not grid_container: return
-	#
-	#for i in range(9):
-		#var btn = grid_container.get_child(i) as Button
-		#if board_state[i] == 1:
-			#btn.text = "X"
-			#btn.disabled = true
-		#elif board_state[i] == 2:
-			#btn.text = "O"
-			#btn.disabled = true
-		#else:
-			#btn.text = ""
-			#var is_my_turn = (current_turn_idx == 0 and am_i_player_one) or (current_turn_idx == 1 and not am_i_player_one)
-			#btn.disabled = not is_my_turn
+func get_local_player() -> CharacterBody2D:
+	# 1. Singleplayer Check
+	var singleplayer = get_tree().root.find_child("SinglePlayer", true, false)
+	if is_instance_valid(singleplayer):
+		return singleplayer
+		
+	# 2. Multiplayer Check: Match node name to unique multiplayer peer ID
+	var local_id_str = str(multiplayer.get_unique_id())
+	var players_container = get_tree().root.find_child("Players", true, false)
+	
+	if is_instance_valid(players_container):
+		# Look for node named after this local machine's peer ID (e.g. "1" or "112267552")
+		var local_node = players_container.get_node_or_null(local_id_str)
+		if is_instance_valid(local_node):
+			return local_node
+			
+		# Fallback: Find child with multiplayer authority
+		for child in players_container.get_children():
+			if child is MultiPlayer and child.is_multiplayer_authority():
+				return child
+				
+	return null
 
-# update player labels, bold whoever's turn it is
-#
-func update_player_labels() -> void:
-	return
-	#var player1_label = game_window.get_node_or_null("VBoxContainer/HBoxContainer2/Player1Label") as RichTextLabel
-	#var player2_label = game_window.get_node_or_null("VBoxContainer/HBoxContainer2/Player2Label") as RichTextLabel
-	#if not player1_label or not player2_label:
-		#return
-	#
-	#var p1 = "Player 1"
-	#var p2 = "Player 2" if seated_players.size() == 2 else "Waiting..."
-	#
-	#if seated_players.size() == 2:
-		#if current_turn_idx == 0:
-			#player1_label.text = "[center][b]► " + p1 + "[/b][/center]"
-			#player2_label.text = "[center]" + p2 + "[/center]"
-		#else:
-			#player1_label.text = "[center]" + p1 + "[/center]"
-			#player2_label.text = "[center][b]► " + p2 + "[/b][/center]"
-	#else:
-		#player1_label.text = "[center]" + p1 + "[/center]"
-		#player2_label.text = "[center]" + p2 + "[/center]"
+func set_local_player_movement_disabled(disabled: bool) -> void:
+	var player = get_local_player()
+	if player and player.has_method("set_movement_disabled"):
+		# Use rpc if it's a MultiPlayer node to ensure the server registers the disable flag
+		if player is MultiPlayer:
+			player.set_movement_disabled.rpc(disabled)
+		else:
+			player.set_movement_disabled(disabled)

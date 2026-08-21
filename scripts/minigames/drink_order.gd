@@ -9,6 +9,9 @@ const FLAVORS = DISPENSER_SCRIPT.DrinkFlavor
 const TOPPING_SCRIPT = preload("res://scripts/minigames/topping_spoon.gd")
 const TOPPINGS = TOPPING_SCRIPT.Topping
 
+# Stores the currently active open ticket across all instances
+static var currently_open_ticket: Node = null
+
 var drink_order: Dictionary = {
 		"size": CUP_SIZES.NONE,
 		"flavor": FLAVORS.NONE,
@@ -21,8 +24,8 @@ var drink_order: Dictionary = {
 
 @onready var ticket_button: TextureButton = $TicketButton
 @onready var details_popup: CanvasLayer = $DetailsPopup
-@onready var backdrop: Control = $DetailsPopup/OverlayBackdrop
-@onready var order_number: Label = $DetailsPopup/OverlayBackdrop/DetailPanel/VBoxContainer/Label
+@onready var order_number: Label = $DetailsPopup/DetailPanel/VBoxContainer/Label
+
 
 func _ready() -> void:
 	details_popup.hide()
@@ -32,7 +35,7 @@ func _ready() -> void:
 	ticket_button.pressed.connect(_on_ticket_pressed)
 	
 	# Close the overlay whenever anywhere on the backdrop screen is clicked/touched
-	backdrop.gui_input.connect(_on_backdrop_gui_input)
+	#backdrop.gui_input.connect(_on_backdrop_gui_input)
 
 func set_order(order: Dictionary) -> void:
 	drink_order = order
@@ -69,13 +72,27 @@ func _update_order_display() -> void:
 	]
 
 func _on_ticket_pressed() -> void:
-	print("show order popup")
-	details_popup.show()
-
-# Close overlay on any click/tap anywhere on screen
-func _on_backdrop_gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		print("hide order popup")
+	print("order ticket pressed")
+	
+	# 1. If this exact ticket is already open, toggle it closed
+	if currently_open_ticket == self:
 		details_popup.hide()
-		# Prevents the click from passing through to underlying game buttons/dispensers
-		get_viewport().set_input_as_handled()
+		currently_open_ticket = null
+		return
+
+	# 2. If another ticket is currently open, close it
+	if currently_open_ticket != null and is_instance_valid(currently_open_ticket):
+		currently_open_ticket.hide_details()
+
+	# 3. Open details for this ticket and mark it as active
+	details_popup.show()
+	currently_open_ticket = self
+
+# Helper method called by other tickets to close this popup
+func hide_details() -> void:
+	details_popup.hide()
+
+# Cleanup static reference if the ticket node gets destroyed while open
+func _exit_tree() -> void:
+	if currently_open_ticket == self:
+		currently_open_ticket = null
