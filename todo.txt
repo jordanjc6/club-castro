@@ -1,0 +1,31 @@
+Goal - Prepare for publish to App Store
+
+1. Cinema
+- add central collision barrier over food counter
+- add barrier to non-enterable theatres
+- make movie selector popup disappear on walking away from interaction area
+- generate monkey-themed small videos 
+- update movie selector gui
+
+2. BBT
+- add popup for singleplayer to indicate tic tac toe is for multiplayer
+- add barrier to upstairs
+
+3. Jungle Plaza
+- add barrier to rec center
+- add barriers to right and left exit arrow signs
+
+4. Multiplayer
+- add popup for host button
+- add popup for join button
+- implement generating game code for host to share with joiner for local wifi 
+multiplayer
+
+5. IOS
+- implement touch area to walk towards
+- test host/join buttons are pressable
+- test movie player ui pressable
+- test tic tac toe game pressable
+- test barista minigame pressable
+- add game music and sounds to areas and minigames
+- add highlighting/animation to interactable areas
