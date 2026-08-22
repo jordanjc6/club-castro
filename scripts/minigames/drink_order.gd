@@ -12,6 +12,10 @@ const TOPPINGS = TOPPING_SCRIPT.Topping
 # Stores the currently active open ticket across all instances
 static var currently_open_ticket: Node = null
 
+# Highlight colors
+const COLOR_NORMAL := Color(1.0, 1.0, 1.0) # Standard tint
+const COLOR_ACTIVE := Color(0.6, 0.6, 0.6)
+
 var drink_order: Dictionary = {
 	"number": 0,
 	"size": CUP_SIZES.NONE,
@@ -30,6 +34,7 @@ var drink_order: Dictionary = {
 
 func _ready() -> void:
 	details_popup.hide()
+	set_highlight(false)
 	_update_order_display()
 	
 	# Open overlay when ticket button is pressed
@@ -91,13 +96,14 @@ func _update_order_display() -> void:
 	]
 
 func _on_ticket_pressed() -> void:
-	#if !find_parent("BaristaMinigame").is_match_running: return
-	
 	print("order ticket pressed")
+	
+	# Release focus so Godot's button hover/focus state doesn't trap the color
+	ticket_button.release_focus()
 	
 	# 1. If this exact ticket is already open, toggle it closed
 	if currently_open_ticket == self:
-		details_popup.hide()
+		hide_details() # Called hide_details() instead of details_popup.hide()
 		currently_open_ticket = null
 		return
 
@@ -107,11 +113,17 @@ func _on_ticket_pressed() -> void:
 
 	# 3. Open details for this ticket and mark it as active
 	details_popup.show()
+	set_highlight(true)
 	currently_open_ticket = self
+
+# Helper method called to enable/disable the highlight visual
+func set_highlight(active: bool) -> void:
+	ticket_button.self_modulate = COLOR_ACTIVE if active else COLOR_NORMAL
 
 # Helper method called by other tickets to close this popup
 func hide_details() -> void:
 	details_popup.hide()
+	set_highlight(false)
 
 # Cleanup static reference if the ticket node gets destroyed while open
 func _exit_tree() -> void:
