@@ -13,14 +13,15 @@ const TOPPINGS = TOPPING_SCRIPT.Topping
 static var currently_open_ticket: Node = null
 
 var drink_order: Dictionary = {
-		"size": CUP_SIZES.NONE,
-		"flavor": FLAVORS.NONE,
-		"has_ice": false,
-		"has_tapioca": false,
-		"has_popping_boba": false,
-		"has_grass_jelly": false,
-		"has_pudding": false
-	}
+	"number": 0,
+	"size": CUP_SIZES.NONE,
+	"flavor": FLAVORS.NONE,
+	"has_ice": false,
+	"has_tapioca": false,
+	"has_popping_boba": false,
+	"has_grass_jelly": false,
+	"has_pudding": false
+}
 
 @onready var ticket_button: TextureButton = $TicketButton
 @onready var details_popup: CanvasLayer = $DetailsPopup
@@ -44,12 +45,13 @@ func set_order(order: Dictionary) -> void:
 func _update_order_display() -> void:
 	if not order_number:
 		return
-
+	
 	# Convert enum integer values (e.g. 1, 2) to readable formatted text ("Small", "Mango")
+	var order_str: String = "Order " + str(drink_order["number"])
 	var size_str: String = CUP_SIZES.keys()[drink_order["size"]].capitalize()
 	var flavor_str: String = FLAVORS.keys()[drink_order["flavor"]].capitalize()
-	var ice_str: String = "Yes" if drink_order["has_ice"] else "No"
-
+	var ice_str: String = "+ Ice\n" if drink_order["has_ice"] else ""
+	
 	# Build active toppings list
 	var active_toppings: Array[String] = []
 	if drink_order.get("has_tapioca", false):
@@ -60,11 +62,28 @@ func _update_order_display() -> void:
 		active_toppings.append("Grass Jelly")
 	if drink_order.get("has_pudding", false):
 		active_toppings.append("Pudding")
+	
+	var toppings_str: String = ""
 
-	var toppings_str: String = ", ".join(active_toppings) if active_toppings.size() > 0 else "None"
-
+	if active_toppings.is_empty():
+		toppings_str = "Toppings: None"
+	elif active_toppings.size() == 1:
+		# Single item: stays on the exact same line
+		toppings_str = "Toppings: " + active_toppings[0]
+	else:
+		# Multiple items: newline, max 2 per line, separated by commas
+		var toppings_lines: Array[String] = []
+		for i in range(0, active_toppings.size(), 2):
+			if i + 1 < active_toppings.size():
+				var comma = "," if (i + 2 < active_toppings.size()) else ""
+				toppings_lines.append("%s, %s%s" % [active_toppings[i], active_toppings[i + 1], comma])
+			else:
+				toppings_lines.append(active_toppings[i])
+		toppings_str = "Toppings:\n" + "\n".join(toppings_lines)
+			
 	# Display formatted order details
-	order_number.text = "Size: %s\nFlavor: %s\nIce: %s\nToppings: %s" % [
+	order_number.text = "%s - %s %s\n%s%s" % [
+		order_str,
 		size_str,
 		flavor_str,
 		ice_str,

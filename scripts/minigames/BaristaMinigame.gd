@@ -94,6 +94,7 @@ var result_timer: SceneTreeTimer = null # used to show game result for some seco
 var drink_status_toaster_tween1: Tween
 var drink_status_toaster_tween2: Tween
 var drink_status_toaster_tween3: Tween
+var order_count: int = 0
 
 
 func _process(delta: float) -> void:
@@ -295,6 +296,7 @@ func generate_random_order() -> void:
 
 	# Save data to tracking array for validation
 	var order = {
+		"number": order_count + 1,
 		"size": rand_size,
 		"flavor": rand_flavor,
 		"has_ice": rand_ice,
@@ -304,6 +306,7 @@ func generate_random_order() -> void:
 		"has_pudding": rand_pudding
 	}
 	orders.append(order)
+	order_count += order_count
 
 func spawn_drink_order() -> void:
 	var current_on_screen = orders_container.get_child_count()
@@ -449,6 +452,8 @@ func check_and_fulfill_order(submitted_drink: Dictionary) -> bool:
 func matches_order(d1: Dictionary, d2: Dictionary) -> bool:
 	print("sent: %s\n order: %s\n" % [d1, d2])
 	for key in d2.keys():
+		if key == "number":
+			continue
 		if not d1.has(key) or d1[key] != d2[key]:
 			return false
 	return true
