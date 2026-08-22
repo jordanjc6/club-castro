@@ -44,6 +44,7 @@ const TOPPINGS = TOPPING_SCRIPT.Topping
 @onready var game_window: Control = $MinigameUI/GameWindow
 @onready var screen_overlay: Control = $MinigameUI/GameWindow/Overlay # doesn't include game result area
 @onready var screen: Control = $MinigameUI/GameWindow/Screen
+@onready var exit_button: Button = $MinigameUI/GameWindow/Screen/ExitButton
 @onready var timer_label: Label = $MinigameUI/GameWindow/Screen/TimerLabel
 @onready var score_label: Label = $MinigameUI/GameWindow/Screen/ScoreLabel
 @onready var small_cup_spawner: Control = $MinigameUI/GameWindow/Screen/CupSpawners/SmallCupSpawner
@@ -72,6 +73,11 @@ var order_timer: Timer
 var match_time_left: float = 120.0 # 2 minutes in seconds
 var orders_completed: int = 0
 var is_match_running: bool = false
+
+# exit confirmation
+@onready var exit_panel: PanelContainer = $MinigameUI/ExitConfirmation
+@onready var confirm_exit_btn: Button = $MinigameUI/ExitConfirmation/VBoxContainer/HBoxContainer/YesButton
+@onready var cancel_exit_btn: Button = $MinigameUI/ExitConfirmation/VBoxContainer/HBoxContainer/NoButton
 
 # game result
 @onready var game_result_panel: PanelContainer = $MinigameUI/GameResult
@@ -104,6 +110,7 @@ func _ready() -> void:
 	# ui popups hidden on startup
 	game_prompt_panel.visible = false
 	game_window.visible = false
+	exit_panel.visible = false
 	game_result_panel.visible = false
 	
 	# interaction area signals
@@ -117,6 +124,7 @@ func _ready() -> void:
 	# game window
 	screen_overlay.visible = false
 	result_overlay.visible = false
+	exit_button.gui_input.connect(_on_exit_button)
 	small_cup_spawner.gui_input.connect(spawn_small_cup)
 	medium_cup_spawner.gui_input.connect(spawn_medium_cup)
 	large_cup_spawner.gui_input.connect(spawn_large_cup)
@@ -133,6 +141,10 @@ func _ready() -> void:
 	send_drink1_btn.pressed.connect(send_drink.bind(1))
 	send_drink2_btn.pressed.connect(send_drink.bind(2))
 	send_drink3_btn.pressed.connect(send_drink.bind(3))
+	
+	# exit confirmation
+	confirm_exit_btn.gui_input.connect(exit_confirmed)
+	cancel_exit_btn.gui_input.connect(exit_cancelled)
 
 # show local game prompt upon entering game area
 #
@@ -145,25 +157,6 @@ func _on_body_entered(body: Node) -> void:
 		hud.visible = false
 		game_prompt_panel.visible = true
 		game_result_panel.visible = false
-
-# close local game prompt / quit game upon leaving game area
-#
-#func _on_body_exited(body: Node) -> void:
-	## ignore if it wasn't a player that interacted
-	#if not is_instance_valid(body) or not body.is_inside_tree():
-		#return
-	#
-	#var input_sync = body.get_node_or_null("InputSynchronizer")
-		#
-	## only hide popup for the player that exited
-	#if ( (input_sync and input_sync.is_multiplayer_authority()) or body.name == "SinglePlayer"):
-		#print("game area exited by %s" % body)
-		#if body.name == "SinglePlayer":
-			#hud.visible = true
-		#game_prompt_panel.visible = false
-		## if game is in progress, quit it
-		#if game_window.visible:
-			#_on_cancel_button_pressed()
 
 func _on_body_exited(body: Node) -> void:
 	if not is_instance_valid(body) or not body.is_inside_tree():
@@ -198,6 +191,28 @@ func _on_cancel_button_pressed() -> void:
 	game_prompt_panel.visible = false
 	game_window.visible = false
 	server_leave_seat.rpc_id(1, multiplayer.get_unique_id())
+
+func _on_exit_button(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		print("exit btn clicked")
+		exit_panel.visible = true
+		screen_overlay.visible = true
+		order_timer.paused = true
+		is_match_running = false
+
+func exit_confirmed(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		print("exit confirmed")
+		exit_panel.visible = false
+		_end_match()
+
+func exit_cancelled(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		print("exit cancelled")
+		exit_panel.visible = false
+		screen_overlay.visible = false
+		order_timer.paused = false
+		is_match_running = true
 
 # Start game session timer & reset score
 func _start_match() -> void:
@@ -519,7 +534,7 @@ func show_game_result(message: String) -> void:
 	screen_overlay.visible = true
 	result_overlay.visible = true
 	
-	await get_tree().create_timer(4.0).timeout
+	await get_tree().create_timer(2).timeout
 	game_result_label.text = message + "\n\n Click anywhere to exit..."
 	screen_overlay.gui_input.connect(_on_screen_overlay_gui_input)
 	result_overlay.gui_input.connect(_on_screen_overlay_gui_input)

@@ -139,11 +139,17 @@ offset_top = -3.0
 offset_right = 2781.0
 offset_bottom = 723.0
 
-[node name="GameResult" parent="BaristaMinigame/MinigameUI" parent_id_path=PackedInt32Array(1344997855, 535232106) index="2" unique_id=1386153806]
+[node name="ExitConfirmation" parent="BaristaMinigame/MinigameUI" parent_id_path=PackedInt32Array(1344997855, 535232106) index="2" unique_id=213480221]
+visible = true
 offset_left = 1725.5599
-offset_top = -118.92001
+offset_top = -120.92001
 offset_right = 2374.56
-offset_bottom = 82.07999
+offset_bottom = 80.07999
+
+[node name="GameResult" parent="BaristaMinigame/MinigameUI" parent_id_path=PackedInt32Array(1344997855, 535232106) index="3" unique_id=1386153806]
+visible = true
+offset_left = 1725.5599
+offset_right = 2374.56
 
 [connection signal="body_entered" from="BBTCollisions/bbt-to-jungle-plaza" to="BBTCollisions/bbt-to-jungle-plaza" method="_on_body_entered"]
 

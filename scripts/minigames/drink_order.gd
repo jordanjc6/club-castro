@@ -72,6 +72,8 @@ func _update_order_display() -> void:
 	]
 
 func _on_ticket_pressed() -> void:
+	#if !find_parent("BaristaMinigame").is_match_running: return
+	
 	print("order ticket pressed")
 	
 	# 1. If this exact ticket is already open, toggle it closed

@@ -18,6 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://dxusxhc7g524t" path="res://scenes/minigames/taro_dispenser.tscn" id="10_y8frw"]
 [ext_resource type="Texture2D" uid="uid://csqq61o3s7m4j" path="res://assets/minigames/bbt-barista/drink-status-icons/error-10379_128.png" id="11_je2ua"]
 [ext_resource type="Texture2D" uid="uid://jrwgg6bk2fyh" path="res://assets/minigames/bbt-barista/drink-status-icons/check-symbol-4794_128.png" id="19_hsd2r"]
+[ext_resource type="Texture2D" uid="uid://dvbfkyccp7e2t" path="res://assets/icons/exit.png" id="19_m8jje"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_00mmp"]
 radius = 61.03278
@@ -46,6 +47,18 @@ corner_radius_bottom_left = 35
 texture = ExtResource("6_rgp3r")
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_do0cr"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_je2ua"]
+bg_color = Color(0.7764706, 0.8745098, 0.9647059, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_t5v6p"]
 radius = 56.142673
@@ -151,21 +164,37 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxTexture_do0cr")
 
+[node name="ExitButton" type="Button" parent="MinigameUI/GameWindow/Screen" unique_id=218723624]
+custom_maximum_size = Vector2(90, 90)
+layout_mode = 0
+offset_left = -3.0
+offset_top = -4.0
+offset_right = 87.0
+offset_bottom = 86.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_je2ua")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_je2ua")
+theme_override_styles/hover = SubResource("StyleBoxFlat_je2ua")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_je2ua")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_je2ua")
+theme_override_styles/focus = SubResource("StyleBoxFlat_je2ua")
+icon = ExtResource("19_m8jje")
+icon_alignment = 1
+
 [node name="TimerLabel" type="Label" parent="MinigameUI/GameWindow/Screen" unique_id=89217815]
 layout_mode = 0
-offset_left = 19.0
-offset_top = 14.0
-offset_right = 118.0
-offset_bottom = 83.0
+offset_left = 18.0
+offset_top = 558.0
+offset_right = 117.0
+offset_bottom = 627.0
 theme_override_font_sizes/font_size = 50
 text = "2:00"
 
 [node name="ScoreLabel" type="Label" parent="MinigameUI/GameWindow/Screen" unique_id=1770127784]
 layout_mode = 0
-offset_left = 19.0
-offset_top = 80.0
-offset_right = 118.0
-offset_bottom = 149.0
+offset_left = 18.0
+offset_top = 624.0
+offset_right = 142.0
+offset_bottom = 693.0
 theme_override_font_sizes/font_size = 28
 text = "Orders: 0"
 
@@ -365,6 +394,67 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="ExitConfirmation" type="PanelContainer" parent="MinigameUI" unique_id=213480221]
+visible = false
+anchors_preset = -1
+anchor_left = 0.07300001
+anchor_top = 0.16100001
+anchor_right = 0.07300001
+anchor_bottom = 0.16100001
+offset_left = 213.56
+offset_top = -118.92001
+offset_right = 862.56
+offset_bottom = 82.07999
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ke0q3")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MinigameUI/ExitConfirmation" unique_id=703360404]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="MinigameUI/ExitConfirmation/VBoxContainer" unique_id=905875944]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "Exit the game?"
+label_settings = SubResource("LabelSettings_nibfx")
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MinigameUI/ExitConfirmation/VBoxContainer" unique_id=1059023974]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_vertical = 6
+mouse_filter = 2
+theme_override_constants/separation = 75
+alignment = 1
+
+[node name="YesButton" type="Button" parent="MinigameUI/ExitConfirmation/VBoxContainer/HBoxContainer" unique_id=272190179]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 42
+theme_override_styles/normal = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/hover = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/focus = SubResource("StyleBoxFlat_yokly")
+text = "Yes"
+
+[node name="NoButton" type="Button" parent="MinigameUI/ExitConfirmation/VBoxContainer/HBoxContainer" unique_id=2049415964]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 42
+theme_override_styles/normal = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/hover = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/focus = SubResource("StyleBoxFlat_yokly")
+text = "No"
+
 [node name="GameResult" type="PanelContainer" parent="MinigameUI" unique_id=1386153806]
 visible = false
 anchors_preset = -1
@@ -372,10 +462,10 @@ anchor_left = 0.07300001
 anchor_top = 0.16100001
 anchor_right = 0.07300001
 anchor_bottom = 0.16100001
-offset_left = 210.56
-offset_top = -115.92001
-offset_right = 859.56
-offset_bottom = 85.07999
+offset_left = 213.56
+offset_top = -118.92001
+offset_right = 862.56
+offset_bottom = 82.07999
 theme_override_styles/panel = SubResource("StyleBoxFlat_ke0q3")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MinigameUI/GameResult" unique_id=1853412220]
