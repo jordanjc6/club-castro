@@ -1,7 +1,9 @@
 extends Node2D
 
 var movies: Array = [
+	preload("res://assets/videos/law.ogv"),
 	preload("res://assets/videos/monkey-hero.ogv"),
+	preload("res://assets/videos/spain-vs-argentina.ogv"),
 	preload("res://assets/videos/madeira.ogv"),
 	preload("res://assets/videos/paredes.ogv")
 ]
