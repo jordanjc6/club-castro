@@ -1,9 +1,7 @@
 Goal - Prepare for publish to App Store
 
 1. Cinema
-- add central collision barrier over food counter
 - add barrier to non-enterable theatres
-- make movie selector popup disappear on walking away from interaction area
 - generate monkey-themed small videos 
 - update movie selector gui
 

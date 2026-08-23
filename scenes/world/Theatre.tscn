@@ -102,5 +102,6 @@ text = "2"
 
 [connection signal="body_entered" from="TheatreCollisions/theatre-to-cinema" to="TheatreCollisions/theatre-to-cinema" method="_on_body_entered"]
 [connection signal="body_entered" from="MovieProjector/Area2D" to="MovieProjector" method="_on_movie_projector_area_entered"]
+[connection signal="body_exited" from="MovieProjector/Area2D" to="MovieProjector" method="_on_movie_projector_area_exited"]
 [connection signal="pressed" from="MovieSelector/Panel/VBoxContainer/1" to="MovieProjector" method="_on_movie_1_pressed"]
 [connection signal="pressed" from="MovieSelector/Panel/VBoxContainer/2" to="MovieProjector" method="_on_movie_2_pressed"]

@@ -37,6 +37,11 @@ position = Vector2(0, 0.48840332)
 scale = Vector2(1, 0.98310155)
 polygon = PackedVector2Array(541, -229, 214, -229, 215, -302, 141, -298, 117, -320, 304, -524, 341, -525, 324, -811, 376, -829, 373, -863, 447, -867, 571, -880, 677, -885, 790, -876, 900, -853, 953, -823, 927, -529, 966, -528, 1178, -294, 1052, -293, 1055, -234, 730, -230, 729, -203, 1296, -207, 1292, -976, -25, -964, -24, -204, 727, -203)
 
+[node name="StaticBody2D" type="StaticBody2D" parent="TheCinemaCollisions" unique_id=365278532]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="TheCinemaCollisions/StaticBody2D" unique_id=2052525600]
+polygon = PackedVector2Array(429, -585, 406, -686, 473, -769, 563, -777, 725, -777, 803, -767, 854, -654, 836, -575)
+
 [node name="the-cinema-to-jungle-plaza" type="Area2D" parent="TheCinemaCollisions" unique_id=1381998142]
 collision_layer = 4
 collision_mask = 2

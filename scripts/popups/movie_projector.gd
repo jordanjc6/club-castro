@@ -20,6 +20,11 @@ func _on_movie_projector_area_entered(body: Node2D) -> void:
 	%MovieSelector.visible = true
 	is_movie_selector_open = true
 
+func _on_movie_projector_area_exited(body: Node2D) -> void:
+	print("Movie projector area exited by %s" % body)
+	%MovieSelector.visible = false
+	is_movie_selector_open = false
+
 func _on_movie_1_pressed() -> void:
 	print("Movie 1 selected")
 	#%MovieSelector.visible = false
