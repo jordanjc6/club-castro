@@ -77,31 +77,70 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 3
 anchors_preset = 0
-offset_left = 581.0
-offset_top = -1646.0
-offset_right = 1021.0
-offset_bottom = -1291.0
+offset_left = 421.0
+offset_top = -1725.0
+offset_right = 858.0
+offset_bottom = -1507.0
 
-[node name="Panel" type="Panel" parent="MovieSelector" unique_id=630878723]
-layout_mode = 0
-offset_right = 119.0
-offset_bottom = 73.0
+[node name="PanelContainer" type="PanelContainer" parent="MovieSelector" unique_id=644031754]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MovieSelector/Panel" unique_id=172059618]
-layout_mode = 0
-offset_right = 111.0
-offset_bottom = 66.0
-
-[node name="1" type="Button" parent="MovieSelector/Panel/VBoxContainer" unique_id=1110334123]
+[node name="VBoxContainer" type="VBoxContainer" parent="MovieSelector/PanelContainer" unique_id=172059618]
 layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MovieSelector/PanelContainer/VBoxContainer" unique_id=1024329820]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="1" type="Button" parent="MovieSelector/PanelContainer/VBoxContainer/HBoxContainer" unique_id=1110334123]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
 text = "1"
 
-[node name="2" type="Button" parent="MovieSelector/Panel/VBoxContainer" unique_id=926251504]
+[node name="2" type="Button" parent="MovieSelector/PanelContainer/VBoxContainer/HBoxContainer" unique_id=926251504]
 layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
 text = "2"
+
+[node name="3" type="Button" parent="MovieSelector/PanelContainer/VBoxContainer/HBoxContainer" unique_id=1451630637]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "3
+"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MovieSelector/PanelContainer/VBoxContainer" unique_id=1821024711]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="4" type="Button" parent="MovieSelector/PanelContainer/VBoxContainer/HBoxContainer2" unique_id=1484344036]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "4
+"
+
+[node name="5" type="Button" parent="MovieSelector/PanelContainer/VBoxContainer/HBoxContainer2" unique_id=2080329722]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "5
+"
+
+[node name="6" type="Button" parent="MovieSelector/PanelContainer/VBoxContainer/HBoxContainer2" unique_id=814164821]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "6
+"
 
 [connection signal="body_entered" from="TheatreCollisions/theatre-to-cinema" to="TheatreCollisions/theatre-to-cinema" method="_on_body_entered"]
 [connection signal="body_entered" from="MovieProjector/Area2D" to="MovieProjector" method="_on_movie_projector_area_entered"]
 [connection signal="body_exited" from="MovieProjector/Area2D" to="MovieProjector" method="_on_movie_projector_area_exited"]
-[connection signal="pressed" from="MovieSelector/Panel/VBoxContainer/1" to="MovieProjector" method="_on_movie_1_pressed"]
-[connection signal="pressed" from="MovieSelector/Panel/VBoxContainer/2" to="MovieProjector" method="_on_movie_2_pressed"]

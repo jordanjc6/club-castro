@@ -2,8 +2,7 @@ Goal - Prepare for publish to App Store
 
 1. Cinema
 - add barrier to non-enterable theatres
-- generate monkey-themed small videos 
-- update movie selector gui
+- generate monkey-themed small videos (at least 3 more)
 
 2. BBT
 - add popup for singleplayer to indicate tic tac toe is for multiplayer

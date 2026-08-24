@@ -4,8 +4,9 @@ var movies: Array = [
 	preload("res://assets/videos/law.ogv"),
 	preload("res://assets/videos/monkey-hero.ogv"),
 	preload("res://assets/videos/spain-vs-argentina.ogv"),
-	preload("res://assets/videos/madeira.ogv"),
-	preload("res://assets/videos/paredes.ogv")
+	preload("res://assets/videos/law.ogv"),
+	preload("res://assets/videos/monkey-hero.ogv"),
+	preload("res://assets/videos/spain-vs-argentina.ogv")
 ]
 
 # Global variables (meant to be shared with all clients in multiplayer)
@@ -17,6 +18,11 @@ func _ready() -> void:
 	# If this machine is the host, listen for late-joining players
 	if multiplayer.is_server():
 		multiplayer.peer_connected.connect(_on_peer_connected)
+	
+	# bind movie selector btns
+	var buttons = %MovieSelector.find_children("", "Button")
+	for i in range(buttons.size()):
+		buttons[i].pressed.connect(_on_movie_selected.bind(i))
 
 func _on_movie_projector_area_entered(body: Node2D) -> void:
 	print("Movie projector interacted with by %s" % body)
@@ -28,19 +34,9 @@ func _on_movie_projector_area_exited(body: Node2D) -> void:
 	%MovieSelector.visible = false
 	is_movie_selector_open = false
 
-func _on_movie_1_pressed() -> void:
-	print("Movie 1 selected")
-	#%MovieSelector.visible = false
-	#%VideoStreamPlayer.stream = movies[0]
-	#%VideoStreamPlayer.play()
-	rpc("sync_movie_selection", 0)
-
-func _on_movie_2_pressed() -> void:
-	print("Movie 2 selected")
-	#%MovieSelector.visible = false
-	#%VideoStreamPlayer.stream = movies[1]
-	#%VideoStreamPlayer.play()
-	rpc("sync_movie_selection", 1)
+func _on_movie_selected(index: int) -> void:
+	print("Movie %d selected" % (index + 1))
+	rpc("sync_movie_selection", index)
 
 func _on_peer_connected(peer_id: int) -> void:
 	# Catch up late joiners: send them the current movie and time
