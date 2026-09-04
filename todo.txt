@@ -6,8 +6,6 @@ Goal - Prepare for publish to App Store
 2. Multiplayer
 - add popup for host button
 - add popup for join button
-- implement generating game code for host to share with joiner for local wifi 
-multiplayer
 
 3. IOS
 - implement touch area to walk towards

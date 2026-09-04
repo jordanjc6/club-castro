@@ -133,19 +133,29 @@ func become_host():
 func join_game(lobby_id: String):
 	print("Joining EOS Lobby: ", lobby_id)
 	
-	var opts = EOS.Lobby.JoinLobbyOptions.new()
-	opts.lobby_id = lobby_id
+	# 1. Search for the lobby by ID using your HLobbies script
+	var lobbies = await HLobbies.search_by_lobby_id_async(lobby_id)
 	
-	var lobby = await HLobbies.join_lobby_async(opts)
-	if not lobby:
+	if not lobbies or lobbies.size() == 0:
+		print("Failed to find EOS Lobby with ID: ", lobby_id)
+		return
+		
+	# 2. Get the target HLobby instance from search results
+	var target_lobby: HLobby = lobbies[0]
+	
+	# 3. Join using HLobbies.join_async
+	var joined_lobby = await HLobbies.join_async(target_lobby)
+	
+	if not joined_lobby:
 		print("Failed to join EOS Lobby.")
 		return
 		
 	print("Joined EOS Lobby successfully!")
 	
-	# The host Product User ID from the joined HLobby object
-	var host_user_id = lobby.owner_product_user_id
+	# Extract host Product User ID from the HLobby object
+	var host_user_id = joined_lobby.owner_product_user_id
 	
+	# Connect Godot multiplayer client peer over EOS Relay
 	var error = eos_peer.create_client(SOCKET_NAME, host_user_id)
 	if error != OK:
 		print("Failed to create EOS client peer: ", error)

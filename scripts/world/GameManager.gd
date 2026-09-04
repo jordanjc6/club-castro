@@ -31,6 +31,6 @@ func _join_button_pressed():
 	%HUD.hide()
 	#MultiplayerManager.join_game()
 	
-	var entered_code = "0ecd44aaff6347cf8994668c446ef3aa"
+	var entered_code = "b6d16cf9149b48b19e60ec7e8bc5b7a4"
 	if entered_code != "":
 		MultiplayerManager.join_game(entered_code)
