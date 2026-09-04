@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://c1meexkm7ti74" path="res://scripts/world/Teleporter.gd" id="2_spf70"]
 [ext_resource type="PackedScene" uid="uid://cjnc5jcd6qw46" path="res://scenes/minigames/TicTacToeMinigame.tscn" id="3_ke0q3"]
 [ext_resource type="PackedScene" uid="uid://blgq5u7jc5i8u" path="res://scenes/minigames/BaristaMinigame.tscn" id="4_nibfx"]
+[ext_resource type="PackedScene" uid="uid://eghfg8h23uwq" path="res://scenes/world/area_barrier.tscn" id="5_r027k"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_083f8"]
 size = Vector2(181, 34.25)
@@ -150,6 +151,14 @@ offset_bottom = 80.07999
 visible = true
 offset_left = 1725.5599
 offset_right = 2374.56
+
+[node name="TemporaryBarriers" type="Node2D" parent="." unique_id=2043860063]
+
+[node name="AreaBarrier" parent="TemporaryBarriers" unique_id=1631110596 instance=ExtResource("5_r027k")]
+position = Vector2(2445, 339)
+
+[node name="AreaBarrier2" parent="TemporaryBarriers" unique_id=17872663 instance=ExtResource("5_r027k")]
+position = Vector2(2530, 96)
 
 [connection signal="body_entered" from="BBTCollisions/bbt-to-jungle-plaza" to="BBTCollisions/bbt-to-jungle-plaza" method="_on_body_entered"]
 

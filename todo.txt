@@ -1,24 +1,15 @@
 Goal - Prepare for publish to App Store
 
 1. Cinema
-- add barrier to non-enterable theatres
-- generate monkey-themed small videos (at least 3 more)
+- generate monkey-themed small videos (at least 1 more)
 
-2. BBT
-- add popup for singleplayer to indicate tic tac toe is for multiplayer
-- add barrier to upstairs
-
-3. Jungle Plaza
-- add barrier to rec center
-- add barriers to right and left exit arrow signs
-
-4. Multiplayer
+2. Multiplayer
 - add popup for host button
 - add popup for join button
 - implement generating game code for host to share with joiner for local wifi 
 multiplayer
 
-5. IOS
+3. IOS
 - implement touch area to walk towards
 - test host/join buttons are pressable
 - test movie player ui pressable

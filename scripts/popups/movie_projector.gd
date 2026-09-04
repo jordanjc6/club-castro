@@ -1,12 +1,12 @@
 extends Node2D
 
 var movies: Array = [
-	preload("res://assets/videos/law.ogv"),
+	preload("res://assets/videos/monkey-space.ogv"),
 	preload("res://assets/videos/monkey-hero.ogv"),
-	preload("res://assets/videos/spain-vs-argentina.ogv"),
-	preload("res://assets/videos/law.ogv"),
-	preload("res://assets/videos/monkey-hero.ogv"),
-	preload("res://assets/videos/spain-vs-argentina.ogv")
+	preload("res://assets/videos/monkey-soccer.ogv"),
+	preload("res://assets/videos/monkey-court.ogv"),
+	preload("res://assets/videos/monkey-ghost.ogv"),
+	preload("res://assets/videos/monkey-ghost.ogv")
 ]
 
 # Global variables (meant to be shared with all clients in multiplayer)

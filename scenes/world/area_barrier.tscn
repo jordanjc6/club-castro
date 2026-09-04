@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://eghfg8h23uwq"]
+
+[ext_resource type="Texture2D" uid="uid://dc0idd4cl2hgx" path="res://assets/icons/road-block.png" id="1_qvvvq"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_00mmp"]
+size = Vector2(70, 63)
+
+[node name="AreaBarrier" type="StaticBody2D" unique_id=1631110596]
+collision_mask = 2
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1434835098]
+texture = ExtResource("1_qvvvq")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=254290726]
+position = Vector2(0, -1.5)
+shape = SubResource("RectangleShape2D_00mmp")
