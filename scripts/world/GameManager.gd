@@ -12,9 +12,25 @@ func _host_button_pressed():
 	print("host btn")
 	%HUD.hide()
 	MultiplayerManager.become_host()
+	
+	# Polling briefly until the async lobby creation completes and yields a code
+	var attempts = 0
+	while attempts < 20:
+		await get_tree().create_timer(0.25).timeout
+		var code = MultiplayerManager.get_active_lobby_code()
+		if code != "":
+			print("Lobby Code: %s" % code)
+			return
+		attempts += 1
+		
+	print("Failed to fetch lobby code.")
 
 
 func _join_button_pressed():
 	print("join btn")
 	%HUD.hide()
-	MultiplayerManager.join_game()
+	#MultiplayerManager.join_game()
+	
+	var entered_code = "0ecd44aaff6347cf8994668c446ef3aa"
+	if entered_code != "":
+		MultiplayerManager.join_game(entered_code)
