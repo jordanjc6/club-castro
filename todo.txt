@@ -1,7 +1,7 @@
 Goal - Prepare for publish to App Store
 
 1. Multiplayer
-- show host left notification, returning to single player
+- show disconnected notification, returning to single player
 - re-show multiplayer HUD for single player after leaving multiplayer
 - add popup for host button to see room code
 - add popup for join button to enter room code
