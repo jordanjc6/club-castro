@@ -4,8 +4,10 @@ Goal - Prepare for publish to App Store
 - generate monkey-themed small videos (at least 1 more)
 
 2. Multiplayer
-- add popup for host button
-- add popup for join button
+- show host left notification, returning to single player
+- re-show multiplayer HUD for single player after leaving multiplayer
+- add popup for host button to see room code
+- add popup for join button to enter room code
 
 3. IOS
 - implement touch area to walk towards
