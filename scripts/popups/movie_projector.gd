@@ -6,7 +6,7 @@ var movies: Array = [
 	preload("res://assets/videos/monkey-soccer.ogv"),
 	preload("res://assets/videos/monkey-court.ogv"),
 	preload("res://assets/videos/monkey-ghost.ogv"),
-	preload("res://assets/videos/monkey-ghost.ogv")
+	preload("res://assets/videos/monkey-school.ogv")
 ]
 
 # Global variables (meant to be shared with all clients in multiplayer)

@@ -35,6 +35,7 @@ var num_players_in_theatre: int = 0
 var eos_peer: EOSGMultiplayerPeer
 const SOCKET_NAME = "Room"
 var active_lobby_id: String = ""
+var _eos_logged_in: bool = false
 
 # Mobile background and heartbeat/ping settings
 var _background_time_msec: int = 0
@@ -47,8 +48,11 @@ const HEARTBEAT_TIMEOUT: float = 10.0
 
 
 func _ready():
-	_initialize_eos()
 	_setup_heartbeat_timer()
+	# Step 1: Initialize platform binaries once
+	await _initialize_eos_platform()
+	# Step 2: Attempt background login (won't block game if offline)
+	_login_eos_user()
 
 func _notification(what: int) -> void:
 	match what:
@@ -71,8 +75,8 @@ func _notification(what: int) -> void:
 				
 				_background_time_msec = 0
 
-func _initialize_eos():
-	# 1. Setup EOS Credentials using high-level HCredentials
+# Runs ONCE at app launch to load the C++ SDK binaries into memory
+func _initialize_eos_platform():
 	var credentials = HCredentials.new()
 	credentials.product_name = "Club Castro"
 	credentials.product_version = "1.0"
@@ -82,26 +86,32 @@ func _initialize_eos():
 	credentials.client_id = CLIENT_ID
 	credentials.client_secret = CLIENT_SECRET
 	
-	# 2. Setup Platform
 	var setup_success: bool = await HPlatform.setup_eos_async(credentials)
 	if setup_success:
-		print("EOS Platform successfully initialized!")
+		print("EOS Platform binaries initialized successfully!")
 	else:
-		print("Failed to initialize EOS Platform.")
-		return
-	
-	# 3. Login Anonymously asynchronously
-	var login_success: bool = await HAuth.login_anonymous_async("Player")
-	if login_success:
-		print("Logged in anonymously to EOS!")
-	else:
-		print("EOS anonymous login failed.")
-		return
-	
-	# 4. Setup Multiplayer Peer
-	eos_peer = EOSGMultiplayerPeer.new()
+		print("EOS Platform already initialized or setup skipped.")
 
-# Setup Heartbeat Timer for host dropouts
+# Can be safely retried multiple times when internet becomes available
+func _login_eos_user() -> bool:
+	if _eos_logged_in and is_instance_valid(HAuth) and HAuth.product_user_id != "":
+		return true
+
+	print("Attempting anonymous EOS login...")
+	var login_success: bool = await HAuth.login_anonymous_async("Player")
+	
+	if login_success:
+		_eos_logged_in = true
+		if eos_peer == null:
+			eos_peer = EOSGMultiplayerPeer.new()
+		print("EOS logged in successfully! Online multiplayer ready.")
+		return true
+	else:
+		print("EOS anonymous login failed (check internet connection).")
+		_eos_logged_in = false
+		return false
+
+# Setup Heartbeat Timer for host dropouts and network connection monitoring
 func _setup_heartbeat_timer():
 	if is_instance_valid(_heartbeat_timer):
 		_heartbeat_timer.queue_free()
@@ -114,14 +124,22 @@ func _setup_heartbeat_timer():
 	add_child(_heartbeat_timer)
 
 func _on_heartbeat_tick():
-	if multiplayer.multiplayer_peer == null or multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
+	if multiplayer.multiplayer_peer == null:
 		return
 
-	# Host broadcasts heartbeat to all connected clients
+	# HOST NETWORK CHECK
 	if multiplayer.is_server():
+		# If the host loses its peer connection binding or internet socket
+		if multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_DISCONNECTED:
+			print("[CRITICAL] Host network connection lost! Reverting host to single player...")
+			host_force_return_to_single_player()
+			return
+			
+		# Broadcast heartbeat to all joiners
 		rpc("receive_host_heartbeat")
+
+	# JOINER NETWORK CHECK
 	else:
-		# Joiner checks time elapsed since last heartbeat received from host
 		if _last_host_heartbeat_msec > 0:
 			var time_since_last_ping = (Time.get_ticks_msec() - _last_host_heartbeat_msec) / 1000.0
 			if time_since_last_ping > HEARTBEAT_TIMEOUT:
@@ -139,8 +157,51 @@ func force_return_to_single_player():
 	_last_host_heartbeat_msec = 0
 	_on_server_disconnected()
 
+func host_force_return_to_single_player():
+	print("[CRITICAL] Host lost network connection! Restoring SinglePlayer...")
+	
+	if is_instance_valid(_heartbeat_timer):
+		_heartbeat_timer.stop()
+		
+	_last_host_heartbeat_msec = 0
+
+	var world_scene = get_tree().get_current_scene()
+	_players_spawn_node = world_scene.get_node_or_null("Players")
+
+	# 1. Clean up EOS Lobby asynchronously
+	if active_lobby_id != "":
+		destroy_active_lobby_async()
+		active_lobby_id = ""
+
+	# 2. Reset network peer
+	if eos_peer:
+		eos_peer.close()
+		eos_peer = null
+		
+	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
+
+	# 3. Flush all network player instances from current world tree
+	if _players_spawn_node:
+		for child in _players_spawn_node.get_children():
+			_players_spawn_node.remove_child(child)
+			child.queue_free()
+
+	host_mode_enabled = false
+	num_players_in_theatre = 0
+
+	# 4. Restore host's single player at fixed spawn
+	_restore_single_player(FIXED_SINGLEPLAYER_SPAWN, FIXED_GRID_OFFSET)
+
 # Called when Host presses Host Button
 func become_host():
+	# If not logged in yet (e.g. game launched offline), retry authentication now
+	if not _eos_logged_in or eos_peer == null or not is_instance_valid(HAuth) or HAuth.product_user_id == "":
+		print("Not connected to EOS. Retrying login...")
+		var success = await _login_eos_user()
+		if not success:
+			print("Cannot host: Unable to authenticate with EOS (check Wi-Fi connection).")
+			return
+
 	print("Creating EOS Lobby...")
 	host_mode_enabled = true
 	
@@ -184,6 +245,14 @@ func become_host():
 
 # Called when Client passes the Lobby Code to Join
 func join_game(lobby_id: String):
+	# If not logged in yet (e.g. game launched offline), retry authentication now
+	if not _eos_logged_in or eos_peer == null or not is_instance_valid(HAuth) or HAuth.product_user_id == "":
+		print("Not connected to EOS. Retrying login...")
+		var success = await _login_eos_user()
+		if not success:
+			print("Cannot join: Unable to authenticate with EOS (check Wi-Fi connection).")
+			return
+
 	print("Joining EOS Lobby: ", lobby_id)
 	
 	var lobbies = await HLobbies.search_by_lobby_id_async(lobby_id)
