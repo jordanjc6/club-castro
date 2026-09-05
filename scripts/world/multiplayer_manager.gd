@@ -43,7 +43,7 @@ const MAX_BACKGROUND_SECONDS: float = 10.0
 var _heartbeat_timer: Timer
 var _last_host_heartbeat_msec: int = 0
 const HEARTBEAT_INTERVAL: float = 0.5
-const HEARTBEAT_TIMEOUT: float = 2.0
+const HEARTBEAT_TIMEOUT: float = 10.0
 
 
 func _ready():
