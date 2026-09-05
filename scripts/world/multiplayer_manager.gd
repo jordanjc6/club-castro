@@ -37,17 +37,27 @@ const SOCKET_NAME = "Room"
 var active_lobby_id: String = ""
 var _eos_logged_in: bool = false
 
-# Mobile background and heartbeat/ping settings
+# Mobile background settings
 var _background_time_msec: int = 0
 const MAX_BACKGROUND_SECONDS: float = 10.0
 
+# Heartbeat & Ping Settings
 var _heartbeat_timer: Timer
 var _last_host_heartbeat_msec: int = 0
 const HEARTBEAT_INTERVAL: float = 0.5
 const HEARTBEAT_TIMEOUT: float = 10.0
 
+var _ping_request: HTTPRequest
+var _last_ping_msec: int = 0
+const PING_INTERVAL_SEC: float = 3.0
+var _consecutive_ping_failures: int = 0
+
+# Absorbs temporary Wi-Fi jitter (4 fails * 3s timeout = ~12s grace period)
+const MAX_PING_FAILURES: int = 4
+
 
 func _ready():
+	_setup_ping_request()
 	_setup_heartbeat_timer()
 	# Step 1: Initialize platform binaries once
 	await _initialize_eos_platform()
@@ -56,6 +66,11 @@ func _ready():
 
 func _notification(what: int) -> void:
 	match what:
+		# Catch window close or quit request
+		NOTIFICATION_WM_CLOSE_REQUEST:
+			if not multiplayer.is_server() and multiplayer.multiplayer_peer and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED:
+				rpc_id(1, "notify_server_client_leaving", multiplayer.get_unique_id())
+
 		# App moves to background (checking notifications, pulling down control center, switching apps)
 		NOTIFICATION_APPLICATION_PAUSED:
 			_background_time_msec = Time.get_ticks_msec()
@@ -67,15 +82,36 @@ func _notification(what: int) -> void:
 				var elapsed_seconds = (Time.get_ticks_msec() - _background_time_msec) / 1000.0
 				print("App resumed after %.2f seconds." % elapsed_seconds)
 				
-				# If host was backgrounded too long, destroy lobby and reset state
-				if host_mode_enabled and active_lobby_id != "":
-					if elapsed_seconds > MAX_BACKGROUND_SECONDS:
-						print("Host backgrounded too long! Destroying lobby...")
-						leave_or_close_host_lobby()
+				# If backgrounded too long, drop cleanly back to single player
+				if elapsed_seconds > MAX_BACKGROUND_SECONDS:
+					print("App backgrounded too long! Returning to single player...")
+					if host_mode_enabled:
+						host_force_return_to_single_player()
+					else:
+						force_return_to_single_player()
 				
 				_background_time_msec = 0
 
-# Runs ONCE at app launch to load the C++ SDK binaries into memory
+# Active internet verification for Host
+func _setup_ping_request():
+	if is_instance_valid(_ping_request):
+		_ping_request.queue_free()
+		
+	_ping_request = HTTPRequest.new()
+	_ping_request.name = "NetworkPingRequest"
+	_ping_request.timeout = 3.0 # Allow up to 3.0 seconds per HTTP attempt
+	_ping_request.request_completed.connect(_on_ping_request_completed)
+	add_child(_ping_request)
+
+func _on_ping_request_completed(result: int, response_code: int, _headers: PackedStringArray, _body: PackedByteArray):
+	# ANY non-zero response code means a remote server responded back -> Internet is ALIVE!
+	if result != HTTPRequest.RESULT_SUCCESS or response_code == 0:
+		_consecutive_ping_failures += 1
+		print("Host internet ping failed (%d/%d)" % [_consecutive_ping_failures, MAX_PING_FAILURES])
+	else:
+		_consecutive_ping_failures = 0 # Reset counter on successful connection
+
+# Runs ONCE at app launch to load C++ SDK binaries into memory
 func _initialize_eos_platform():
 	var credentials = HCredentials.new()
 	credentials.product_name = "Club Castro"
@@ -129,13 +165,27 @@ func _on_heartbeat_tick():
 
 	# HOST NETWORK CHECK
 	if multiplayer.is_server():
-		# If the host loses its peer connection binding or internet socket
+		# Check 1: Socket Disconnect
 		if multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_DISCONNECTED:
-			print("[CRITICAL] Host network connection lost! Reverting host to single player...")
+			print("[CRITICAL] Host peer disconnected! Returning to single player...")
 			host_force_return_to_single_player()
 			return
-			
-		# Broadcast heartbeat to all joiners
+
+		# Check 2: Did active pings fail (Wi-Fi/Internet dead)
+		if _consecutive_ping_failures >= MAX_PING_FAILURES:
+			print("[CRITICAL] Host lost internet connection! Restoring single player...")
+			_consecutive_ping_failures = 0
+			host_force_return_to_single_player()
+			return
+
+		# Trigger lightweight ping to 1.1.1.1 every PING_INTERVAL_SEC
+		var current_time = Time.get_ticks_msec()
+		if (current_time - _last_ping_msec) / 1000.0 >= PING_INTERVAL_SEC:
+			_last_ping_msec = current_time
+			if is_instance_valid(_ping_request) and _ping_request.get_http_client_status() == HTTPClient.STATUS_DISCONNECTED:
+				_ping_request.request("https://1.1.1.1", [], HTTPClient.METHOD_HEAD)
+
+		# Broadcast heartbeat to joiners
 		rpc("receive_host_heartbeat")
 
 	# JOINER NETWORK CHECK
@@ -194,7 +244,6 @@ func host_force_return_to_single_player():
 
 # Called when Host presses Host Button
 func become_host():
-	# If not logged in yet (e.g. game launched offline), retry authentication now
 	if not _eos_logged_in or eos_peer == null or not is_instance_valid(HAuth) or HAuth.product_user_id == "":
 		print("Not connected to EOS. Retrying login...")
 		var success = await _login_eos_user()
@@ -239,13 +288,11 @@ func become_host():
 	_add_player_to_game(1, position, offset)
 	_remove_single_player()
 	
-	# Start heartbeat timer
 	if is_instance_valid(_heartbeat_timer):
 		_heartbeat_timer.start()
 
 # Called when Client passes the Lobby Code to Join
 func join_game(lobby_id: String):
-	# If not logged in yet (e.g. game launched offline), retry authentication now
 	if not _eos_logged_in or eos_peer == null or not is_instance_valid(HAuth) or HAuth.product_user_id == "":
 		print("Not connected to EOS. Retrying login...")
 		var success = await _login_eos_user()
@@ -279,11 +326,9 @@ func join_game(lobby_id: String):
 		
 	multiplayer.multiplayer_peer = eos_peer
 
-	# Listen for host disconnect signal
 	if not multiplayer.server_disconnected.is_connected(_on_server_disconnected):
 		multiplayer.server_disconnected.connect(_on_server_disconnected)
 
-	# Start client heartbeat listener
 	_last_host_heartbeat_msec = Time.get_ticks_msec()
 	if is_instance_valid(_heartbeat_timer):
 		_heartbeat_timer.start()
@@ -312,7 +357,6 @@ func leave_game_as_joiner():
 		_heartbeat_timer.stop()
 	_last_host_heartbeat_msec = 0
 
-	# Notify server to clean up our avatar immediately
 	if multiplayer.multiplayer_peer and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED:
 		rpc_id(1, "notify_server_client_leaving", multiplayer.get_unique_id())
 
@@ -380,7 +424,6 @@ func leave_active_lobby_async():
 	else:
 		print("Failed to leave EOS Lobby: ", EOS.result_str(ret))
 
-# Get the generated lobby ID code to display on UI
 func get_active_lobby_code() -> String:
 	return active_lobby_id
 
@@ -428,12 +471,12 @@ func _delete_player(id: int):
 	if not _players_spawn_node:
 		return
 
-	# Search for player node by name or player_id property
+	# Search by exact node name or custom player_id / multiplayer authority
 	var player_node: Node = _players_spawn_node.get_node_or_null(str(id))
 	
 	if not player_node:
 		for child in _players_spawn_node.get_children():
-			if "player_id" in child and child.player_id == id:
+			if ("player_id" in child and child.player_id == id) or child.get_multiplayer_authority() == id:
 				player_node = child
 				break
 
@@ -464,7 +507,6 @@ func _remove_single_player():
 			else:
 				MultiplayerManager.rpc_id(1, "decrement_players_in_theatre")
 		
-		# Save node reference and remove from scene tree without destroying
 		stored_single_player = player_to_remove
 		world_scene.remove_child(player_to_remove)
 
@@ -501,20 +543,17 @@ func _on_server_disconnected():
 	# 4. Restore stored single player at fixed position
 	_restore_single_player(FIXED_SINGLEPLAYER_SPAWN, FIXED_GRID_OFFSET)
 
-	# Clean up listener connection
 	if multiplayer.server_disconnected.is_connected(_on_server_disconnected):
 		multiplayer.server_disconnected.disconnect(_on_server_disconnected)
 
 func _restore_single_player(pos: Vector2, offset: Vector2):
 	print("Attempting to restore SinglePlayer...")
-	print("stored_single_player is_instance_valid: ", is_instance_valid(stored_single_player))
 	
 	if not is_instance_valid(stored_single_player):
 		print("ERROR: stored_single_player was freed or null! Cannot restore.")
 		return
 
 	var world_scene = get_tree().get_current_scene()
-	print("Current world scene name: ", world_scene.name if world_scene else "NULL")
 	
 	stored_single_player.global_position = pos
 	if "current_grid_offset" in stored_single_player:
@@ -537,7 +576,6 @@ func decrement_players_in_theatre():
 		print("Number of players in theatre: %d" % num_players_in_theatre)
 		rpc("sync_player_count", num_players_in_theatre)
 
-# All clients receive the updated count after server updates it
 @rpc("any_peer", "call_local", "reliable")
 func sync_player_count(new_count: int) -> void:
 	num_players_in_theatre = new_count
