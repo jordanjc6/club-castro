@@ -1,5 +1,7 @@
 extends Node
 
+signal player_disconnected_notif
+
 # --- EOS Credentials ---
 const PRODUCT_ID = "ec9ba98721e9490985c87199b1c2ad6b"
 const SANDBOX_ID = "ca6206f7cc3349fe97da5c535648e98f"
@@ -12,7 +14,7 @@ const SERVER_IP = "127.0.0.1"
 const MAC_IP = "192.168.2.23"
 
 # Fixed spawn fallback coordinates when returning to single player
-const FIXED_SINGLEPLAYER_SPAWN = Vector2(500, 550)
+const FIXED_SINGLEPLAYER_SPAWN = Vector2(647, 528)
 const FIXED_GRID_OFFSET = Vector2.ZERO
 
 # (x1, y1) = top left theatremap offset
@@ -129,11 +131,13 @@ func _initialize_eos_platform():
 		print("EOS Platform already initialized or setup skipped.")
 
 # Can be safely retried multiple times when internet becomes available
-func _login_eos_user() -> bool:
-	if _eos_logged_in and is_instance_valid(HAuth) and HAuth.product_user_id != "":
+func _login_eos_user(force_retry: bool = false) -> bool:
+	if not force_retry and _eos_logged_in and is_instance_valid(HAuth) and HAuth.product_user_id != "":
 		return true
 
 	print("Attempting anonymous EOS login...")
+	_eos_logged_in = false
+	
 	var login_success: bool = await HAuth.login_anonymous_async("Player")
 	
 	if login_success:
@@ -218,10 +222,9 @@ func host_force_return_to_single_player():
 	var world_scene = get_tree().get_current_scene()
 	_players_spawn_node = world_scene.get_node_or_null("Players")
 
-	# 1. Clean up EOS Lobby asynchronously
+	# 1. Clean up EOS Lobby non-blockingly
 	if active_lobby_id != "":
 		destroy_active_lobby_async()
-		active_lobby_id = ""
 
 	# 2. Reset network peer
 	if eos_peer:
@@ -238,26 +241,31 @@ func host_force_return_to_single_player():
 
 	host_mode_enabled = false
 	num_players_in_theatre = 0
+	_stop_video_stream()
 
 	# 4. Restore host's single player at fixed spawn
 	_restore_single_player(FIXED_SINGLEPLAYER_SPAWN, FIXED_GRID_OFFSET)
 
 # Called when Host presses Host Button
-func become_host():
+func become_host() -> bool:
 	# check if logged into epic online services anonymously
-	if not _eos_logged_in or eos_peer == null or not is_instance_valid(HAuth) or HAuth.product_user_id == "":
+	if not _eos_logged_in or not is_instance_valid(HAuth) or HAuth.product_user_id == "":
 		print("Not connected to EOS. Retrying login...")
 		var success = await _login_eos_user()
 		if not success:
 			print("Cannot host: Unable to authenticate with EOS (check Wi-Fi connection).")
 			return false
-	
-	# can create lobby since logged in
+
+	# If active_lobby_id was stuck from a previous session, try to destroy it
+	if active_lobby_id != "":
+		print("Cleaning up old lobby before creating a new one...")
+		destroy_active_lobby_async()
+
 	print("Creating EOS Lobby...")
 	host_mode_enabled = true
 	
 	var world_scene = get_tree().get_current_scene()
-	_players_spawn_node = world_scene.get_node("Players")
+	_players_spawn_node = world_scene.get_node_or_null("Players")
 	
 	var opts = EOS.Lobby.CreateLobbyOptions.new()
 	opts.max_lobby_members = 5
@@ -266,22 +274,37 @@ func become_host():
 	
 	var lobby = await HLobbies.create_lobby_async(opts)
 	
+	# Fail-safe: Re-authenticate EOS if session expired after network reconnect and retry
 	if not lobby:
-		print("Failed to create EOS Lobby.")
+		print("Lobby creation failed. Refreshing EOS login and retrying in 1.5s...")
+		await _login_eos_user(true)
+		await get_tree().create_timer(1.5).timeout
+		lobby = await HLobbies.create_lobby_async(opts)
+
+	if not lobby:
+		print("Failed to create EOS Lobby after retry.")
+		host_mode_enabled = false
 		return false
 		
 	active_lobby_id = lobby.lobby_id
 	print("EOS Lobby Created! Share this Lobby ID: ", active_lobby_id)
 	
+	# SAFEGUARD: Ensure eos_peer is not null before creating server
+	if eos_peer == null:
+		eos_peer = EOSGMultiplayerPeer.new()
+
 	var error = eos_peer.create_server(SOCKET_NAME)
 	if error != OK:
 		print("Failed to create EOS server peer: ", error)
+		host_mode_enabled = false
 		return false
 		
 	multiplayer.multiplayer_peer = eos_peer
 	
-	multiplayer.peer_connected.connect(_add_player_to_game)
-	multiplayer.peer_disconnected.connect(_delete_player)
+	if not multiplayer.peer_connected.is_connected(_add_player_to_game):
+		multiplayer.peer_connected.connect(_add_player_to_game)
+	if not multiplayer.peer_disconnected.is_connected(_delete_player):
+		multiplayer.peer_disconnected.connect(_delete_player)
 	
 	var single_player = world_scene.get_node_or_null("SinglePlayer")
 	var position = single_player.global_position if single_player else Vector2.ZERO
@@ -292,20 +315,19 @@ func become_host():
 	
 	if is_instance_valid(_heartbeat_timer):
 		_heartbeat_timer.start()
-	
+
 	return true
 
 # Called when Client passes the Lobby Code to Join
-func join_game(lobby_id: String):
+func join_game(lobby_id: String) -> bool:
 	# check if logged into epic online services anonymously
-	if not _eos_logged_in or eos_peer == null or not is_instance_valid(HAuth) or HAuth.product_user_id == "":
+	if not _eos_logged_in or not is_instance_valid(HAuth) or HAuth.product_user_id == "":
 		print("Not connected to EOS. Retrying login...")
 		var success = await _login_eos_user()
 		if not success:
 			print("Cannot join: Unable to authenticate with EOS (check Wi-Fi connection).")
 			return false
-	
-	# can join lobby since logged in
+
 	print("Joining EOS Lobby: ", lobby_id)
 	
 	var lobbies = await HLobbies.search_by_lobby_id_async(lobby_id)
@@ -317,14 +339,26 @@ func join_game(lobby_id: String):
 	var target_lobby: HLobby = lobbies[0]
 	var joined_lobby = await HLobbies.join_async(target_lobby)
 	
+	# Fail-safe: Refresh EOS login token if joining fails due to a stale session
 	if not joined_lobby:
-		print("Failed to join EOS Lobby.")
+		print("Failed to join EOS Lobby. Refreshing token and retrying...")
+		await _login_eos_user(true)
+		lobbies = await HLobbies.search_by_lobby_id_async(lobby_id)
+		if lobbies and lobbies.size() > 0:
+			joined_lobby = await HLobbies.join_async(lobbies[0])
+
+	if not joined_lobby:
+		print("Failed to join EOS Lobby after retry.")
 		return false
 		
 	print("Joined EOS Lobby successfully!")
 	
 	var host_user_id = joined_lobby.owner_product_user_id
 	
+	# SAFEGUARD: Ensure eos_peer is not null before creating client
+	if eos_peer == null:
+		eos_peer = EOSGMultiplayerPeer.new()
+
 	var error = eos_peer.create_client(SOCKET_NAME, host_user_id)
 	if error != OK:
 		print("Failed to create EOS client peer: ", error)
@@ -340,51 +374,48 @@ func join_game(lobby_id: String):
 		_heartbeat_timer.start()
 
 	_remove_single_player()
-	
 	return true
 
-## Call this if Host manually closes or leaves the lobby room
-#func leave_or_close_host_lobby():
-	#if host_mode_enabled and active_lobby_id != "":
-		#await destroy_active_lobby_async()
-		#
-		#active_lobby_id = ""
-		#host_mode_enabled = false
-		#
-		#if eos_peer:
-			#eos_peer.close()
-			#eos_peer = null
-		#
-		#multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
+# Call this if Host manually closes or leaves the lobby room
+func leave_or_close_host_lobby():
+	if host_mode_enabled and active_lobby_id != "":
+		destroy_active_lobby_async()
+		
+		host_mode_enabled = false
+		
+		if eos_peer:
+			eos_peer.close()
+			eos_peer = null
+		
+		multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 
-## Call this when a Joiner explicitly leaves via UI button
-#func leave_game_as_joiner():
-	#print("Leaving game as joiner...")
-	#
-	#if is_instance_valid(_heartbeat_timer):
-		#_heartbeat_timer.stop()
-	#_last_host_heartbeat_msec = 0
-#
-	#if multiplayer.multiplayer_peer and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED:
-		#rpc_id(1, "notify_server_client_leaving", multiplayer.get_unique_id())
-#
-	#if active_lobby_id != "":
-		#leave_active_lobby_async()
-		#active_lobby_id = ""
-#
-	#multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
-	#if eos_peer:
-		#eos_peer.close()
-		#eos_peer = null
-#
-	#var world_scene = get_tree().get_current_scene()
-	#_players_spawn_node = world_scene.get_node_or_null("Players")
-	#if _players_spawn_node:
-		#for child in _players_spawn_node.get_children():
-			#_players_spawn_node.remove_child(child)
-			#child.queue_free()
-#
-	#_restore_single_player(FIXED_SINGLEPLAYER_SPAWN, FIXED_GRID_OFFSET)
+# Call this when a Joiner explicitly leaves via UI button
+func leave_game_as_joiner():
+	print("Leaving game as joiner...")
+	
+	if is_instance_valid(_heartbeat_timer):
+		_heartbeat_timer.stop()
+	_last_host_heartbeat_msec = 0
+
+	if multiplayer.multiplayer_peer and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED:
+		rpc_id(1, "notify_server_client_leaving", multiplayer.get_unique_id())
+
+	if active_lobby_id != "":
+		leave_active_lobby_async()
+
+	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
+	if eos_peer:
+		eos_peer.close()
+		eos_peer = null
+
+	var world_scene = get_tree().get_current_scene()
+	_players_spawn_node = world_scene.get_node_or_null("Players")
+	if _players_spawn_node:
+		for child in _players_spawn_node.get_children():
+			_players_spawn_node.remove_child(child)
+			child.queue_free()
+
+	_restore_single_player(FIXED_SINGLEPLAYER_SPAWN, FIXED_GRID_OFFSET)
 
 @rpc("any_peer", "call_remote", "reliable")
 func notify_server_client_leaving(client_id: int):
@@ -397,7 +428,7 @@ func destroy_active_lobby_async():
 		return
 
 	if not is_instance_valid(EOSGRuntime):
-		print("EOSGRuntime is freed or invalid. Skipping lobby destruction.")
+		print("EOSGRuntime invalid. Clearing lobby ID locally.")
 		active_lobby_id = ""
 		return
 
@@ -408,12 +439,15 @@ func destroy_active_lobby_async():
 	if is_instance_valid(HAuth) and HAuth.product_user_id != "":
 		opts.local_user_id = HAuth.product_user_id
 
+	# Clear local variable immediately so we don't double-trigger
+	active_lobby_id = ""
+
 	EOS.Lobby.LobbyInterface.destroy_lobby(opts)
 	var ret = await IEOS.lobby_interface_destroy_lobby_callback
 	if EOS.is_success(ret):
 		print("EOS Lobby destroyed successfully on Epic servers!")
 	else:
-		print("Failed to destroy EOS Lobby: ", EOS.result_str(ret))
+		print("Destroy lobby network call completed with status: ", EOS.result_str(ret))
 
 func leave_active_lobby_async():
 	if active_lobby_id == "":
@@ -425,6 +459,8 @@ func leave_active_lobby_async():
 	if is_instance_valid(HAuth) and HAuth.product_user_id != "":
 		opts.local_user_id = HAuth.product_user_id
 	
+	active_lobby_id = ""
+
 	EOS.Lobby.LobbyInterface.leave_lobby(opts)
 	var ret = await IEOS.lobby_interface_leave_lobby_callback
 	if EOS.is_success(ret):
@@ -489,6 +525,12 @@ func _delete_player(id: int):
 				break
 
 	if player_node:
+		# Free synchronizer first to prevent lingering sync error packets
+		var sync_node = player_node.get_node_or_null("MultiplayerSynchronizer")
+		if sync_node:
+			sync_node.public_visibility = false
+			sync_node.queue_free()
+
 		var player_position = player_node.global_position if player_node is Node2D else Vector2.ZERO
 		var x = player_position.x
 		var y = player_position.y
@@ -543,7 +585,6 @@ func _on_server_disconnected():
 	# 3. Clean up EOS lobby state
 	if active_lobby_id != "":
 		leave_active_lobby_async()
-		active_lobby_id = ""
 		
 	host_mode_enabled = false
 	num_players_in_theatre = 0
@@ -570,6 +611,9 @@ func _restore_single_player(pos: Vector2, offset: Vector2):
 
 	world_scene.add_child(stored_single_player)
 	print("SUCCESS: SinglePlayer restored at position: ", pos)
+
+	# Defer signal emission so UI nodes complete ready/setup before displaying popup
+	player_disconnected_notif.emit.call_deferred()
 
 @rpc("any_peer", "call_local", "reliable")
 func increment_players_in_theatre():
