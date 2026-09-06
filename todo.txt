@@ -2,6 +2,7 @@ Goal - Prepare for publish to App Store
 
 1. Multiplayer
 - update HUD hide/show on enter barista game area
+- add more notifs for host/join statuses (see prints in output)
 - add popup for host button to see room code
 - add popup for join button to enter room code
 
