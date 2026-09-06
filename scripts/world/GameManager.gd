@@ -3,6 +3,9 @@ extends Node
 @onready var host_button: Button = $"../HUD/SideNav/MultiplayerHUD/VBoxContainer/HostButton"
 @onready var join_button: Button = $"../HUD/SideNav/MultiplayerHUD/VBoxContainer/JoinButton"
 
+var created_joinable_lobby = false  # for host
+var joined_lobby = false  # for joiners
+
 
 func _ready() -> void:
 	host_button.pressed.connect(_host_button_pressed)
@@ -11,26 +14,14 @@ func _ready() -> void:
 func _host_button_pressed():
 	print("host btn")
 	%HUD.hide()
-	MultiplayerManager.become_host()
 	
-	# Polling briefly until the async lobby creation completes and yields a code
-	var attempts = 0
-	while attempts < 20:
-		await get_tree().create_timer(0.25).timeout
-		var code = MultiplayerManager.get_active_lobby_code()
-		if code != "":
-			print("Lobby Code: %s" % code)
-			return
-		attempts += 1
-		
-	print("Failed to fetch lobby code.")
+	created_joinable_lobby = await MultiplayerManager.become_host()
 
 
 func _join_button_pressed():
 	print("join btn")
 	%HUD.hide()
-	#MultiplayerManager.join_game()
 	
-	var entered_code = "b53be77633aa49e1ac3e507ef13bbf22"
+	var entered_code = "f453c9dcb52f4b1a85dcca79a1fb7c48"
 	if entered_code != "":
-		MultiplayerManager.join_game(entered_code)
+		joined_lobby = await MultiplayerManager.join_game(entered_code)
