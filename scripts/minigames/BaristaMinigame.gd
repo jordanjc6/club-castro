@@ -155,7 +155,7 @@ func _on_body_entered(body: Node) -> void:
 	# only show popup for the player that entered
 	if ( (input_sync and input_sync.is_multiplayer_authority()) or body.name == "SinglePlayer"):
 		print("game area entered by %s" % body)
-		hud.visible = false
+		hud.get_node("SideNav").visible = false
 		game_prompt_panel.visible = true
 		game_result_panel.visible = false
 
@@ -164,7 +164,7 @@ func _on_body_exited(body: Node) -> void:
 		return
 	
 	if body.name == "SinglePlayer":
-		hud.visible = true
+		hud.get_node("SideNav").visible = true
 		game_prompt_panel.visible = false
 		if game_window.visible:
 			_on_cancel_button_pressed()

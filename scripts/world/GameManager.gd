@@ -1,5 +1,6 @@
 extends Node
 
+@onready var side_nav: HBoxContainer = $"../HUD/SideNav"
 @onready var host_button: Button = $"../HUD/SideNav/MultiplayerHUD/VBoxContainer/HostButton"
 @onready var join_button: Button = $"../HUD/SideNav/MultiplayerHUD/VBoxContainer/JoinButton"
 @onready var game_notif: PanelContainer = $"../HUD/GameNotification"
@@ -11,16 +12,20 @@ func _ready() -> void:
 	game_notif.hide()
 	
 	# Listen for the disconnect signal directly from your Autoload MultiplayerManager
-	MultiplayerManager.player_disconnected_notif.connect(show_temp_disconnect_notif)
+	MultiplayerManager.player_disconnected_notif.connect(on_player_disconnected)
 
 func _host_button_pressed():
 	print("host btn")
 	host_button.disabled = true
 	join_button.disabled = true
-	if await MultiplayerManager.become_host(): %HUD.hide()
+	if await MultiplayerManager.become_host(): 
+		side_nav.hide()
+		show_temp_notif("Entered lobby as host!")
 	else: 
+		print("HERE")
 		host_button.disabled = false
 		join_button.disabled = false
+		show_temp_notif("Failed to create lobby. Check internet connection or try restarting app!")
 
 func _join_button_pressed():
 	print("join btn")
@@ -28,26 +33,38 @@ func _join_button_pressed():
 	join_button.disabled = true
 	var entered_code = "090364c5f3254476a2e9f0f4451bb83b"
 	if entered_code != "":
-		if await MultiplayerManager.join_game(entered_code): %HUD.hide()
+		var result = await MultiplayerManager.join_game(entered_code)
+		if result.success: 
+			side_nav.hide()
+			show_temp_notif("Joined lobby!")
 		else:
 			host_button.disabled = false
 			join_button.disabled = false
+			var text = result.message if result.message != "" else "Failed to join lobby. Check internet connection or try restarting app!"
+			show_temp_notif(text)
 
-func show_temp_disconnect_notif():
-	%HUD.show()
+func on_player_disconnected(message: String):
+	side_nav.show()
 	host_button.disabled = false
 	join_button.disabled = false
+	show_temp_notif(message)
+
+func show_temp_notif(text: String):
+	# Set notif text
+	var label_node: Label = game_notif.get_node("Label")
+	if is_instance_valid(label_node):
+		label_node.text = text
 	
-	# 1. Make everything visible
+	# Make everything visible
 	game_notif.show()
 	
-	# 2. Create a clean, auto-managed timer tween
+	# Create a clean, auto-managed timer tween
 	var tween = create_tween()
 	
-	# Optional: Smooth fade-in or instant display, then delay for 2 seconds
-	tween.tween_interval(3.0)
+	# Smooth fade-in or instant display, then delay for 2 seconds
+	tween.tween_interval(4.0)
 	
-	# 3. Safely hide everything when the 2 seconds finish
+	# Safely hide everything when the 2 seconds finish
 	tween.tween_callback(func():
 		game_notif.hide()
 	)
