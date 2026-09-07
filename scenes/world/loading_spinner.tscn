@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://gn2g1uens55f"]
+
+[ext_resource type="Texture2D" uid="uid://bdhpsihm46qds" path="res://assets/loading-spinners/rainbow-ring.png" id="1_86gtq"]
+[ext_resource type="Script" uid="uid://dn1cgp7785dv5" path="res://scripts/world/loading_spinner.gd" id="2_s5p3l"]
+
+[node name="LoadingSpinner" type="TextureProgressBar" unique_id=837070289]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -0.5
+offset_top = -0.5
+offset_right = 0.5
+offset_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+value = 100.0
+fill_mode = 4
+radial_fill_degrees = 100.0
+texture_progress = ExtResource("1_86gtq")
+script = ExtResource("2_s5p3l")

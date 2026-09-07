@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://bknaby53d7dgl" path="res://scripts/world/side_nav.gd" id="5_252at"]
 [ext_resource type="Texture2D" uid="uid://egdknrgtofd" path="res://assets/icons/left-arrow.svg" id="5_i1jm3"]
 [ext_resource type="Script" uid="uid://doydguqh43yjw" path="res://scripts/world/GameManager.gd" id="5_qxiha"]
+[ext_resource type="PackedScene" uid="uid://gn2g1uens55f" path="res://scenes/world/loading_spinner.tscn" id="7_qh0kd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_252at"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
@@ -137,6 +138,8 @@ text = "<Notification Text>"
 label_settings = SubResource("LabelSettings_l5ull")
 horizontal_alignment = 1
 autowrap_mode = 2
+
+[node name="LoadingSpinner" parent="HUD" unique_id=837070289 instance=ExtResource("7_qh0kd")]
 
 [node name="GameManager" type="Node" parent="." unique_id=619952250]
 script = ExtResource("5_qxiha")

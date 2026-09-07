@@ -246,8 +246,55 @@ func host_force_return_to_single_player():
 	# 4. Restore host's single player at fixed spawn
 	_restore_single_player(FIXED_SINGLEPLAYER_SPAWN, FIXED_GRID_OFFSET)
 
+func is_network_available(timeout_sec: float = 1.5) -> bool:
+	var http = HTTPClient.new()
+	var err = http.connect_to_host("1.1.1.1", 80)
+	if err != OK:
+		return false
+	
+	var start_time = Time.get_ticks_msec()
+	while http.get_status() == HTTPClient.STATUS_CONNECTING or http.get_status() == HTTPClient.STATUS_RESOLVING:
+		http.poll()
+		if (Time.get_ticks_msec() - start_time) > (timeout_sec * 1000):
+			http.close()
+			return false
+		
+		# YIELD TO MAIN THREAD: Allows rendering, UI, and Tweens to process
+		await get_tree().process_frame
+		
+	var status = http.get_status()
+	http.close()
+	return status == HTTPClient.STATUS_CONNECTED or status == HTTPClient.STATUS_REQUESTING
+
+#func is_network_available(timeout_sec: float = 1.5) -> bool:
+	#var http = HTTPClient.new()
+	## Connect to a fast, reliable endpoint
+	#var err = http.connect_to_host("1.1.1.1", 80)
+	#if err != OK:
+		#return false
+	#
+	#var start_time = Time.get_ticks_msec()
+	#while http.get_status() == HTTPClient.STATUS_CONNECTING or http.get_status() == HTTPClient.STATUS_RESOLVING:
+		#http.poll()
+		#if (Time.get_ticks_msec() - start_time) > (timeout_sec * 1000):
+			#http.close()
+			#return false
+		#OS.delay_msec(10)
+		#
+	#var status = http.get_status()
+	#http.close()
+	#return status == HTTPClient.STATUS_CONNECTED or status == HTTPClient.STATUS_REQUESTING
+
 # Called when Host presses Host Button
 func become_host() -> bool:
+	# FAST FAIL: Check physical internet connection before making any EOS calls
+	#if not is_network_available():
+		#print("Cannot host: No active internet connection detected.")
+		#return false
+	if not await is_network_available():
+		print("No internet connection.")
+		return false
+	
 	# check if logged into epic online services anonymously
 	if not _eos_logged_in or not is_instance_valid(HAuth) or HAuth.product_user_id == "":
 		print("Not connected to EOS. Retrying login...")
@@ -320,6 +367,14 @@ func become_host() -> bool:
 
 # Called when Client passes the Lobby Code to Join
 func join_game(lobby_id: String) -> Dictionary:
+	# FAST FAIL: Check physical internet connection before making any EOS calls
+	#if not is_network_available():
+		#print("Cannot join: No active internet connection detected.")
+		#return {"success": false, "message": ""}
+	if not await is_network_available():
+		print("No internet connection.")
+		return {"success": false, "message": ""}
+	
 	# check if logged into epic online services anonymously
 	if not _eos_logged_in or not is_instance_valid(HAuth) or HAuth.product_user_id == "":
 		print("Not connected to EOS. Retrying login...")
