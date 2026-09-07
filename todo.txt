@@ -1,7 +1,6 @@
 Goal - Prepare for publish to App Store
 
 1. Multiplayer
-- add leave lobby button, handle for host and joiner 
 - add popup for host button to see room code
 - add popup for join button to enter room code
 

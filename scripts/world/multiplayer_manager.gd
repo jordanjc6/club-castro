@@ -436,38 +436,37 @@ func join_game(lobby_id: String) -> Dictionary:
 	_remove_single_player()
 	return {"success": true, "message": ""}
 
+func _on_leave_lobby_button_pressed() -> void:
+	if multiplayer.is_server():
+		# HOST LEAVING: Destroys lobby, closes peer, and kicks all joiners back to single player
+		leave_or_close_host_lobby()
+	else:
+		# JOINER LEAVING: Sends disconnect RPC to host, leaves lobby, and restores local single player
+		leave_game_as_joiner()
+
 # Call this if Host manually closes or leaves the lobby room
 func leave_or_close_host_lobby():
-	if host_mode_enabled and active_lobby_id != "":
-		destroy_active_lobby_async()
-		
-		host_mode_enabled = false
-		
-		if eos_peer:
-			eos_peer.close()
-			eos_peer = null
-		
-		multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
+	if not host_mode_enabled:
+		return
 
-# Call this when a Joiner explicitly leaves via UI button
-func leave_game_as_joiner():
-	print("Leaving game as joiner...")
-	
+	# 1. Stop heartbeat timer immediately
 	if is_instance_valid(_heartbeat_timer):
 		_heartbeat_timer.stop()
 	_last_host_heartbeat_msec = 0
 
-	if multiplayer.multiplayer_peer and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED:
-		rpc_id(1, "notify_server_client_leaving", multiplayer.get_unique_id())
-
+	# 2. Fire-and-forget EOS lobby destruction (don't block local UI if offline)
 	if active_lobby_id != "":
-		leave_active_lobby_async()
+		destroy_active_lobby_async()
 
-	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
+	# 3. Shutdown network peer immediately (instantly notifies clients)
+	host_mode_enabled = false
 	if eos_peer:
 		eos_peer.close()
 		eos_peer = null
+		
+	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 
+	# 4. Flush all network player instances
 	var world_scene = get_tree().get_current_scene()
 	_players_spawn_node = world_scene.get_node_or_null("Players")
 	if _players_spawn_node:
@@ -475,6 +474,47 @@ func leave_game_as_joiner():
 			_players_spawn_node.remove_child(child)
 			child.queue_free()
 
+	num_players_in_theatre = 0
+	_stop_video_stream()
+
+	_restore_single_player(FIXED_SINGLEPLAYER_SPAWN, FIXED_GRID_OFFSET)
+
+# Call this when a Joiner explicitly leaves via UI button
+func leave_game_as_joiner():
+	print("Leaving game as joiner...")
+	
+	# 1. Stop heartbeat timer immediately
+	if is_instance_valid(_heartbeat_timer):
+		_heartbeat_timer.stop()
+	_last_host_heartbeat_msec = 0
+
+	# 2. Try sending notification to host (best-effort, don't block if it fails)
+	if multiplayer.multiplayer_peer and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED:
+		rpc_id(1, "notify_server_client_leaving", multiplayer.get_unique_id())
+
+	# 3. Fire-and-forget EOS lobby exit (don't let EOS network timeouts delay local return)
+	if active_lobby_id != "":
+		leave_active_lobby_async() # Runs in background
+
+	# 4. Force local peer shutdown instantly
+	if eos_peer:
+		eos_peer.close()
+		eos_peer = null
+	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
+
+	# 5. Clear network nodes
+	var world_scene = get_tree().get_current_scene()
+	_players_spawn_node = world_scene.get_node_or_null("Players")
+	if _players_spawn_node:
+		for child in _players_spawn_node.get_children():
+			_players_spawn_node.remove_child(child)
+			child.queue_free()
+
+	# 6. Fallback guard for single player node
+	if not is_instance_valid(stored_single_player):
+		push_warning("stored_single_player was invalid! Re-instantiating fallback...")
+		# Optional: Re-instantiate single player scene if stored node was freed
+		
 	_restore_single_player(FIXED_SINGLEPLAYER_SPAWN, FIXED_GRID_OFFSET)
 
 @rpc("any_peer", "call_remote", "reliable")
@@ -664,6 +704,11 @@ func _restore_single_player(pos: Vector2, offset: Vector2):
 		return
 
 	var world_scene = get_tree().get_current_scene()
+	
+	# SAFEGUARD: Prevent crash if SinglePlayer is already added back to the tree
+	if stored_single_player.get_parent() == world_scene:
+		print("SinglePlayer is already active in scene tree.")
+		return
 	
 	stored_single_player.global_position = pos
 	if "current_grid_offset" in stored_single_player:

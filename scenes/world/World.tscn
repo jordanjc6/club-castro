@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://egdknrgtofd" path="res://assets/icons/left-arrow.svg" id="5_i1jm3"]
 [ext_resource type="Script" uid="uid://doydguqh43yjw" path="res://scripts/world/GameManager.gd" id="5_qxiha"]
 [ext_resource type="PackedScene" uid="uid://gn2g1uens55f" path="res://scenes/world/loading_spinner.tscn" id="7_qh0kd"]
+[ext_resource type="Script" uid="uid://cg7ixi8n10q84" path="res://scripts/world/lobby_nav.gd" id="7_yr1n6"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_252at"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
@@ -66,12 +67,13 @@ position = Vector2(647, 528)
 [node name="HUD" type="CanvasLayer" parent="." unique_id=484417608]
 
 [node name="SideNav" type="HBoxContainer" parent="HUD" unique_id=1923128839]
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 242.0
+offset_bottom = 160.0
 theme_override_constants/separation = 0
 script = ExtResource("5_252at")
 
 [node name="MultiplayerHUD" type="PanelContainer" parent="HUD/SideNav" unique_id=41617895]
+custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_252at")
 
@@ -107,6 +109,63 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_i1jm3")
 text = "Join Game"
 
 [node name="ToggleButton" type="Button" parent="HUD/SideNav" unique_id=268719714]
+custom_minimum_size = Vector2(40, 60)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_qh0kd")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_qh0kd")
+theme_override_styles/hover = SubResource("StyleBoxFlat_qh0kd")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_qh0kd")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_qh0kd")
+theme_override_styles/focus = SubResource("StyleBoxFlat_qh0kd")
+icon = ExtResource("5_i1jm3")
+expand_icon = true
+
+[node name="LobbyNav" type="HBoxContainer" parent="HUD" unique_id=185419302]
+visible = false
+offset_right = 242.0
+offset_bottom = 160.0
+theme_override_constants/separation = 0
+script = ExtResource("7_yr1n6")
+
+[node name="MultiplayerHUD" type="PanelContainer" parent="HUD/LobbyNav" unique_id=1765557496]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_252at")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/LobbyNav/MultiplayerHUD" unique_id=1738318062]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="LobbyButton" type="Button" parent="HUD/LobbyNav/MultiplayerHUD/VBoxContainer" unique_id=119244669]
+custom_minimum_size = Vector2(100, 80)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_qxiha")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_qxiha")
+theme_override_styles/hover = SubResource("StyleBoxFlat_qxiha")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_qxiha")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_qxiha")
+theme_override_styles/focus = SubResource("StyleBoxFlat_qxiha")
+text = "Show Lobby Code"
+autowrap_mode = 2
+
+[node name="ExitButton" type="Button" parent="HUD/LobbyNav/MultiplayerHUD/VBoxContainer" unique_id=1586688484]
+custom_minimum_size = Vector2(100, 80)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_i1jm3")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_i1jm3")
+theme_override_styles/hover = SubResource("StyleBoxFlat_i1jm3")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_i1jm3")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_i1jm3")
+theme_override_styles/focus = SubResource("StyleBoxFlat_i1jm3")
+text = "Exit Lobby"
+
+[node name="ToggleButton" type="Button" parent="HUD/LobbyNav" unique_id=328265418]
 custom_minimum_size = Vector2(40, 60)
 layout_mode = 2
 size_flags_vertical = 0
