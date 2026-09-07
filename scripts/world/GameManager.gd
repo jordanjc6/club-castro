@@ -33,7 +33,7 @@ func _host_button_pressed():
 
 func _join_button_pressed():
 	print("join btn")
-	var entered_code = "397da76c5ed04cb3bf4a177fa4210cd0"
+	var entered_code = "bd055ad58941455b96002eea7a487b1b"
 	if entered_code != "":
 		loading_spinner.show()
 		host_button.disabled = true

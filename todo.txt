@@ -1,8 +1,6 @@
 Goal - Prepare for publish to App Store
 
 1. Multiplayer
-- add reconnecting notif for when joiner's wifi disconnected and when
-  host's wifi disconnected
 - add leave lobby button, handle for host and joiner 
 - add popup for host button to see room code
 - add popup for join button to enter room code
