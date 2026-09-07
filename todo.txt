@@ -1,7 +1,6 @@
 Goal - Prepare for publish to App Store
 
 1. Multiplayer
-- add popup for host button to see room code
 - add popup for join button to enter room code
 
 2. IOS

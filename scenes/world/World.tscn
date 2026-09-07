@@ -35,6 +35,28 @@ border_width_right = 3
 border_width_bottom = 3
 border_color = Color(0, 0, 0, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_16fjv"]
+bg_color = Color(0.7764706, 0.8745098, 0.9647059, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 40
+corner_radius_top_right = 40
+corner_radius_bottom_right = 40
+corner_radius_bottom_left = 40
+
+[sub_resource type="LabelSettings" id="LabelSettings_l5ull"]
+font_size = 48
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l5ull"]
+bg_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ckp8c"]
+bg_color = Color(1, 1, 1, 1)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yr1n6"]
 bg_color = Color(0.7764706, 0.8745098, 0.9647059, 1)
 border_width_left = 4
@@ -43,10 +65,6 @@ border_width_bottom = 4
 border_color = Color(0, 0, 0, 1)
 corner_radius_bottom_right = 40
 corner_radius_bottom_left = 40
-
-[sub_resource type="LabelSettings" id="LabelSettings_l5ull"]
-font_size = 48
-font_color = Color(0, 0, 0, 1)
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_qxiha"]
 properties/0/path = NodePath(".:position")
@@ -149,7 +167,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_qxiha")
 theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_qxiha")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_qxiha")
 theme_override_styles/focus = SubResource("StyleBoxFlat_qxiha")
-text = "Show Lobby Code"
+text = "Lobby Code"
 autowrap_mode = 2
 
 [node name="ExitButton" type="Button" parent="HUD/LobbyNav/MultiplayerHUD/VBoxContainer" unique_id=1586688484]
@@ -178,6 +196,58 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_qh0kd")
 icon = ExtResource("5_i1jm3")
 expand_icon = true
 
+[node name="LobbyPopup" type="PanelContainer" parent="HUD" unique_id=1627291021]
+anchors_preset = -1
+anchor_left = 0.07300001
+anchor_top = 0.16100001
+anchor_right = 0.07300001
+anchor_bottom = 0.16100001
+offset_left = 144.56
+offset_top = 101.07999
+offset_right = 978.56
+offset_bottom = 381.08
+theme_override_styles/panel = SubResource("StyleBoxFlat_16fjv")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/LobbyPopup" unique_id=1964072610]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HUD/LobbyPopup/VBoxContainer" unique_id=1242951591]
+custom_minimum_size = Vector2(100, 60)
+layout_mode = 2
+text = "Lobby Code:"
+label_settings = SubResource("LabelSettings_l5ull")
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Code" type="Label" parent="HUD/LobbyPopup/VBoxContainer" unique_id=1111133432]
+custom_minimum_size = Vector2(100, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 40
+text = "<Lobby Code>"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="CopyButton" type="Button" parent="HUD/LobbyPopup/VBoxContainer" unique_id=7174288]
+custom_minimum_size = Vector2(0, 70)
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_disabled_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_l5ull")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_l5ull")
+theme_override_styles/hover = SubResource("StyleBoxFlat_l5ull")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_l5ull")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_ckp8c")
+theme_override_styles/focus = SubResource("StyleBoxFlat_ckp8c")
+text = "Copy Code"
+
 [node name="GameNotification" type="PanelContainer" parent="HUD" unique_id=742197015]
 anchors_preset = -1
 anchor_left = 0.07300001
@@ -199,6 +269,7 @@ horizontal_alignment = 1
 autowrap_mode = 2
 
 [node name="LoadingSpinner" parent="HUD" unique_id=837070289 instance=ExtResource("7_qh0kd")]
+visible = false
 
 [node name="GameManager" type="Node" parent="." unique_id=619952250]
 script = ExtResource("5_qxiha")

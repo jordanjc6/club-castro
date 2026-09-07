@@ -6,6 +6,8 @@ extends Node
 @onready var join_button: Button = $"../HUD/SideNav/MultiplayerHUD/VBoxContainer/JoinButton"
 @onready var lobby_button: Button = $"../HUD/LobbyNav/MultiplayerHUD/VBoxContainer/LobbyButton"
 @onready var exit_button: Button = $"../HUD/LobbyNav/MultiplayerHUD/VBoxContainer/ExitButton"
+@onready var lobby_popup: PanelContainer = $"../HUD/LobbyPopup"
+@onready var copy_button: Button = $"../HUD/LobbyPopup/VBoxContainer/CopyButton"
 @onready var game_notif: PanelContainer = $"../HUD/GameNotification"
 @onready var loading_spinner: TextureProgressBar = $"../HUD/LoadingSpinner"
 
@@ -15,6 +17,8 @@ func _ready() -> void:
 	join_button.pressed.connect(_join_button_pressed)
 	lobby_button.pressed.connect(_lobby_button_pressed)
 	exit_button.pressed.connect(_exit_button_pressed)
+	copy_button.pressed.connect(_copy_button_pressed)
+	lobby_popup.hide()
 	game_notif.hide()
 	loading_spinner.hide()
 	
@@ -39,7 +43,7 @@ func _host_button_pressed():
 
 func _join_button_pressed():
 	print("join btn")
-	var entered_code = "a95c94b8f9834fcc8009d7f53782d681"
+	var entered_code = "5ed4f7dc658f43f5b028af07ddc1588d"
 	if entered_code != "":
 		loading_spinner.show()
 		host_button.disabled = true
@@ -58,7 +62,9 @@ func _join_button_pressed():
 
 func _lobby_button_pressed():
 	print("lobby btn")
-	# toggle show center popup with copiable lobby code
+	if !lobby_popup.visible:
+		lobby_popup.get_node("VBoxContainer/Code").text  = MultiplayerManager.get_active_lobby_code()
+	lobby_popup.visible = !lobby_popup.visible
 
 func _exit_button_pressed():
 	print("exit btn")
@@ -70,11 +76,17 @@ func _exit_button_pressed():
 	exit_button.disabled = false
 	loading_spinner.hide()
 	lobby_nav.hide()
+	lobby_popup.hide()
 	side_nav.show()
+
+func _copy_button_pressed():
+	print("copy btn")
+	DisplayServer.clipboard_set(MultiplayerManager.get_active_lobby_code())
 
 func on_player_disconnected(message: String):
 	side_nav.show()
 	lobby_nav.hide()
+	lobby_popup.hide()
 	host_button.disabled = false
 	join_button.disabled = false
 	show_temp_notif(message)
