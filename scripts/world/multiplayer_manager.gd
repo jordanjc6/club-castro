@@ -1,6 +1,7 @@
 extends Node
 
 signal player_disconnected_notif(message: String)
+signal player_reconnecting_notif(message: String)
 
 # --- EOS Credentials ---
 const PRODUCT_ID = "ec9ba98721e9490985c87199b1c2ad6b"
@@ -47,7 +48,7 @@ const MAX_BACKGROUND_SECONDS: float = 10.0
 var _heartbeat_timer: Timer
 var _last_host_heartbeat_msec: int = 0
 const HEARTBEAT_INTERVAL: float = 0.5
-const HEARTBEAT_TIMEOUT: float = 10.0
+const HEARTBEAT_TIMEOUT: float = 5.5
 
 var _ping_request: HTTPRequest
 var _last_ping_msec: int = 0
@@ -181,6 +182,8 @@ func _on_heartbeat_tick():
 			_consecutive_ping_failures = 0
 			host_force_return_to_single_player()
 			return
+		elif _consecutive_ping_failures > 0:
+			player_reconnecting_notif.emit("Internet connection unstable, attempting to reconnect...")
 
 		# Trigger lightweight ping to 1.1.1.1 every PING_INTERVAL_SEC
 		var current_time = Time.get_ticks_msec()
@@ -199,6 +202,8 @@ func _on_heartbeat_tick():
 			if time_since_last_ping > HEARTBEAT_TIMEOUT:
 				print("Host ping lost for %.2fs! Force-restoring SinglePlayer." % time_since_last_ping)
 				force_return_to_single_player()
+			elif time_since_last_ping > 1.5:
+				player_reconnecting_notif.emit("Internet connection unstable, attempting to reconnect...")
 
 @rpc("any_peer", "call_remote", "unreliable")
 func receive_host_heartbeat():

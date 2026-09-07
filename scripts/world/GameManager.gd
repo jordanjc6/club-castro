@@ -15,6 +15,7 @@ func _ready() -> void:
 	
 	# Listen for the disconnect signal directly from your Autoload MultiplayerManager
 	MultiplayerManager.player_disconnected_notif.connect(on_player_disconnected)
+	MultiplayerManager.player_reconnecting_notif.connect(on_player_reconnecting)
 
 func _host_button_pressed():
 	print("host btn")
@@ -32,7 +33,7 @@ func _host_button_pressed():
 
 func _join_button_pressed():
 	print("join btn")
-	var entered_code = "a2e16a5e6849477089e4d83d357d308e"
+	var entered_code = "397da76c5ed04cb3bf4a177fa4210cd0"
 	if entered_code != "":
 		loading_spinner.show()
 		host_button.disabled = true
@@ -73,3 +74,15 @@ func show_temp_notif(text: String):
 	tween.tween_callback(func():
 		game_notif.hide()
 	)
+
+func on_player_reconnecting(message: String):
+	show_perm_notif(message)
+
+func show_perm_notif(text: String):
+	# Set notif text
+	var label_node: Label = game_notif.get_node("Label")
+	if is_instance_valid(label_node):
+		label_node.text = text
+	
+	# Make everything visible
+	game_notif.show()
