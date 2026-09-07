@@ -8,6 +8,8 @@ extends Node
 @onready var exit_button: Button = $"../HUD/LobbyNav/MultiplayerHUD/VBoxContainer/ExitButton"
 @onready var lobby_popup: PanelContainer = $"../HUD/LobbyPopup"
 @onready var copy_button: Button = $"../HUD/LobbyPopup/VBoxContainer/CopyButton"
+@onready var join_popup: PanelContainer = $"../HUD/JoinPopup"
+@onready var find_button: Button = $"../HUD/JoinPopup/VBoxContainer/FindButton"
 @onready var game_notif: PanelContainer = $"../HUD/GameNotification"
 @onready var loading_spinner: TextureProgressBar = $"../HUD/LoadingSpinner"
 
@@ -18,13 +20,22 @@ func _ready() -> void:
 	lobby_button.pressed.connect(_lobby_button_pressed)
 	exit_button.pressed.connect(_exit_button_pressed)
 	copy_button.pressed.connect(_copy_button_pressed)
+	find_button.pressed.connect(_find_button_pressed)
 	lobby_popup.hide()
+	join_popup.hide()
 	game_notif.hide()
 	loading_spinner.hide()
 	
 	# Listen for the disconnect signal directly from your Autoload MultiplayerManager
 	MultiplayerManager.player_disconnected_notif.connect(on_player_disconnected)
 	MultiplayerManager.player_reconnecting_notif.connect(on_player_reconnecting)
+	
+	# Listens for the user pressing 'Enter' or 'Done' on the iOS keyboard
+	join_popup.get_node("VBoxContainer/Code").text_submitted.connect(_on_code_submitted)
+
+func _on_code_submitted(_new_text: String) -> void:
+	# Dismisses the iOS keyboard natively
+	join_popup.get_node("VBoxContainer/Code").release_focus()
 
 func _host_button_pressed():
 	print("host btn")
@@ -43,7 +54,13 @@ func _host_button_pressed():
 
 func _join_button_pressed():
 	print("join btn")
-	var entered_code = "5ed4f7dc658f43f5b028af07ddc1588d"
+	join_popup.visible = !join_popup.visible
+	if join_popup.visible: host_button.disabled = true
+	else: host_button.disabled = false
+
+func _find_button_pressed():
+	print("find btn")
+	var entered_code = join_popup.get_node("VBoxContainer/Code").text.strip_edges()
 	if entered_code != "":
 		loading_spinner.show()
 		host_button.disabled = true
@@ -51,6 +68,7 @@ func _join_button_pressed():
 		var result = await MultiplayerManager.join_game(entered_code)
 		if result.success: 
 			side_nav.hide()
+			join_popup.hide()
 			lobby_nav.show()
 			show_temp_notif("Joined lobby!")
 		else:
@@ -64,6 +82,8 @@ func _lobby_button_pressed():
 	print("lobby btn")
 	if !lobby_popup.visible:
 		lobby_popup.get_node("VBoxContainer/Code").text  = MultiplayerManager.get_active_lobby_code()
+		exit_button.disabled = true
+	else: exit_button.disabled = false
 	lobby_popup.visible = !lobby_popup.visible
 
 func _exit_button_pressed():

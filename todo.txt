@@ -1,9 +1,6 @@
 Goal - Prepare for publish to App Store
 
-1. Multiplayer
-- add popup for join button to enter room code
-
-2. IOS
+IOS
 - implement touch area to walk towards
 - test host/join buttons are pressable
 - test movie player ui pressable
