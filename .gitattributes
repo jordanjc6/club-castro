@@ -1,2 +1,25 @@
 # Normalize EOL for all files that Git considers text files.
 * text=auto eol=lf
+appstore filter=lfs diff=lfs merge=lfs -text
+exports filter=lfs diff=lfs merge=lfs -text
+appstore/ClubCastro.pck filter=lfs diff=lfs merge=lfs -text
+appstore/ClubCastro.xcframework filter=lfs diff=lfs merge=lfs -text
+appstore/ClubCastro.xcodeproj filter=lfs diff=lfs merge=lfs -text
+appstore/MoltenVK.xcframework filter=lfs diff=lfs merge=lfs -text
+appstore/icons filter=lfs diff=lfs merge=lfs -text
+appstore/libgodot_camera.visionos.debug.xcframework filter=lfs diff=lfs merge=lfs -text
+appstore/ClubCastro filter=lfs diff=lfs merge=lfs -text
+appstore/PrivacyInfo.xcprivacy filter=lfs diff=lfs merge=lfs -text
+appstore/libgodot_camera.visionos.release.xcframework filter=lfs diff=lfs merge=lfs -text
+exports/MoltenVK.xcframework filter=lfs diff=lfs merge=lfs -text
+exports/libgodot_camera.visionos.release.xcframework filter=lfs diff=lfs merge=lfs -text
+exports/ClubCastro2 filter=lfs diff=lfs merge=lfs -text
+exports/PrivacyInfo.xcprivacy filter=lfs diff=lfs merge=lfs -text
+exports/libgodot_camera.visionos.debug.xcframework filter=lfs diff=lfs merge=lfs -text
+exports/ClubCastro filter=lfs diff=lfs merge=lfs -text
+exports/ClubCastro.pck filter=lfs diff=lfs merge=lfs -text
+exports/ClubCastro.xcframework filter=lfs diff=lfs merge=lfs -text
+exports/ClubCastro.xcodeproj filter=lfs diff=lfs merge=lfs -text
+exports/ClubCastro2.pck filter=lfs diff=lfs merge=lfs -text
+exports/ClubCastro2.xcframework filter=lfs diff=lfs merge=lfs -text
+*.a filter=lfs diff=lfs merge=lfs -text
