@@ -1,8 +1,6 @@
 Goal - Prepare for publish to App Store
 
 IOS
-- test host/join buttons are pressable
-- test movie player ui pressable
-- test tic tac toe game pressable
-- test barista minigame pressable
+- can't long hold or double tap input field to paste lobby code
+- can't click bbt barista game dispensers
 - add highlighting/animation to interactable areas
