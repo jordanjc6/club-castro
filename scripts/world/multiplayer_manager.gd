@@ -2,6 +2,7 @@ extends Node
 
 signal player_disconnected_notif(message: String)
 signal player_reconnecting_notif(message: String)
+signal player_reconnected_notif(message: String)
 
 # --- EOS Credentials ---
 const PRODUCT_ID = "ec9ba98721e9490985c87199b1c2ad6b"
@@ -57,6 +58,7 @@ var _consecutive_ping_failures: int = 0
 
 # Absorbs temporary Wi-Fi jitter (4 fails * 3s timeout = ~12s grace period)
 const MAX_PING_FAILURES: int = 4
+var _is_reconnecting: bool = false # <--- ADD THIS TRACKING FLAG
 
 
 func _ready():
@@ -107,12 +109,16 @@ func _setup_ping_request():
 	add_child(_ping_request)
 
 func _on_ping_request_completed(result: int, response_code: int, _headers: PackedStringArray, _body: PackedByteArray):
-	# ANY non-zero response code means a remote server responded back -> Internet is ALIVE!
 	if result != HTTPRequest.RESULT_SUCCESS or response_code == 0:
 		_consecutive_ping_failures += 1
 		print("Host internet ping failed (%d/%d)" % [_consecutive_ping_failures, MAX_PING_FAILURES])
 	else:
-		_consecutive_ping_failures = 0 # Reset counter on successful connection
+		# Connection is alive! Check if we were previously reconnecting
+		if _is_reconnecting:
+			_is_reconnecting = false
+			player_reconnected_notif.emit("Connection restored!")
+			
+		_consecutive_ping_failures = 0 # Reset counter
 
 # Runs ONCE at app launch to load C++ SDK binaries into memory
 func _initialize_eos_platform():
@@ -170,29 +176,30 @@ func _on_heartbeat_tick():
 
 	# HOST NETWORK CHECK
 	if multiplayer.is_server():
-		# Check 1: Socket Disconnect
 		if multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_DISCONNECTED:
 			print("[CRITICAL] Host peer disconnected! Returning to single player...")
+			_is_reconnecting = false
 			host_force_return_to_single_player()
 			return
 
-		# Check 2: Did active pings fail (Wi-Fi/Internet dead)
 		if _consecutive_ping_failures >= MAX_PING_FAILURES:
 			print("[CRITICAL] Host lost internet connection! Restoring single player...")
 			_consecutive_ping_failures = 0
+			_is_reconnecting = false
 			host_force_return_to_single_player()
 			return
 		elif _consecutive_ping_failures > 0:
-			player_reconnecting_notif.emit("Internet connection unstable, attempting to reconnect...")
+			if not _is_reconnecting:
+				_is_reconnecting = true
+				player_reconnecting_notif.emit("Internet connection unstable, attempting to reconnect...")
 
-		# Trigger lightweight ping to 1.1.1.1 every PING_INTERVAL_SEC
+		# Trigger ping request
 		var current_time = Time.get_ticks_msec()
 		if (current_time - _last_ping_msec) / 1000.0 >= PING_INTERVAL_SEC:
 			_last_ping_msec = current_time
 			if is_instance_valid(_ping_request) and _ping_request.get_http_client_status() == HTTPClient.STATUS_DISCONNECTED:
 				_ping_request.request("https://1.1.1.1", [], HTTPClient.METHOD_HEAD)
 
-		# Broadcast heartbeat to joiners
 		rpc("receive_host_heartbeat")
 
 	# JOINER NETWORK CHECK
@@ -201,12 +208,19 @@ func _on_heartbeat_tick():
 			var time_since_last_ping = (Time.get_ticks_msec() - _last_host_heartbeat_msec) / 1000.0
 			if time_since_last_ping > HEARTBEAT_TIMEOUT:
 				print("Host ping lost for %.2fs! Force-restoring SinglePlayer." % time_since_last_ping)
+				_is_reconnecting = false
 				force_return_to_single_player()
 			elif time_since_last_ping > 1.5:
-				player_reconnecting_notif.emit("Internet connection unstable, attempting to reconnect...")
+				if not _is_reconnecting:
+					_is_reconnecting = true
+					player_reconnecting_notif.emit("Internet connection unstable, attempting to reconnect...")
 
 @rpc("any_peer", "call_remote", "unreliable")
 func receive_host_heartbeat():
+	if _is_reconnecting:
+		_is_reconnecting = false
+		player_reconnected_notif.emit("Reconnected to host!")
+		
 	_last_host_heartbeat_msec = Time.get_ticks_msec()
 
 func force_return_to_single_player():
@@ -320,7 +334,7 @@ func become_host() -> bool:
 	_players_spawn_node = world_scene.get_node_or_null("Players")
 	
 	var opts = EOS.Lobby.CreateLobbyOptions.new()
-	opts.max_lobby_members = 5
+	opts.max_lobby_members = 2
 	opts.permission_level = EOS.Lobby.LobbyPermissionLevel.PublicAdvertised
 	opts.bucket_id = "Default"
 	
@@ -372,20 +386,15 @@ func become_host() -> bool:
 
 # Called when Client passes the Lobby Code to Join
 func join_game(lobby_id: String) -> Dictionary:
-	# FAST FAIL: Check physical internet connection before making any EOS calls
-	#if not is_network_available():
-		#print("Cannot join: No active internet connection detected.")
-		#return {"success": false, "message": ""}
 	if not await is_network_available():
 		print("No internet connection.")
 		return {"success": false, "message": ""}
 	
-	# check if logged into epic online services anonymously
 	if not _eos_logged_in or not is_instance_valid(HAuth) or HAuth.product_user_id == "":
 		print("Not connected to EOS. Retrying login...")
 		var success = await _login_eos_user()
 		if not success:
-			print("Cannot join: Unable to authenticate with EOS (check Wi-Fi connection).")
+			print("Cannot join: Unable to authenticate with EOS.")
 			return {"success": false, "message": ""}
 	
 	print("Joining EOS Lobby: ", lobby_id)
@@ -394,28 +403,28 @@ func join_game(lobby_id: String) -> Dictionary:
 	
 	if not lobbies or lobbies.size() == 0:
 		print("Failed to find EOS Lobby with ID: ", lobby_id)
-		return {"success": false, "message": "No lobby with entered ID!"}
+		return {"success": false, "message": "No lobby with the entered ID exists!"}
 		
 	var target_lobby: HLobby = lobbies[0]
-	var joined_lobby = await HLobbies.join_async(target_lobby)
+	var joined_lobby: HLobby = await HLobbies.join_async(target_lobby)
 	
-	# Fail-safe: Refresh EOS login token if joining fails due to a stale session
+	# Fail-safe retry if token expired
 	if not joined_lobby:
-		print("Failed to join EOS Lobby. Refreshing token and retrying...")
+		print("Initial join attempt failed. Refreshing login token and retrying...")
 		await _login_eos_user(true)
 		lobbies = await HLobbies.search_by_lobby_id_async(lobby_id)
 		if lobbies and lobbies.size() > 0:
 			joined_lobby = await HLobbies.join_async(lobbies[0])
-	
+
+	# HLobbies returns null when joining a lobby that is full
 	if not joined_lobby:
-		print("Failed to join EOS Lobby after retry.")
-		return {"success": false, "message": ""}
+		print("[EOS JOIN ERROR] Failed to join existing lobby. Returning 'Lobby is full!'")
+		return {"success": false, "message": "Lobby is full!"}
 		
 	print("Joined EOS Lobby successfully!")
 	
 	var host_user_id = joined_lobby.owner_product_user_id
 	
-	# SAFEGUARD: Ensure eos_peer is not null before creating client
 	if eos_peer == null:
 		eos_peer = EOSGMultiplayerPeer.new()
 	

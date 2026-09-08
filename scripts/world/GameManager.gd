@@ -29,6 +29,7 @@ func _ready() -> void:
 	# Listen for the disconnect signal directly from your Autoload MultiplayerManager
 	MultiplayerManager.player_disconnected_notif.connect(on_player_disconnected)
 	MultiplayerManager.player_reconnecting_notif.connect(on_player_reconnecting)
+	MultiplayerManager.player_reconnected_notif.connect(on_player_reconnected)
 	
 	# Listens for the user pressing 'Enter' or 'Done' on the iOS keyboard
 	join_popup.get_node("VBoxContainer/Code").text_submitted.connect(_on_code_submitted)
@@ -63,7 +64,6 @@ func _find_button_pressed():
 	var entered_code = join_popup.get_node("VBoxContainer/Code").text.strip_edges()
 	if entered_code != "":
 		loading_spinner.show()
-		host_button.disabled = true
 		join_button.disabled = true
 		var result = await MultiplayerManager.join_game(entered_code)
 		if result.success: 
@@ -72,7 +72,6 @@ func _find_button_pressed():
 			lobby_nav.show()
 			show_temp_notif("Joined lobby!")
 		else:
-			host_button.disabled = false
 			join_button.disabled = false
 			var text = result.message if result.message != "" else "Failed to join lobby. Check internet connection!"
 			show_temp_notif(text)
@@ -142,3 +141,6 @@ func show_perm_notif(text: String):
 	
 	# Make everything visible
 	game_notif.show()
+
+func on_player_reconnected(message: String):
+	show_temp_notif(message)

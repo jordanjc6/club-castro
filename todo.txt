@@ -1,7 +1,6 @@
 Goal - Prepare for publish to App Store
 
 IOS
-- implement touch area to walk towards
 - test host/join buttons are pressable
 - test movie player ui pressable
 - test tic tac toe game pressable
