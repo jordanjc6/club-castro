@@ -2,5 +2,3 @@ Goal - Prepare for publish to App Store
 
 IOS
 - add highlighting/animation to interactable areas
-- test: can't long hold or double tap input field to paste lobby code
-- test: can't click bbt barista game dispensers
