@@ -247,6 +247,12 @@ scale = Vector2(0.28830463, 0.25757363)
 [node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser" index="1" unique_id=706931982]
 position = Vector2(17, 64)
 
+[node name="Button" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser" index="2" unique_id=1677738142]
+offset_left = -22.0
+offset_top = -121.0
+offset_right = 54.0
+offset_bottom = 164.0
+
 [node name="MatchaDispenser" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser" unique_id=156156222 instance=ExtResource("7_n1cwh")]
 position = Vector2(-498, -347)
 
@@ -256,6 +262,12 @@ scale = Vector2(0.16795506, 0.15903307)
 
 [node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser/MatchaDispenser" index="1" unique_id=706931982]
 position = Vector2(603, 400)
+
+[node name="Button" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser/MatchaDispenser" index="2" unique_id=1518366544]
+offset_left = 560.0
+offset_top = 236.0
+offset_right = 643.0
+offset_bottom = 504.0
 
 [node name="HoneydewDispenser" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser" unique_id=921366755 instance=ExtResource("8_yh4ya")]
 position = Vector2(-498, -347)
@@ -267,6 +279,12 @@ scale = Vector2(0.17105258, 0.15945718)
 [node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser/HoneydewDispenser" index="1" unique_id=706931982]
 position = Vector2(691, 405)
 
+[node name="Button" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser/HoneydewDispenser" index="2" unique_id=747733041]
+offset_left = 655.0
+offset_top = 239.0
+offset_right = 734.0
+offset_bottom = 508.0
+
 [node name="BrownsugarDispenser" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser" unique_id=1878401235 instance=ExtResource("9_5cb16")]
 position = Vector2(-498, -347)
 
@@ -277,6 +295,12 @@ scale = Vector2(0.16447361, 0.16072945)
 [node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser/BrownsugarDispenser" index="1" unique_id=706931982]
 position = Vector2(781, 406)
 
+[node name="Button" parent="MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser/BrownsugarDispenser" index="2" unique_id=1040540351]
+offset_left = 742.0
+offset_top = 224.0
+offset_right = 821.0
+offset_bottom = 505.0
+
 [node name="TaroDispenser" parent="MinigameUI/GameWindow/Screen/TeaDispensers" unique_id=574873936 instance=ExtResource("10_y8frw")]
 
 [node name="Sprite2D" parent="MinigameUI/GameWindow/Screen/TeaDispensers/TaroDispenser" index="0" unique_id=13670146]
@@ -285,6 +309,12 @@ scale = Vector2(0.17214918, 0.15564035)
 
 [node name="CollisionShape2D" parent="MinigameUI/GameWindow/Screen/TeaDispensers/TaroDispenser" index="1" unique_id=706931982]
 position = Vector2(868, 404)
+
+[node name="Button" parent="MinigameUI/GameWindow/Screen/TeaDispensers/TaroDispenser" index="2" unique_id=418719904]
+offset_left = 832.0
+offset_top = 239.0
+offset_right = 909.0
+offset_bottom = 506.0
 
 [node name="IceSpawner" type="Button" parent="MinigameUI/GameWindow/Screen" unique_id=1878822087]
 layout_mode = 0

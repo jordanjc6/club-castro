@@ -9,22 +9,19 @@ enum DrinkFlavor { NONE, MANGO, MATCHA, HONEYDEW, BROWNSUGAR, TARO }
 
 var is_active: bool = false
 @onready var sprite: Sprite2D = $Sprite2D
+@onready var button: Button = $Button
 
 
 func _ready() -> void:
 	# Add to general dispenser group for mutual exclusion & cup checks
 	add_to_group("dispenser")
+	button.gui_input.connect(_on_dispenser_clicked)
 	
-	input_event.connect(_on_input_event)
+	#input_event.connect(_on_input_event)
 	_update_modulate()
 
-func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
-	var is_click = event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed
-	var is_touch = event is InputEventScreenTouch and event.pressed
-	
-	if is_click or is_touch:
-		get_viewport().set_input_as_handled()
-		
+func _on_dispenser_clicked(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		if not is_active:
 			# Deactivate ALL other dispensers before activating this one
 			get_tree().call_group("dispenser", "deactivate")
@@ -34,6 +31,23 @@ func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> voi
 			is_active = false
 			
 		_update_modulate()
+
+#func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
+	#var is_click = event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed
+	#var is_touch = event is InputEventScreenTouch and event.pressed
+	#
+	#if is_click or is_touch:
+		#get_viewport().set_input_as_handled()
+		#
+		#if not is_active:
+			## Deactivate ALL other dispensers before activating this one
+			#get_tree().call_group("dispenser", "deactivate")
+			#is_active = true
+		#else:
+			## Clicking the active dispenser toggles it off
+			#is_active = false
+			#
+		#_update_modulate()
 
 ## Called automatically on all dispensers via call_group()
 func deactivate() -> void:

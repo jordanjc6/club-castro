@@ -20,3 +20,10 @@ texture = ExtResource("2_nrbfb")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=706931982]
 position = Vector2(4, -1)
 shape = SubResource("CapsuleShape2D_t5v6p")
+
+[node name="Button" type="Button" parent="." unique_id=1518366544]
+offset_left = -35.0
+offset_top = -152.0
+offset_right = 44.0
+offset_bottom = 102.0
+flat = true
