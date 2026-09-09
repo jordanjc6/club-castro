@@ -20,6 +20,10 @@ const FLAVORS = DISPENSER_SCRIPT.DrinkFlavor
 const TOPPING_SCRIPT = preload("res://scripts/minigames/topping_spoon.gd")
 const TOPPINGS = TOPPING_SCRIPT.Topping
 
+# define nodes for touch highlight/animate
+@export var barista_entrance_polygon: Polygon2D
+@export var barista_button:  Button
+
 @export var small_cup_scene: PackedScene
 @export var medium_cup_scene: PackedScene
 @export var large_cup_scene: PackedScene
@@ -109,6 +113,9 @@ func _process(delta: float) -> void:
 		_update_timer_display()
 
 func _ready() -> void:
+	# press bean bag signal for animation
+	barista_button.pressed.connect(_on_barista_button_pressed)
+	
 	# ui popups hidden on startup
 	game_prompt_panel.visible = false
 	game_window.visible = false
@@ -147,6 +154,33 @@ func _ready() -> void:
 	# exit confirmation
 	confirm_exit_btn.gui_input.connect(exit_confirmed)
 	cancel_exit_btn.gui_input.connect(exit_cancelled)
+
+func _on_barista_button_pressed() -> void:
+	var touch_pos = get_global_mouse_position()
+	
+	# Move the player and check what type of character is currently active
+	var is_singleplayer = _move_local_player_to_position(touch_pos)
+	highlight_barista_entrance()
+
+func highlight_barista_entrance():
+	var flash_tween = create_tween()
+	barista_entrance_polygon.modulate.a = 0.5
+	flash_tween.tween_property(barista_entrance_polygon, "modulate:a", 0.0, 0.25).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+func _move_local_player_to_position(target_pos: Vector2) -> bool:
+	var players = get_tree().get_nodes_in_group("player")
+	for player in players:
+		# Check for Multiplayer character
+		if player is MultiPlayer and player.is_local_player():
+			player.request_move_target.rpc(target_pos)
+			return false # Is NOT singleplayer
+			
+		# Check for Singleplayer character (by node name or class)
+		elif player.name == "SinglePlayer" or player.has_method("set_move_target"):
+			player.set_move_target(target_pos)
+			return true # IS singleplayer
+			
+	return false
 
 # show local game prompt upon entering game area
 #

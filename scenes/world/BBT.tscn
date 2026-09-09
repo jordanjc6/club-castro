@@ -12,6 +12,9 @@ size = Vector2(181, 34.25)
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_r027k"]
 blend_mode = 1
 
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_f2y7u"]
+blend_mode = 1
+
 [node name="BBT" type="Node2D" unique_id=323713113]
 
 [node name="BBTMap" type="CanvasLayer" parent="." unique_id=455165754]
@@ -168,10 +171,12 @@ offset_right = 2020.0
 offset_bottom = 538.0
 flat = true
 
-[node name="BaristaMinigame" parent="." unique_id=1344997855 instance=ExtResource("4_nibfx")]
+[node name="BaristaMinigame" parent="." unique_id=1344997855 node_paths=PackedStringArray("barista_entrance_polygon", "barista_button") instance=ExtResource("4_nibfx")]
+barista_entrance_polygon = NodePath("../BaristaEntrance")
+barista_button = NodePath("../BaristaButton")
 
 [node name="CollisionShape2D" parent="BaristaMinigame/InteractionArea" parent_id_path=PackedInt32Array(1344997855, 1306371111) index="0" unique_id=619535156]
-position = Vector2(2375, 343)
+position = Vector2(2365, 358)
 
 [node name="GamePrompt" parent="BaristaMinigame/MinigameUI" parent_id_path=PackedInt32Array(1344997855, 535232106) index="0" unique_id=577733101]
 offset_left = 1725.5599
@@ -195,6 +200,18 @@ offset_bottom = 80.07999
 [node name="GameResult" parent="BaristaMinigame/MinigameUI" parent_id_path=PackedInt32Array(1344997855, 535232106) index="3" unique_id=1386153806]
 offset_left = 1725.5599
 offset_right = 2374.56
+
+[node name="BaristaEntrance" type="Polygon2D" parent="." unique_id=1645667491]
+modulate = Color(1, 1, 1, 0)
+material = SubResource("CanvasItemMaterial_f2y7u")
+polygon = PackedVector2Array(2370, 293, 2345, 324, 2321, 324, 2307, 333, 2306, 372, 2346, 386, 2343, 420, 2362, 420, 2382, 374, 2389, 374, 2396, 360, 2395, 278, 2381, 278)
+
+[node name="BaristaButton" type="Button" parent="." unique_id=760615]
+offset_left = 2307.0
+offset_top = 295.0
+offset_right = 2422.0
+offset_bottom = 413.0
+flat = true
 
 [node name="TemporaryBarriers" type="Node2D" parent="." unique_id=2043860063]
 
