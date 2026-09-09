@@ -11,6 +11,7 @@
 [ext_resource type="Script" uid="uid://cg7ixi8n10q84" path="res://scripts/world/lobby_nav.gd" id="7_yr1n6"]
 [ext_resource type="Script" uid="uid://bypyut2vuv646" path="res://scripts/world/join_popup.gd" id="8_16fjv"]
 [ext_resource type="Texture2D" uid="uid://x2y5cpfwfgg7" path="res://assets/icons/clear.png" id="9_16fjv"]
+[ext_resource type="Script" uid="uid://wgcgjdf5slly" path="res://scripts/world/line_edit.gd" id="10_ckp8c"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_252at"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
@@ -289,10 +290,11 @@ size_flags_horizontal = 4
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 40
 theme_override_icons/clear = ExtResource("9_16fjv")
-placeholder_text = "Type or paste code here..."
+placeholder_text = "Type code or hold here to paste..."
 alignment = 1
 clear_button_enabled = true
 caret_blink = true
+script = ExtResource("10_ckp8c")
 
 [node name="FindButton" type="Button" parent="HUD/JoinPopup/VBoxContainer" unique_id=534641587]
 custom_minimum_size = Vector2(300, 90)

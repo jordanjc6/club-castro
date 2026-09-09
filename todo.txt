@@ -1,6 +1,6 @@
 Goal - Prepare for publish to App Store
 
 IOS
-- can't long hold or double tap input field to paste lobby code
+- test: can't long hold or double tap input field to paste lobby code
 - can't click bbt barista game dispensers
 - add highlighting/animation to interactable areas
