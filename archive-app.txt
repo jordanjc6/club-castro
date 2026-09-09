@@ -1,0 +1,17 @@
+How to Export and Prepare for Archive to App Store Connect
+
+Godot
+- project > export > preset> export project > in popup window, ensure debug box
+  unchecked
+- open .xcodeproj in xcode
+
+Xcode
+- target > general, update supported destinations, minimum deployment target,
+  identity heading, deployment info
+- target > info, remove privacy key fields, add key Privacy - Local Network
+  Usage Description and add value "This game uses the local network to discover
+  and connect to multiplayer lobbies and peers."
+- command + shift + K to clean build folder
+- set target build to any ios device
+- top bar, product > archive
+- upload to app store connect for review

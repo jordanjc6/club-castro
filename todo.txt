@@ -1,3 +1,1 @@
 Goal - Prepare for publish to App Store
-
-- test barista, tictactoe, and movie projector highlighting on ios

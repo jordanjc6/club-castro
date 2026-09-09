@@ -8,9 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		1FF8DBB11FBA9DE1009DE660 /* dummy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FF8DBB01FBA9DE1009DE660 /* dummy.cpp */; };
-		589384010000000000000001 /* libeosg.ios.template_debug.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 589384010000000000000002 /* libeosg.ios.template_debug.xcframework */; };
-		589384010000000000000003 /* libeosg.ios.template_debug.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 589384010000000000000002 /* libeosg.ios.template_debug.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		589384010000000000000004 /* libgodot-cpp.ios.template_debug.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 589384010000000000000005 /* libgodot-cpp.ios.template_debug.xcframework */; };
+		589384010000000000000001 /* libeosg.ios.template_release.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 589384010000000000000002 /* libeosg.ios.template_release.xcframework */; };
+		589384010000000000000003 /* libeosg.ios.template_release.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 589384010000000000000002 /* libeosg.ios.template_release.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		589384010000000000000004 /* libgodot-cpp.ios.template_release.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 589384010000000000000005 /* libgodot-cpp.ios.template_release.xcframework */; };
 		589384010000000000000006 /* EOSSDK.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 589384010000000000000007 /* EOSSDK.xcframework */; };
 		589384010000000000000008 /* EOSSDK.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 589384010000000000000007 /* EOSSDK.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		9039D3BE24C093AC0020482C /* MoltenVK in Frameworks */ = {isa = PBXBuildFile; fileRef = 9039D3BD24C093AC0020482C /* MoltenVK */; };
@@ -30,7 +30,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				589384010000000000000003 /* libeosg.ios.template_debug.xcframework in Embed Frameworks */,
+				589384010000000000000003 /* libeosg.ios.template_release.xcframework in Embed Frameworks */,
 				589384010000000000000008 /* EOSSDK.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -42,8 +42,8 @@
 		1F1575711F582BE20003B888 /* dylibs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = dylibs; path = ClubCastro/dylibs; sourceTree = "<group>"; };
 		1FF4C1881F584E6300A41E41 /* ClubCastro.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ClubCastro.entitlements; sourceTree = "<group>"; };
 		1FF8DBB01FBA9DE1009DE660 /* dummy.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dummy.cpp; sourceTree = "<group>"; };
-		589384010000000000000002 /* libeosg.ios.template_debug.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libeosg.ios.template_debug.xcframework; path = "ClubCastro/dylibs/addons/epic-online-services-godot/bin/ios/libeosg.ios.template_debug.xcframework"; sourceTree = "<group>"; };
-		589384010000000000000005 /* libgodot-cpp.ios.template_debug.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = "libgodot-cpp.ios.template_debug.xcframework"; path = "ClubCastro/dylibs/addons/epic-online-services-godot/bin/ios/libgodot-cpp.ios.template_debug.xcframework"; sourceTree = "<group>"; };
+		589384010000000000000002 /* libeosg.ios.template_release.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libeosg.ios.template_release.xcframework; path = "ClubCastro/dylibs/addons/epic-online-services-godot/bin/ios/libeosg.ios.template_release.xcframework"; sourceTree = "<group>"; };
+		589384010000000000000005 /* libgodot-cpp.ios.template_release.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = "libgodot-cpp.ios.template_release.xcframework"; path = "ClubCastro/dylibs/addons/epic-online-services-godot/bin/ios/libgodot-cpp.ios.template_release.xcframework"; sourceTree = "<group>"; };
 		589384010000000000000007 /* EOSSDK.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = EOSSDK.xcframework; path = "ClubCastro/dylibs/addons/epic-online-services-godot/bin/ios/EOSSDK.xcframework"; sourceTree = "<group>"; };
 		9039D3BD24C093AC0020482C /* MoltenVK */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MoltenVK; path = MoltenVK.xcframework; sourceTree = "<group>"; };
 		90B4C2AA2680BC560039117A /* dummy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dummy.h; sourceTree = "<group>"; };
@@ -65,8 +65,8 @@
 			files = (
 				9039D3BE24C093AC0020482C /* MoltenVK in Frameworks */,
 				DEADBEEF2F582BE20003B888 /* godot in Frameworks */,
-				589384010000000000000001 /* libeosg.ios.template_debug.xcframework in Frameworks */,
-				589384010000000000000004 /* libgodot-cpp.ios.template_debug.xcframework in Frameworks */,
+				589384010000000000000001 /* libeosg.ios.template_release.xcframework in Frameworks */,
+				589384010000000000000004 /* libgodot-cpp.ios.template_release.xcframework in Frameworks */,
 				589384010000000000000006 /* EOSSDK.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -99,8 +99,8 @@
 			children = (
 				9039D3BD24C093AC0020482C /* MoltenVK */,
 				DEADBEEF1F582BE20003B888 /* godot */,
-				589384010000000000000002 /* libeosg.ios.template_debug.xcframework */,
-				589384010000000000000005 /* libgodot-cpp.ios.template_debug.xcframework */,
+				589384010000000000000002 /* libeosg.ios.template_release.xcframework */,
+				589384010000000000000005 /* libgodot-cpp.ios.template_release.xcframework */,
 				589384010000000000000007 /* EOSSDK.xcframework */,
 			);
 			name = Frameworks;
@@ -273,7 +273,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_CLASSIC_1500 = "-ld_classic";
 				LD_CLASSIC_1501 = "-ld_classic";
 				LD_CLASSIC_1510 = "-ld_classic";
@@ -330,7 +330,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_CLASSIC_1500 = "-ld_classic";
 				LD_CLASSIC_1501 = "-ld_classic";
 				LD_CLASSIC_1510 = "-ld_classic";
@@ -359,7 +359,8 @@
 				EXECUTABLE_NAME = ClubCastro;
 				INFOPLIST_FILE = "ClubCastro/ClubCastro-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = ClubCastro;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -379,9 +380,13 @@
 				PRODUCT_NAME = ClubCastro;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = ClubCastro/dummy.h;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VALID_ARCHS = "arm64 x86_64";
 				WRAPPER_EXTENSION = app;
 			};
@@ -401,7 +406,8 @@
 				EXECUTABLE_NAME = ClubCastro;
 				INFOPLIST_FILE = "ClubCastro/ClubCastro-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = ClubCastro;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -421,9 +427,13 @@
 				PRODUCT_NAME = ClubCastro;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = ClubCastro/dummy.h;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VALID_ARCHS = "arm64 x86_64";
 				WRAPPER_EXTENSION = app;
 			};
