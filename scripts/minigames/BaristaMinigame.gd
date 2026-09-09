@@ -68,6 +68,7 @@ const TOPPINGS = TOPPING_SCRIPT.Topping
 # drink orders
 var orders: Array[Dictionary] = []
 var order_timer: Timer
+var time_between_orders: float = 7
 
 # --- MATCH TIMING & SCORE ---
 var match_time_left: float = 120.0 # 2 minutes in seconds
@@ -281,7 +282,7 @@ func start_orders_timer() -> void:
 	generate_random_order()
 	spawn_drink_order()
 	order_timer = Timer.new()
-	order_timer.wait_time = 10.0
+	order_timer.wait_time = time_between_orders
 	order_timer.autostart = true
 	order_timer.timeout.connect(_on_order_timer_timeout)
 	add_child(order_timer)

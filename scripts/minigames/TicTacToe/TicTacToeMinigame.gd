@@ -1,6 +1,10 @@
 extends Node2D
 
-@onready var hud: CanvasLayer = $"../../HUD"
+# define nodes for touch highlight/animate
+@export var beanbag_polygon: Polygon2D
+@export var beanbag_button:  Button
+
+@onready var hud: CanvasLayer = $"../../../HUD"
 @onready var interaction_area: Area2D = $InteractionArea
 @onready var game_prompt_panel: PanelContainer = $MinigameUI/GamePrompt
 @onready var join_button: Button = $MinigameUI/GamePrompt/VBoxContainer/HBoxContainer/YesButton
@@ -24,6 +28,9 @@ func _ready() -> void:
 	game_window.visible = false
 	game_result_panel.visible = false
 	
+	# press bean bag signal for animation
+	beanbag_button.pressed.connect(_on_beanbag_pressed)
+	
 	# interaction area signals
 	interaction_area.body_entered.connect(_on_body_entered)
 	interaction_area.body_exited.connect(_on_body_exited)
@@ -34,6 +41,36 @@ func _ready() -> void:
 	
 	# game result panel buttons
 	close_result_button.pressed.connect(_on_close_result_button_pressed)
+
+func _on_beanbag_pressed() -> void:
+	var touch_pos = get_global_mouse_position()
+	
+	# Move the player and check what type of character is currently active
+	var is_singleplayer = _move_local_player_to_position(touch_pos)
+	
+	# ONLY trigger the visual highlight if the active player is NOT SinglePlayer
+	if not is_singleplayer:
+		highlight_beanbag()
+
+func highlight_beanbag():
+	var flash_tween = create_tween()
+	beanbag_polygon.modulate.a = 0.5
+	flash_tween.tween_property(beanbag_polygon, "modulate:a", 0.0, 0.25).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+func _move_local_player_to_position(target_pos: Vector2) -> bool:
+	var players = get_tree().get_nodes_in_group("player")
+	for player in players:
+		# Check for Multiplayer character
+		if player is MultiPlayer and player.is_local_player():
+			player.request_move_target.rpc(target_pos)
+			return false # Is NOT singleplayer
+			
+		# Check for Singleplayer character (by node name or class)
+		elif player.name == "SinglePlayer" or player.has_method("set_move_target"):
+			player.set_move_target(target_pos)
+			return true # IS singleplayer
+			
+	return false
 
 # show local game prompt upon entering game area
 #

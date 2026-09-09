@@ -26,6 +26,7 @@ var current_grid_offset: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
+	add_to_group("player")
 	target_position = global_position
 	
 	# Only enable the camera if this player instance belongs to the local machine

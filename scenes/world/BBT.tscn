@@ -9,6 +9,9 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_083f8"]
 size = Vector2(181, 34.25)
 
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_r027k"]
+blend_mode = 1
+
 [node name="BBT" type="Node2D" unique_id=323713113]
 
 [node name="BBTMap" type="CanvasLayer" parent="." unique_id=455165754]
@@ -47,80 +50,123 @@ new_zone_offset = Vector2(0, 0)
 position = Vector2(1980, 703)
 shape = SubResource("RectangleShape2D_083f8")
 
-[node name="TicTacToe1" parent="." unique_id=2005503400 instance=ExtResource("3_ke0q3")]
+[node name="TicTacToeMinigames" type="Node2D" parent="." unique_id=1961381157]
 
-[node name="CollisionShape2D" parent="TicTacToe1/InteractionArea" parent_id_path=PackedInt32Array(2005503400, 1306371111) index="0" unique_id=619535156]
+[node name="TicTacToe1" parent="TicTacToeMinigames" unique_id=2005503400 node_paths=PackedStringArray("beanbag_polygon", "beanbag_button") instance=ExtResource("3_ke0q3")]
+beanbag_polygon = NodePath("../BeanBag1")
+beanbag_button = NodePath("../Button1")
+
+[node name="CollisionShape2D" parent="TicTacToeMinigames/TicTacToe1/InteractionArea" parent_id_path=PackedInt32Array(2005503400, 1306371111) index="0" unique_id=619535156]
 position = Vector2(1661, 471)
 
-[node name="GamePrompt" parent="TicTacToe1/MinigameUI" parent_id_path=PackedInt32Array(2005503400, 535232106) index="0" unique_id=577733101]
+[node name="GamePrompt" parent="TicTacToeMinigames/TicTacToe1/MinigameUI" parent_id_path=PackedInt32Array(2005503400, 535232106) index="0" unique_id=577733101]
 visible = false
 offset_left = 1694.5599
 offset_top = -115.92001
 offset_right = 2351.56
-offset_bottom = 147.07999
+offset_bottom = 83.07999
 
-[node name="GameWindow" parent="TicTacToe1/MinigameUI" parent_id_path=PackedInt32Array(2005503400, 535232106) index="1" unique_id=2080723378]
+[node name="GameWindow" parent="TicTacToeMinigames/TicTacToe1/MinigameUI" parent_id_path=PackedInt32Array(2005503400, 535232106) index="1" unique_id=2080723378]
 offset_left = 1850.0
 offset_top = 32.0
 offset_right = 2381.0
 offset_bottom = 685.0
 
-[node name="GameResult" parent="TicTacToe1/MinigameUI" parent_id_path=PackedInt32Array(2005503400, 535232106) index="2" unique_id=1386153806]
-visible = false
+[node name="GameResult" parent="TicTacToeMinigames/TicTacToe1/MinigameUI" parent_id_path=PackedInt32Array(2005503400, 535232106) index="2" unique_id=1386153806]
 offset_left = 1688.5599
 offset_top = -116.92001
 offset_right = 2409.56
 offset_bottom = 90.07999
 
-[node name="TicTacToe2" parent="." unique_id=1772129830 instance=ExtResource("3_ke0q3")]
+[node name="TicTacToe2" parent="TicTacToeMinigames" unique_id=1772129830 node_paths=PackedStringArray("beanbag_polygon", "beanbag_button") instance=ExtResource("3_ke0q3")]
+beanbag_polygon = NodePath("../BeanBag2")
+beanbag_button = NodePath("../Button2")
 
-[node name="CollisionShape2D" parent="TicTacToe2/InteractionArea" parent_id_path=PackedInt32Array(1772129830, 1306371111) index="0" unique_id=619535156]
+[node name="CollisionShape2D" parent="TicTacToeMinigames/TicTacToe2/InteractionArea" parent_id_path=PackedInt32Array(1772129830, 1306371111) index="0" unique_id=619535156]
 position = Vector2(1832, 423)
 
-[node name="GamePrompt" parent="TicTacToe2/MinigameUI" parent_id_path=PackedInt32Array(1772129830, 535232106) index="0" unique_id=577733101]
+[node name="GamePrompt" parent="TicTacToeMinigames/TicTacToe2/MinigameUI" parent_id_path=PackedInt32Array(1772129830, 535232106) index="0" unique_id=577733101]
 visible = false
 offset_left = 1694.5599
 offset_top = -115.92001
 offset_right = 2353.56
-offset_bottom = 147.07999
+offset_bottom = 80.07999
 
-[node name="GameWindow" parent="TicTacToe2/MinigameUI" parent_id_path=PackedInt32Array(1772129830, 535232106) index="1" unique_id=2080723378]
+[node name="GameWindow" parent="TicTacToeMinigames/TicTacToe2/MinigameUI" parent_id_path=PackedInt32Array(1772129830, 535232106) index="1" unique_id=2080723378]
 offset_left = 1850.0
 offset_top = 32.0
 offset_right = 2381.0
 offset_bottom = 685.0
 
-[node name="GameResult" parent="TicTacToe2/MinigameUI" parent_id_path=PackedInt32Array(1772129830, 535232106) index="2" unique_id=1386153806]
-visible = false
+[node name="GameResult" parent="TicTacToeMinigames/TicTacToe2/MinigameUI" parent_id_path=PackedInt32Array(1772129830, 535232106) index="2" unique_id=1386153806]
 offset_left = 1690.5599
 offset_top = -116.92001
 offset_right = 2404.56
 offset_bottom = 90.07999
 
-[node name="TicTacToe3" parent="." unique_id=723725470 instance=ExtResource("3_ke0q3")]
+[node name="TicTacToe3" parent="TicTacToeMinigames" unique_id=723725470 node_paths=PackedStringArray("beanbag_polygon", "beanbag_button") instance=ExtResource("3_ke0q3")]
+beanbag_polygon = NodePath("../BeanBag3")
+beanbag_button = NodePath("../Button3")
 
-[node name="CollisionShape2D" parent="TicTacToe3/InteractionArea" parent_id_path=PackedInt32Array(723725470, 1306371111) index="0" unique_id=619535156]
+[node name="CollisionShape2D" parent="TicTacToeMinigames/TicTacToe3/InteractionArea" parent_id_path=PackedInt32Array(723725470, 1306371111) index="0" unique_id=619535156]
 position = Vector2(1955, 481)
 
-[node name="GamePrompt" parent="TicTacToe3/MinigameUI" parent_id_path=PackedInt32Array(723725470, 535232106) index="0" unique_id=577733101]
+[node name="GamePrompt" parent="TicTacToeMinigames/TicTacToe3/MinigameUI" parent_id_path=PackedInt32Array(723725470, 535232106) index="0" unique_id=577733101]
 visible = false
 offset_left = 1694.5599
 offset_top = -115.92001
 offset_right = 2352.56
-offset_bottom = 147.07999
+offset_bottom = 80.07999
 
-[node name="GameWindow" parent="TicTacToe3/MinigameUI" parent_id_path=PackedInt32Array(723725470, 535232106) index="1" unique_id=2080723378]
+[node name="GameWindow" parent="TicTacToeMinigames/TicTacToe3/MinigameUI" parent_id_path=PackedInt32Array(723725470, 535232106) index="1" unique_id=2080723378]
 offset_left = 1850.0
 offset_top = 32.0
 offset_right = 2381.0
 offset_bottom = 685.0
 
-[node name="GameResult" parent="TicTacToe3/MinigameUI" parent_id_path=PackedInt32Array(723725470, 535232106) index="2" unique_id=1386153806]
-visible = false
+[node name="GameResult" parent="TicTacToeMinigames/TicTacToe3/MinigameUI" parent_id_path=PackedInt32Array(723725470, 535232106) index="2" unique_id=1386153806]
 offset_left = 1686.5599
 offset_top = -117.92001
 offset_right = 2414.56
 offset_bottom = 91.07999
+
+[node name="BeanBag1" type="Polygon2D" parent="TicTacToeMinigames" unique_id=333711011]
+modulate = Color(1, 1, 1, 0)
+material = SubResource("CanvasItemMaterial_r027k")
+polygon = PackedVector2Array(1592, 537, 1651, 554, 1709, 545, 1739, 526, 1734, 497, 1762, 471, 1748, 435, 1692, 397, 1646, 388, 1619, 393, 1591, 414, 1571, 453, 1564, 491)
+
+[node name="BeanBag2" type="Polygon2D" parent="TicTacToeMinigames" unique_id=1490324854]
+modulate = Color(1, 1, 1, 0)
+material = SubResource("CanvasItemMaterial_r027k")
+position = Vector2(176, -53)
+polygon = PackedVector2Array(1654, 408, 1614, 421, 1587, 448, 1575, 482, 1577, 495, 1588, 517, 1598, 522, 1616, 517, 1632, 497, 1650, 515, 1662, 517, 1675, 510, 1681, 494, 1687, 495, 1686, 510, 1696, 515, 1700, 527, 1723, 494, 1737, 485, 1732, 455, 1702, 421)
+
+[node name="BeanBag3" type="Polygon2D" parent="TicTacToeMinigames" unique_id=765445251]
+modulate = Color(1, 1, 1, 0)
+material = SubResource("CanvasItemMaterial_r027k")
+position = Vector2(302, 11)
+polygon = PackedVector2Array(1655, 405, 1615, 417, 1591, 436, 1578, 464, 1590, 478, 1590, 501, 1584, 507, 1606, 526, 1644, 534, 1678, 531, 1707, 516, 1722, 496, 1723, 458, 1702, 420)
+
+[node name="Button1" type="Button" parent="TicTacToeMinigames" unique_id=729941361]
+offset_left = 1588.0
+offset_top = 404.0
+offset_right = 1731.0
+offset_bottom = 540.0
+flat = true
+
+[node name="Button2" type="Button" parent="TicTacToeMinigames" unique_id=1095892475]
+offset_left = 1763.0
+offset_top = 369.0
+offset_right = 1893.0
+offset_bottom = 468.0
+flat = true
+
+[node name="Button3" type="Button" parent="TicTacToeMinigames" unique_id=1997776145]
+offset_left = 1892.0
+offset_top = 427.0
+offset_right = 2020.0
+offset_bottom = 538.0
+flat = true
 
 [node name="BaristaMinigame" parent="." unique_id=1344997855 instance=ExtResource("4_nibfx")]
 
@@ -141,14 +187,12 @@ offset_right = 2781.0
 offset_bottom = 723.0
 
 [node name="ExitConfirmation" parent="BaristaMinigame/MinigameUI" parent_id_path=PackedInt32Array(1344997855, 535232106) index="2" unique_id=213480221]
-visible = true
 offset_left = 1725.5599
 offset_top = -120.92001
 offset_right = 2374.56
 offset_bottom = 80.07999
 
 [node name="GameResult" parent="BaristaMinigame/MinigameUI" parent_id_path=PackedInt32Array(1344997855, 535232106) index="3" unique_id=1386153806]
-visible = true
 offset_left = 1725.5599
 offset_right = 2374.56
 
@@ -162,9 +206,9 @@ position = Vector2(2530, 96)
 
 [connection signal="body_entered" from="BBTCollisions/bbt-to-jungle-plaza" to="BBTCollisions/bbt-to-jungle-plaza" method="_on_body_entered"]
 
-[editable path="TicTacToe1"]
-[editable path="TicTacToe2"]
-[editable path="TicTacToe3"]
+[editable path="TicTacToeMinigames/TicTacToe1"]
+[editable path="TicTacToeMinigames/TicTacToe2"]
+[editable path="TicTacToeMinigames/TicTacToe3"]
 [editable path="BaristaMinigame"]
 [editable path="BaristaMinigame/MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser"]
 [editable path="BaristaMinigame/MinigameUI/GameWindow/Screen/TeaDispensers/MangoDispenser/MatchaDispenser"]

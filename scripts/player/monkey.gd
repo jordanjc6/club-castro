@@ -19,6 +19,8 @@ var current_grid_offset: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
+	add_to_group("player")
+	
 	# Enable the camera
 	camera.make_current()
 	# Detach camera rotation/position scaling from parent body movement
