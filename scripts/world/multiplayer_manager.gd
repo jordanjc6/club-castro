@@ -14,6 +14,7 @@ const CLIENT_SECRET = "1dfP19Ju9/3Y2HlrTWrzLwYmKPW5mz9IMAVbkkjqvD8"
 const SERVER_PORT = 8080
 const SERVER_IP = "127.0.0.1"
 const MAC_IP = "192.168.2.23"
+const MAX_LOBBY_SIZE = 6
 
 # Fixed spawn fallback coordinates when returning to single player
 const FIXED_SINGLEPLAYER_SPAWN = Vector2(647, 528)
@@ -334,7 +335,7 @@ func become_host() -> bool:
 	_players_spawn_node = world_scene.get_node_or_null("Players")
 	
 	var opts = EOS.Lobby.CreateLobbyOptions.new()
-	opts.max_lobby_members = 2
+	opts.max_lobby_members = MAX_LOBBY_SIZE
 	opts.permission_level = EOS.Lobby.LobbyPermissionLevel.PublicAdvertised
 	opts.bucket_id = "Default"
 	
@@ -419,7 +420,7 @@ func join_game(lobby_id: String) -> Dictionary:
 	# HLobbies returns null when joining a lobby that is full
 	if not joined_lobby:
 		print("[EOS JOIN ERROR] Failed to join existing lobby. Returning 'Lobby is full!'")
-		return {"success": false, "message": "Lobby is full!"}
+		return {"success": false, "message": "Lobby is full! (Max Size = %d)" % MAX_LOBBY_SIZE}
 		
 	print("Joined EOS Lobby successfully!")
 	
