@@ -8,7 +8,10 @@
 size = Vector2(64, 201)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t5v6p"]
-size = Vector2(63.5, 60)
+size = Vector2(106, 114)
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_55x2c"]
+blend_mode = 1
 
 [node name="Theatre" type="Node2D" unique_id=968989905]
 
@@ -48,16 +51,30 @@ new_zone_offset = Vector2(0, -950)
 position = Vector2(81, -1293)
 shape = SubResource("RectangleShape2D_00mmp")
 
-[node name="MovieProjector" type="Node2D" parent="." unique_id=1845853004]
+[node name="MovieProjector" type="Node2D" parent="." unique_id=1845853004 node_paths=PackedStringArray("projector_polygon", "projector_button")]
 script = ExtResource("3_55x2c")
+projector_polygon = NodePath("Projector")
+projector_button = NodePath("Button")
 
 [node name="Area2D" type="Area2D" parent="MovieProjector" unique_id=2056654171]
 collision_layer = 4
 collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MovieProjector/Area2D" unique_id=721876728]
-position = Vector2(316, -1482)
+position = Vector2(319, -1455)
 shape = SubResource("RectangleShape2D_t5v6p")
+
+[node name="Projector" type="Polygon2D" parent="MovieProjector" unique_id=905458028]
+modulate = Color(1, 1, 1, 0)
+material = SubResource("CanvasItemMaterial_55x2c")
+polygon = PackedVector2Array(331, -1439, 282, -1444, 282, -1493, 291, -1501, 296, -1516, 292, -1526, 279, -1536, 285, -1549, 275, -1558, 270, -1571, 273, -1584, 283, -1596, 301, -1596, 298, -1616, 302, -1627, 311, -1637, 322, -1638, 331, -1637, 340, -1621, 341, -1610, 338, -1594, 329, -1581, 343, -1576, 345, -1571, 355, -1575, 359, -1566, 357, -1553, 346, -1552, 345, -1542, 342, -1537, 349, -1533, 346, -1523, 347, -1511, 362, -1507, 364, -1459)
+
+[node name="Button" type="Button" parent="MovieProjector" unique_id=176871591]
+offset_left = 272.0
+offset_top = -1641.0
+offset_right = 362.0
+offset_bottom = -1433.0
+flat = true
 
 [node name="MovieScreen" type="AspectRatioContainer" parent="." unique_id=2032382032]
 offset_left = 303.0

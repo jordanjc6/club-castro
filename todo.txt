@@ -1,4 +1,3 @@
 Goal - Prepare for publish to App Store
 
-IOS
-- add highlighting/animation to interactable areas
+- test barista, tictactoe, and movie projector highlighting on ios

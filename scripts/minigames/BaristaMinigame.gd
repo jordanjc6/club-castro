@@ -113,7 +113,7 @@ func _process(delta: float) -> void:
 		_update_timer_display()
 
 func _ready() -> void:
-	# press bean bag signal for animation
+	# press barista entrance signal for animation
 	barista_button.pressed.connect(_on_barista_button_pressed)
 	
 	# ui popups hidden on startup
