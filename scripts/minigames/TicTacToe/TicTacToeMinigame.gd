@@ -1,5 +1,6 @@
 extends Node2D
 
+@onready var hud: CanvasLayer = $"../../HUD"
 @onready var interaction_area: Area2D = $InteractionArea
 @onready var game_prompt_panel: PanelContainer = $MinigameUI/GamePrompt
 @onready var join_button: Button = $MinigameUI/GamePrompt/VBoxContainer/HBoxContainer/YesButton
@@ -48,6 +49,10 @@ func _on_body_entered(body: Node) -> void:
 				print("game area entered by %s" % body)
 				game_prompt_panel.visible = true
 				game_result_panel.visible = false
+				
+				hud.get_node("LobbyNav").visible = false
+				hud.get_node("LobbyPopup").visible = false
+				hud.get_node("LobbyNav/MultiplayerHUD/VBoxContainer/ExitButton").disabled = false
 
 # close local game prompt / quit game upon leaving game area
 #
@@ -62,6 +67,8 @@ func _on_body_exited(body: Node) -> void:
 		if input_sync and input_sync.is_inside_tree() and input_sync.is_multiplayer_authority():
 			print("game area exited by %s" % body)
 			game_prompt_panel.visible = false
+			
+			hud.get_node("LobbyNav").visible = true
 			
 			# if game is in progress, quit it
 			if game_window.visible:

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://casxckw0ijbxu"]
 
 [ext_resource type="Script" uid="uid://dqtuu4cn4uo05" path="res://scripts/minigames/dispenser.gd" id="1_dtvii"]
-[ext_resource type="Texture2D" uid="uid://ceqrpyttj7dgr" path="res://assets/minigames/mango-dispenser.png" id="1_tk0fo"]
+[ext_resource type="Texture2D" uid="uid://ceqrpyttj7dgr" path="res://assets/minigames/bbt-barista/tea-dispensers/mango-dispenser.png" id="1_tk0fo"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_t5v6p"]
 radius = 43.0

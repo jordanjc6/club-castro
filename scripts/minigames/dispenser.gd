@@ -10,6 +10,7 @@ enum DrinkFlavor { NONE, MANGO, MATCHA, HONEYDEW, BROWNSUGAR, TARO }
 var is_active: bool = false
 @onready var sprite: Sprite2D = $Sprite2D
 
+
 func _ready() -> void:
 	# Add to general dispenser group for mutual exclusion & cup checks
 	add_to_group("dispenser")
