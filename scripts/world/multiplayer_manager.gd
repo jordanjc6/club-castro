@@ -39,7 +39,8 @@ var num_players_in_theatre: int = 0
 
 var eos_peer: EOSGMultiplayerPeer
 const SOCKET_NAME = "Room"
-var active_lobby_id: String = ""
+var active_lobby_id: String = ""  # actual EOS lobby code
+var short_lobby_code: String = ""  # random alias for actual lobby code
 var _eos_logged_in: bool = false
 
 # Mobile background settings
@@ -305,6 +306,14 @@ func is_network_available(timeout_sec: float = 1.5) -> bool:
 	#http.close()
 	#return status == HTTPClient.STATUS_CONNECTED or status == HTTPClient.STATUS_REQUESTING
 
+# short code to be associated with longer EOS lobby code
+func generate_short_code(length: int = 5) -> String:
+	var chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789" # Excluded ambiguous characters like O/0/I/1
+	var code = ""
+	for i in range(length):
+		code += chars[randi() % chars.length()]
+	return code
+
 # Called when Host presses Host Button
 func become_host() -> bool:
 	# FAST FAIL: Check physical internet connection before making any EOS calls
@@ -334,6 +343,7 @@ func become_host() -> bool:
 	var world_scene = get_tree().get_current_scene()
 	_players_spawn_node = world_scene.get_node_or_null("Players")
 	
+	var short_code = generate_short_code(5)
 	var opts = EOS.Lobby.CreateLobbyOptions.new()
 	opts.max_lobby_members = MAX_LOBBY_SIZE
 	opts.permission_level = EOS.Lobby.LobbyPermissionLevel.PublicAdvertised
@@ -352,9 +362,20 @@ func become_host() -> bool:
 		print("Failed to create EOS Lobby after retry.")
 		host_mode_enabled = false
 		return false
-		
+	
+	# Add the short code attribute to the created lobby
+	lobby.add_attribute("ROOM_CODE", short_code, EOS.Lobby.LobbyAttributeVisibility.Public)
+	
+	# Commit changes to EOS servers
+	var updated = await lobby.update_async()
+	if not updated:
+		print("Failed to sync room code attribute to lobby.")
+		return false
+	
 	active_lobby_id = lobby.lobby_id
-	print("EOS Lobby Created! Share this Lobby ID: ", active_lobby_id)
+	short_lobby_code = short_code
+	print("EOS Lobby Created! Share this Lobby ID: ", short_lobby_code)
+	print("(long code: %s)" % active_lobby_id)
 	
 	# SAFEGUARD: Ensure eos_peer is not null before creating server
 	if eos_peer == null:
@@ -386,7 +407,9 @@ func become_host() -> bool:
 	return true
 
 # Called when Client passes the Lobby Code to Join
-func join_game(lobby_id: String) -> Dictionary:
+func join_game(id: String) -> Dictionary:
+	var code = id.strip_edges().to_upper()
+	
 	if not await is_network_available():
 		print("No internet connection.")
 		return {"success": false, "message": ""}
@@ -398,25 +421,51 @@ func join_game(lobby_id: String) -> Dictionary:
 			print("Cannot join: Unable to authenticate with EOS.")
 			return {"success": false, "message": ""}
 	
-	print("Joining EOS Lobby: ", lobby_id)
+	print("Joining EOS Lobby: ", code)
 	
-	var lobbies = await HLobbies.search_by_lobby_id_async(lobby_id)
+	#var lobbies = await HLobbies.search_by_lobby_id_async(code)
+	#
+	#if not lobbies or lobbies.size() == 0:
+		#print("Failed to find EOS Lobby with ID: ", code)
+		#return {"success": false, "message": "No lobby with the entered ID exists!"}
+		#
+	#var target_lobby: HLobby = lobbies[0]
+	#var joined_lobby: HLobby = await HLobbies.join_async(target_lobby)
+	var lobbies = await HLobbies.search_by_attribute_async({
+		"key": "ROOM_CODE",
+		"value": code,
+		"comparison": EOS.ComparisonOp.Equal
+	})
 	
 	if not lobbies or lobbies.size() == 0:
-		print("Failed to find EOS Lobby with ID: ", lobby_id)
+		print("Failed to find EOS Lobby with Code: ", code)
 		return {"success": false, "message": "No lobby with the entered ID exists!"}
 		
 	var target_lobby: HLobby = lobbies[0]
 	var joined_lobby: HLobby = await HLobbies.join_async(target_lobby)
 	
 	# Fail-safe retry if token expired
+	#if not joined_lobby:
+		#print("Initial join attempt failed. Refreshing login token and retrying...")
+		#await _login_eos_user(true)
+		#lobbies = await HLobbies.search_by_lobby_id_async(code)
+		#if lobbies and lobbies.size() > 0:
+			#joined_lobby = await HLobbies.join_async(lobbies[0])
+	# Fail-safe retry if token expired
 	if not joined_lobby:
 		print("Initial join attempt failed. Refreshing login token and retrying...")
 		await _login_eos_user(true)
-		lobbies = await HLobbies.search_by_lobby_id_async(lobby_id)
+		
+		# Re-query by short code on retry
+		lobbies = await HLobbies.search_by_attribute_async({
+			"key": "ROOM_CODE",
+			"value": code,
+			"comparison": EOS.ComparisonOp.Equal
+		})
+		
 		if lobbies and lobbies.size() > 0:
 			joined_lobby = await HLobbies.join_async(lobbies[0])
-
+	
 	# HLobbies returns null when joining a lobby that is full
 	if not joined_lobby:
 		print("[EOS JOIN ERROR] Failed to join existing lobby. Returning 'Lobby is full!'")
@@ -540,6 +589,7 @@ func destroy_active_lobby_async():
 	if not is_instance_valid(EOSGRuntime):
 		print("EOSGRuntime invalid. Clearing lobby ID locally.")
 		active_lobby_id = ""
+		short_lobby_code = ""
 		return
 
 	print("Destroying EOS Lobby as host: ", active_lobby_id)
@@ -551,6 +601,7 @@ func destroy_active_lobby_async():
 
 	# Clear local variable immediately so we don't double-trigger
 	active_lobby_id = ""
+	short_lobby_code = ""
 
 	EOS.Lobby.LobbyInterface.destroy_lobby(opts)
 	var ret = await IEOS.lobby_interface_destroy_lobby_callback
@@ -570,6 +621,7 @@ func leave_active_lobby_async():
 		opts.local_user_id = HAuth.product_user_id
 	
 	active_lobby_id = ""
+	short_lobby_code = ""
 
 	EOS.Lobby.LobbyInterface.leave_lobby(opts)
 	var ret = await IEOS.lobby_interface_leave_lobby_callback
@@ -579,7 +631,7 @@ func leave_active_lobby_async():
 		print("Failed to leave EOS Lobby: ", EOS.result_str(ret))
 
 func get_active_lobby_code() -> String:
-	return active_lobby_id
+	return short_lobby_code
 
 func _add_player_to_game(id: int, position: Vector2 = Vector2.INF, offset: Vector2 = Vector2.INF):
 	print("player %s joined the game" % id)

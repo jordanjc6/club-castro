@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://g2cpv2pl8eih"
-path="res://.godot/imported/Icon-128.png-614ccb9a8fd7565d19044dd9b2201bc4.ctex"
+path="res://.godot/imported/Icon-128.png-b6f293fb9d65e346abe3a21104ee5b89.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://appstore/export4/ClubCastro/Images.xcassets/AppIcon.appiconset/Icon-128.png"
-dest_files=["res://.godot/imported/Icon-128.png-614ccb9a8fd7565d19044dd9b2201bc4.ctex"]
+source_file="res://appstore/export/ClubCastro/Images.xcassets/AppIcon.appiconset/Icon-128.png"
+dest_files=["res://.godot/imported/Icon-128.png-b6f293fb9d65e346abe3a21104ee5b89.ctex"]
 
 [params]
 

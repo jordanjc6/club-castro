@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c7l67cwen3owj"
-path="res://.godot/imported/splash@2x.png-a495492d81505a66ad91a9147380e364.ctex"
+path="res://.godot/imported/splash@2x.png-6aea58bd32d4317dae094c5cb86dc808.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://appstore/export4/ClubCastro/Images.xcassets/SplashImage.imageset/splash@2x.png"
-dest_files=["res://.godot/imported/splash@2x.png-a495492d81505a66ad91a9147380e364.ctex"]
+source_file="res://appstore/export/ClubCastro/Images.xcassets/SplashImage.imageset/splash@2x.png"
+dest_files=["res://.godot/imported/splash@2x.png-6aea58bd32d4317dae094c5cb86dc808.ctex"]
 
 [params]
 

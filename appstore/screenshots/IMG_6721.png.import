@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bsh8rnln66ee1"
-path="res://.godot/imported/Icon-167.png-933e295b9880626a1e290403a33e6ac7.ctex"
+uid="uid://rx31uyfakfro"
+path="res://.godot/imported/IMG_6721.png-af4b34c8a1d3e313cf99c7623b52d4e5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://appstore/export/ClubCastro/Images.xcassets/AppIcon.appiconset/Icon-167.png"
-dest_files=["res://.godot/imported/Icon-167.png-933e295b9880626a1e290403a33e6ac7.ctex"]
+source_file="res://appstore/screenshots/IMG_6721.png"
+dest_files=["res://.godot/imported/IMG_6721.png-af4b34c8a1d3e313cf99c7623b52d4e5.ctex"]
 
 [params]
 

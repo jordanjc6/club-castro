@@ -1,1 +1,3 @@
-Goal - Prepare for publish to App Store
+Updates
+
+- add touch highlights to doors/entrances

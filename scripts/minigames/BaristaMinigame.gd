@@ -72,7 +72,7 @@ const TOPPINGS = TOPPING_SCRIPT.Topping
 # drink orders
 var orders: Array[Dictionary] = []
 var order_timer: Timer
-var time_between_orders: float = 7
+var time_between_orders: float = 4
 
 # --- MATCH TIMING & SCORE ---
 var match_time_left: float = 120.0 # 2 minutes in seconds
