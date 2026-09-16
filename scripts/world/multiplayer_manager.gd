@@ -45,13 +45,13 @@ var _eos_logged_in: bool = false
 
 # Mobile background settings
 var _background_time_msec: int = 0
-const MAX_BACKGROUND_SECONDS: float = 10.0
+const MAX_BACKGROUND_SECONDS: float = 21.0
 
 # Heartbeat & Ping Settings
 var _heartbeat_timer: Timer
 var _last_host_heartbeat_msec: int = 0
 const HEARTBEAT_INTERVAL: float = 0.5
-const HEARTBEAT_TIMEOUT: float = 5.5
+const HEARTBEAT_TIMEOUT: float = 21
 
 var _ping_request: HTTPRequest
 var _last_ping_msec: int = 0
@@ -59,7 +59,7 @@ const PING_INTERVAL_SEC: float = 3.0
 var _consecutive_ping_failures: int = 0
 
 # Absorbs temporary Wi-Fi jitter (4 fails * 3s timeout = ~12s grace period)
-const MAX_PING_FAILURES: int = 4
+const MAX_PING_FAILURES: int = 7
 var _is_reconnecting: bool = false # <--- ADD THIS TRACKING FLAG
 
 

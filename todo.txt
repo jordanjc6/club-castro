@@ -1,6 +1,5 @@
 Updates
 
-- increase time for lobby disconnect for host and joiner
 - add touch highlights to doors/entrances
 - decrease time for monkey to transition to next room
 - create tag and manhunt
