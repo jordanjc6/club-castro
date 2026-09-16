@@ -1,3 +1,6 @@
 Updates
 
 - add touch highlights to doors/entrances
+
+NOTE: when pushing commits, if don't wanna auto build to app store connect,
+      add [skip ci] anywhere in commit name.
