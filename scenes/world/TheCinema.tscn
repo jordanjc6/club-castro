@@ -48,12 +48,12 @@ stretch_mode = 6
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="TheCinemaCollisions/the-cinema-barrier" unique_id=673300926]
 position = Vector2(0, 0.48840332)
 scale = Vector2(1, 0.98310155)
-polygon = PackedVector2Array(541, -229, 214, -229, 215, -302, 141, -298, 117, -320, 304, -524, 341, -525, 324, -811, 376, -829, 373, -863, 447, -867, 571, -880, 677, -885, 790, -876, 900, -853, 953, -823, 927, -529, 966, -528, 1178, -294, 1052, -293, 1055, -234, 730, -230, 729, -203, 1296, -207, 1292, -976, -25, -964, -24, -204, 727, -203)
+polygon = PackedVector2Array(541, -229, 214, -229, 174, -231.39868, 17, -231.39868, 108, -321.9285, 304, -524, 321, -558.93353, 319, -828.4886, 360, -847.8152, 373, -863, 447, -867, 571, -880, 677, -885, 790, -876, 900, -853, 959, -830.52295, 946, -563.0023, 966, -528, 1187, -291.4128, 1225, -233.43306, 1055, -234, 730, -230, 729, -203, 1296, -207, 1292, -976, -25, -964, -24, -204, 727, -203)
 
 [node name="food-stand-barrier" type="StaticBody2D" parent="TheCinemaCollisions" unique_id=365278532]
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="TheCinemaCollisions/food-stand-barrier" unique_id=2052525600]
-polygon = PackedVector2Array(433, -594, 423, -679, 478, -752, 564, -766, 726, -766, 794, -746, 843, -656, 831, -588)
+polygon = PackedVector2Array(439, -605, 423, -679, 478, -752, 564, -766, 726, -766, 794, -746, 843, -656, 825, -599)
 
 [node name="the-cinema-to-jungle-plaza" type="Area2D" parent="TheCinemaCollisions" unique_id=1381998142]
 collision_layer = 4

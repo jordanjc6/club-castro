@@ -45,7 +45,7 @@ collision_mask = 0
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="TheatreCollisions/theatre-barrier" unique_id=418377874]
 position = Vector2(-3, -1)
-polygon = PackedVector2Array(627, -1077, -4, -1084, 65, -1164, 54, -1385, 127, -1395, 130, -1261, 276, -1481, 377, -1489, 960, -1481, 1012, -1448, 1056, -1415, 1280, -1118, 1280, -1076, 667, -1076, 666, -1046, 1320, -1047, 1315, -1832, -43, -1829, -43, -1049, 666, -1044, 655, -1076)
+polygon = PackedVector2Array(627, -1077, -4, -1084, 43, -1169, 54, -1385, 127, -1395, 131, -1277, 276, -1481, 377, -1489, 991, -1488, 1023, -1457, 1056, -1415, 1280, -1118, 1280, -1076, 667, -1076, 666, -1046, 1320, -1047, 1315, -1832, -43, -1829, -43, -1049, 666, -1044, 655, -1076)
 
 [node name="theatre-to-cinema" type="Area2D" parent="TheatreCollisions" unique_id=479300806]
 collision_layer = 4
