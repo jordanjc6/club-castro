@@ -1,3 +1,6 @@
 Updates
 
+- show lobby code on joiner device as well
+- when host or joiner is disconnected from lobby, need to clear minigame state
+  if was in middle of one when reset to single player (barista and tictactoe)
 - create tag and manhunt

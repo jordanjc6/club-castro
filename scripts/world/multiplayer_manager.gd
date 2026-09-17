@@ -51,7 +51,7 @@ const MAX_BACKGROUND_SECONDS: float = 21.0
 var _heartbeat_timer: Timer
 var _last_host_heartbeat_msec: int = 0
 const HEARTBEAT_INTERVAL: float = 0.5
-const HEARTBEAT_TIMEOUT: float = 21
+const HEARTBEAT_TIMEOUT: float = 6
 
 var _ping_request: HTTPRequest
 var _last_ping_msec: int = 0
