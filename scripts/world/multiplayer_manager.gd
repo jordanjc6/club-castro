@@ -266,6 +266,8 @@ func host_force_return_to_single_player():
 
 	# 4. Restore host's single player at fixed spawn
 	_restore_single_player(FIXED_SINGLEPLAYER_SPAWN, FIXED_GRID_OFFSET)
+	
+	player_disconnected_notif.emit.call_deferred("Host session ended. Returned to single player!")
 
 func is_network_available(timeout_sec: float = 1.5) -> bool:
 	var http = HTTPClient.new()

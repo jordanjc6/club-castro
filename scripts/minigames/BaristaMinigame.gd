@@ -112,7 +112,25 @@ func _process(delta: float) -> void:
 			
 		_update_timer_display()
 
+# Call this during network disconnects to immediately close UI & wipe minigame state
+func force_close_and_reset() -> void:
+	game_prompt_panel.visible = false
+	game_window.visible = false
+	exit_panel.visible = false
+	game_result_panel.visible = false
+	screen_overlay.visible = false
+	result_overlay.visible = false
+	reset_match_state()
+
+func _on_multiplayer_disconnected(_message: String) -> void:
+	force_close_and_reset()
+
 func _ready() -> void:
+	# Listen for lobby disconnects to force-exit active minigames
+	# Resets minigame UI state for both Host and Joiner on lobby disconnect
+	if not MultiplayerManager.player_disconnected_notif.is_connected(_on_multiplayer_disconnected):
+		MultiplayerManager.player_disconnected_notif.connect(_on_multiplayer_disconnected)
+	
 	# press barista entrance signal for animation
 	barista_button.pressed.connect(_on_barista_button_pressed)
 	
@@ -207,17 +225,23 @@ func _on_body_exited(body: Node) -> void:
 		return
 	
 	var input_sync = body.get_node_or_null("InputSynchronizer")
-	# Check is_inside_tree on input_sync before calling authority
-	if (input_sync and input_sync.is_inside_tree() and input_sync.is_multiplayer_authority()) or body.name == "SinglePlayer":
+	
+	# Check is_inside_tree on input_sync before accessing multiplayer authority
+	var is_local_mp = input_sync and input_sync.is_inside_tree() and input_sync.is_multiplayer_authority()
+	var is_local_sp = body.name == "SinglePlayer"
+	
+	if is_local_mp or is_local_sp:
 		print("game area exited by %s" % body)
 		game_prompt_panel.visible = false
 		if game_window.visible:
 			_on_cancel_button_pressed()
 	
-	if (input_sync and input_sync.is_multiplayer_authority()):
-		hud.get_node("LobbyNav").visible = true
-	elif body.name == "SinglePlayer":
-		hud.get_node("SideNav").visible = true
+	if is_local_mp:
+		if hud.has_node("LobbyNav"):
+			hud.get_node("LobbyNav").visible = true
+	elif is_local_sp:
+		if hud.has_node("SideNav"):
+			hud.get_node("SideNav").visible = true
 
 # close local game prompt and request server to join game
 #
@@ -275,11 +299,19 @@ func _update_score_display() -> void:
 		score_label.text = "Orders: %d" % orders_completed
 
 func reset_match_state() -> void:
-	screen_overlay.gui_input.disconnect(_on_screen_overlay_gui_input)
-	result_overlay.gui_input.disconnect(_on_screen_overlay_gui_input)
+	# Check if signals are actually connected before disconnecting to avoid errors
+	if screen_overlay.gui_input.is_connected(_on_screen_overlay_gui_input):
+		screen_overlay.gui_input.disconnect(_on_screen_overlay_gui_input)
+		
+	if result_overlay.gui_input.is_connected(_on_screen_overlay_gui_input):
+		result_overlay.gui_input.disconnect(_on_screen_overlay_gui_input)
+		
 	is_match_running = false
-	order_timer.stop()
-	order_timer = null
+	if is_instance_valid(order_timer):
+		order_timer.stop()
+		order_timer.queue_free() # Safely free the timer node
+		order_timer = null
+		
 	orders = []
 	match_time_left = 120.0
 	orders_completed = 0
@@ -289,18 +321,22 @@ func reset_match_state() -> void:
 	drink_status_icon1.visible = false
 	drink_status_icon2.visible = false
 	drink_status_icon3.visible = false
+	
 	# Clear all displayed ticket nodes
 	for child in orders_container.get_children():
 		child.queue_free()
+		
 	# Clear all spawned cup nodes
 	for child in screen.get_children():
 		if child.get_script() == CUP_SCRIPT:
 			child.queue_free()
+			
 	# Clear active dispenser
 	for dispenser in get_tree().get_nodes_in_group("dispenser"):
 		dispenser.is_active = false
 		if dispenser.has_method("_update_modulate"):
 			dispenser._update_modulate()
+			
 	set_local_player_movement_disabled(false)
 
 func _end_match() -> void:
