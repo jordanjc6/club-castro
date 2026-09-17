@@ -22,7 +22,31 @@ var current_turn_idx: int = 0 # Index of whose turn it is in seated_players
 var am_i_player_one: bool = false
 var result_timer: SceneTreeTimer = null # used to show game result for some seconds
 
+
+func reset_match_state() -> void:
+	result_timer = null
+	board_state.fill(0)
+	seated_players.clear()
+	current_turn_idx = 0
+	am_i_player_one = false
+	update_ui_grid()
+	update_player_labels()
+
+# Call this during network disconnects to immediately close UI & wipe minigame state
+func force_close_and_reset() -> void:
+	game_prompt_panel.visible = false
+	game_window.visible = false
+	game_result_panel.visible = false
+	reset_match_state()
+
+func _on_multiplayer_disconnected(_message: String) -> void:
+	force_close_and_reset()
+
 func _ready() -> void:
+	# Listen for lobby disconnects to force-exit active minigame windows (Host & Joiner)
+	if not MultiplayerManager.player_disconnected_notif.is_connected(_on_multiplayer_disconnected):
+		MultiplayerManager.player_disconnected_notif.connect(_on_multiplayer_disconnected)
+	
 	# ui popups hidden on startup
 	game_prompt_panel.visible = false
 	game_window.visible = false
