@@ -473,6 +473,10 @@ func join_game(id: String) -> Dictionary:
 		
 	print("Joined EOS Lobby successfully!")
 	
+	# set lobby code vars for joiner
+	active_lobby_id = joined_lobby.lobby_id
+	short_lobby_code = code
+	
 	var host_user_id = joined_lobby.owner_product_user_id
 	
 	if eos_peer == null:
