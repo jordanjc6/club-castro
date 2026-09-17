@@ -33,7 +33,7 @@ func _on_body_entered(body: Node2D):
 			
 		# Small optional delay (e.g., 0.15s) so the screen is partially dark 
 		# before the physical position and camera snap over
-		await get_tree().create_timer(0.45).timeout
+		await get_tree().create_timer(0.4).timeout
 		
 		# Update the grid offset on the client controlling this player
 		if body.has_method("update_zone_offset"):

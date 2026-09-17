@@ -1,4 +1,3 @@
 Updates
 
-- decrease time for monkey to transition to next room
 - create tag and manhunt
