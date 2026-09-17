@@ -47,7 +47,7 @@ func _init_camera_on_spawn() -> void:
 
 
 func is_local_player() -> bool:
-	return is_multiplayer_authority()
+	return %InputSynchronizer.is_multiplayer_authority()
 
 
 func _unhandled_input(event: InputEvent) -> void:
