@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bannfykn1ryhq"]
 
 [ext_resource type="Texture2D" uid="uid://b2mut4j8c83cn" path="res://assets/backgrounds/buildings/the-cinema/the-cinema.png" id="1_2wii5"]
+[ext_resource type="Script" uid="uid://bneeqhprjwlhx" path="res://scripts/world/the_cinema.gd" id="1_4dby6"]
 [ext_resource type="Script" uid="uid://c1meexkm7ti74" path="res://scripts/world/Teleporter.gd" id="2_t41h0"]
 [ext_resource type="PackedScene" uid="uid://cje6eaxrs7ia0" path="res://scenes/world/Theatre.tscn" id="3_2wii5"]
 [ext_resource type="PackedScene" uid="uid://eghfg8h23uwq" path="res://scenes/world/area_barrier.tscn" id="4_dxlfx"]
@@ -9,9 +10,20 @@
 size = Vector2(185, 35.5)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_iquk2"]
-size = Vector2(51, 73.25)
+size = Vector2(51, 83.25)
 
-[node name="TheCinema" type="Node2D" unique_id=1682686883]
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_00mmp"]
+blend_mode = 1
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_t5v6p"]
+blend_mode = 1
+
+[node name="TheCinema" type="Node2D" unique_id=1682686883 node_paths=PackedStringArray("exit_polygon", "exit_button", "theatre_entrance_polygon", "theatre_entrance_button")]
+script = ExtResource("1_4dby6")
+exit_polygon = NodePath("TheCinemaExit")
+exit_button = NodePath("TheCinemaExitButton")
+theatre_entrance_polygon = NodePath("TheatreEntrance")
+theatre_entrance_button = NodePath("TheatreEntranceButton")
 
 [node name="TheCinemaMap" type="CanvasLayer" parent="." unique_id=1941181431]
 layer = -1
@@ -41,7 +53,7 @@ polygon = PackedVector2Array(541, -229, 214, -229, 215, -302, 141, -298, 117, -3
 [node name="food-stand-barrier" type="StaticBody2D" parent="TheCinemaCollisions" unique_id=365278532]
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="TheCinemaCollisions/food-stand-barrier" unique_id=2052525600]
-polygon = PackedVector2Array(429, -585, 406, -686, 473, -769, 563, -777, 725, -777, 803, -767, 854, -654, 836, -575)
+polygon = PackedVector2Array(433, -594, 423, -679, 478, -752, 564, -766, 726, -766, 794, -746, 843, -656, 831, -588)
 
 [node name="the-cinema-to-jungle-plaza" type="Area2D" parent="TheCinemaCollisions" unique_id=1381998142]
 collision_layer = 4
@@ -62,7 +74,7 @@ target_position = Vector2(130, -1250)
 new_zone_offset = Vector2(0, -1800)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TheCinemaCollisions/to-theatre" unique_id=1790709402]
-position = Vector2(866.5, -865.625)
+position = Vector2(866.5, -860.625)
 shape = SubResource("RectangleShape2D_iquk2")
 
 [node name="Theatre" parent="." unique_id=968989905 instance=ExtResource("3_2wii5")]
@@ -80,6 +92,32 @@ position = Vector2(646, -872)
 
 [node name="AreaBarrier4" parent="TemporaryBarriers" unique_id=870387245 instance=ExtResource("4_dxlfx")]
 position = Vector2(755, -868)
+
+[node name="TheatreEntrance" type="Polygon2D" parent="." unique_id=1898716116]
+modulate = Color(1, 1, 1, 0)
+material = SubResource("CanvasItemMaterial_00mmp")
+polygon = PackedVector2Array(829, -838, 834, -920, 909, -911, 902, -825)
+
+[node name="TheatreEntranceButton" type="Button" parent="." unique_id=1293170319]
+offset_left = 834.0
+offset_top = -916.0
+offset_right = 901.0
+offset_bottom = -828.0
+flat = true
+
+[node name="TheCinemaExit" type="Polygon2D" parent="." unique_id=1820375040]
+modulate = Color(1, 1, 1, 0)
+material = SubResource("CanvasItemMaterial_t5v6p")
+position = Vector2(0, 72.94739)
+scale = Vector2(1, 1.3157895)
+polygon = PackedVector2Array(541, -233, 546, -269, 722, -269, 728, -231)
+
+[node name="TheCinemaExitButton" type="Button" parent="." unique_id=251581978]
+offset_left = 543.0
+offset_top = -306.0
+offset_right = 726.0
+offset_bottom = -230.0
+flat = true
 
 [connection signal="body_entered" from="TheCinemaCollisions/the-cinema-to-jungle-plaza" to="TheCinemaCollisions/the-cinema-to-jungle-plaza" method="_on_body_entered"]
 [connection signal="body_entered" from="TheCinemaCollisions/to-theatre" to="TheCinemaCollisions/to-theatre" method="_on_body_entered"]

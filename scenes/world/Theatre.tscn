@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cje6eaxrs7ia0"]
 
 [ext_resource type="Texture2D" uid="uid://c2eivhirv8qug" path="res://assets/backgrounds/buildings/the-cinema/theatre.png" id="1_cv0m5"]
+[ext_resource type="Script" uid="uid://co0qda2u75t3j" path="res://scripts/world/theatre.gd" id="1_hgmqd"]
 [ext_resource type="Script" uid="uid://c1meexkm7ti74" path="res://scripts/world/Teleporter.gd" id="2_btfg8"]
 [ext_resource type="Script" uid="uid://blue2ntdcwyex" path="res://scripts/popups/movie_projector.gd" id="3_55x2c"]
 
@@ -13,7 +14,13 @@ size = Vector2(106, 114)
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_55x2c"]
 blend_mode = 1
 
-[node name="Theatre" type="Node2D" unique_id=968989905]
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_00mmp"]
+blend_mode = 1
+
+[node name="Theatre" type="Node2D" unique_id=968989905 node_paths=PackedStringArray("exit_polygon", "exit_button")]
+script = ExtResource("1_hgmqd")
+exit_polygon = NodePath("TheatreExit")
+exit_button = NodePath("TheatreExitButton")
 
 [node name="TheatreMap" type="CanvasLayer" parent="." unique_id=424849751]
 layer = -1
@@ -44,7 +51,7 @@ polygon = PackedVector2Array(627, -1077, -4, -1084, 65, -1164, 54, -1385, 127, -
 collision_layer = 4
 collision_mask = 2
 script = ExtResource("2_btfg8")
-target_position = Vector2(870, -870)
+target_position = Vector2(870, -810)
 new_zone_offset = Vector2(0, -950)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TheatreCollisions/theatre-to-cinema" unique_id=1620647589]
@@ -157,6 +164,18 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 30
 text = "6
 "
+
+[node name="TheatreExit" type="Polygon2D" parent="." unique_id=1221252027]
+modulate = Color(1, 1, 1, 0)
+material = SubResource("CanvasItemMaterial_00mmp")
+polygon = PackedVector2Array(62, -1185, 54, -1318, 123, -1361, 126, -1228)
+
+[node name="TheatreExitButton" type="Button" parent="." unique_id=292407879]
+offset_left = 49.0
+offset_top = -1391.0
+offset_right = 128.0
+offset_bottom = -1178.0
+flat = true
 
 [connection signal="body_entered" from="TheatreCollisions/theatre-to-cinema" to="TheatreCollisions/theatre-to-cinema" method="_on_body_entered"]
 [connection signal="body_entered" from="MovieProjector/Area2D" to="MovieProjector" method="_on_movie_projector_area_entered"]

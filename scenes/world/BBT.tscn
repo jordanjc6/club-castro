@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://bq0dam8ufvp3i"]
 
+[ext_resource type="Script" uid="uid://dfwr015ox45v1" path="res://scripts/world/bbt.gd" id="1_f2y7u"]
 [ext_resource type="Texture2D" uid="uid://cpq8r5nyyvfp8" path="res://assets/backgrounds/buildings/bbt/bbt-first-floor.png" id="1_i77ue"]
 [ext_resource type="Script" uid="uid://c1meexkm7ti74" path="res://scripts/world/Teleporter.gd" id="2_spf70"]
 [ext_resource type="PackedScene" uid="uid://cjnc5jcd6qw46" path="res://scenes/minigames/TicTacToeMinigame.tscn" id="3_ke0q3"]
@@ -15,7 +16,13 @@ blend_mode = 1
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_f2y7u"]
 blend_mode = 1
 
-[node name="BBT" type="Node2D" unique_id=323713113]
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_00mmp"]
+blend_mode = 1
+
+[node name="BBT" type="Node2D" unique_id=323713113 node_paths=PackedStringArray("bbt_exit_polygon", "exit_button")]
+script = ExtResource("1_f2y7u")
+bbt_exit_polygon = NodePath("BBTExitMat")
+exit_button = NodePath("BBTExitMatButton")
 
 [node name="BBTMap" type="CanvasLayer" parent="." unique_id=455165754]
 layer = -1
@@ -211,6 +218,18 @@ offset_left = 2307.0
 offset_top = 295.0
 offset_right = 2422.0
 offset_bottom = 413.0
+flat = true
+
+[node name="BBTExitMat" type="Polygon2D" parent="." unique_id=473693110]
+modulate = Color(1, 1, 1, 0)
+material = SubResource("CanvasItemMaterial_00mmp")
+polygon = PackedVector2Array(1909, 716, 1892, 712, 1948, 635, 2074, 664, 2050, 719)
+
+[node name="BBTExitMatButton" type="Button" parent="." unique_id=342629781]
+offset_left = 1890.0
+offset_top = 639.0
+offset_right = 2077.0
+offset_bottom = 719.0
 flat = true
 
 [node name="TemporaryBarriers" type="Node2D" parent="." unique_id=2043860063]
