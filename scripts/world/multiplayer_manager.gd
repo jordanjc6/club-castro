@@ -822,3 +822,9 @@ func _stop_video_stream() -> void:
 		movie_projector.is_movie_selector_open = false
 	if movie_selector:
 		movie_selector.visible = false
+
+# Broadcasts a minigame invite to all other connected peers in the lobby
+@rpc("any_peer", "call_remote", "reliable")
+func send_minigame_invite_notif(sender_name: String, game_name: String) -> void:
+	# Emits a notification signal locally on the receiving peers
+	player_reconnected_notif.emit("%s invited you to play %s!" % [sender_name, game_name], true)

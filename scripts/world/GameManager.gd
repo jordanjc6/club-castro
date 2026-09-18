@@ -26,6 +26,7 @@ extends Node
 
 # other
 @onready var game_notif: PanelContainer = $"../HUD/GameNotification"
+@onready var join_tag_button: Button = $"../HUD/GameNotification/MarginContainer/VBoxContainer/JoinTagButton"
 @onready var loading_spinner: TextureProgressBar = $"../HUD/LoadingSpinner"
 
 
@@ -47,6 +48,7 @@ func _ready() -> void:
 	tag_start_button.pressed.connect(_tag_start_pressed)
 	join_popup.hide()
 	game_notif.hide()
+	join_tag_button.pressed.connect(_join_tag_pressed)
 	loading_spinner.hide()
 	
 	# Listen for the disconnect signal directly from your Autoload MultiplayerManager
@@ -105,10 +107,26 @@ func _tag_button_pressed():
 	minigames_mainmenu.hide()
 	minigames_tagmenu.show()
 
+func has_other_players_in_lobby() -> bool:
+	# Ensure peer is active and connected
+	if multiplayer.multiplayer_peer == null or multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
+		return false
+		
+	# get_peers() returns all connected peer IDs excluding local peer ID
+	return multiplayer.get_peers().size() > 0
+
 func _tag_invite_pressed():
 	print("invite to play tag")
-	# send temp invite notifs to all other players in lobby
-	return
+	
+	# Check if any other players are connected in the lobby
+	if not has_other_players_in_lobby():
+		show_temp_notif("No other players in the lobby!")
+		return
+	
+	# Send RPC notification to all other peers in the lobby
+	MultiplayerManager.rpc("send_minigame_invite_notif", "A player", "Tag")
+	# Show local feedback to the sender
+	show_temp_notif("Sent invites to players in lobby!")
 
 func _tag_close_pressed():
 	print("close tag menu")
@@ -120,6 +138,10 @@ func _tag_close_pressed():
 
 func _tag_start_pressed():
 	print("start tag game!")
+	return
+
+func _join_tag_pressed():
+	print("join tag minigame!")
 	return
 
 func _lobby_button_pressed():
@@ -177,11 +199,16 @@ func on_player_disconnected(message: String):
 	exit_button.disabled = false
 	show_temp_notif(message)
 
-func show_temp_notif(text: String):
+func show_temp_notif(text: String, is_tag_invite: bool = false):
 	# Set notif text
-	var label_node: Label = game_notif.get_node("Label")
+	var label_node: Label = game_notif.get_node("MarginContainer/VBoxContainer/Label")
 	if is_instance_valid(label_node):
 		label_node.text = text
+	
+	# conditionally show join tag button
+	var join_tag_button: Button = game_notif.get_node("MarginContainer/VBoxContainer/JoinTagButton")
+	if is_instance_valid(join_tag_button):
+		join_tag_button.visible = is_tag_invite
 	
 	# Make everything visible
 	game_notif.show()
@@ -190,10 +217,12 @@ func show_temp_notif(text: String):
 	var tween = create_tween()
 	
 	# Smooth fade-in or instant display, then delay for 2 seconds
-	tween.tween_interval(4.0)
+	tween.tween_interval(4.5)
 	
 	# Safely hide everything when the 2 seconds finish
 	tween.tween_callback(func():
+		if is_instance_valid(join_tag_button) and join_tag_button.visible:
+			join_tag_button.hide()
 		game_notif.hide()
 	)
 
@@ -209,5 +238,5 @@ func show_perm_notif(text: String):
 	# Make everything visible
 	game_notif.show()
 
-func on_player_reconnected(message: String):
-	show_temp_notif(message)
+func on_player_reconnected(message: String, flag: bool = false):
+	show_temp_notif(message, flag)

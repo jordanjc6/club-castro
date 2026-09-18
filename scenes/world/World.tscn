@@ -153,6 +153,20 @@ border_color = Color(0, 0, 0, 1)
 corner_radius_bottom_right = 40
 corner_radius_bottom_left = 40
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lplgh"]
+bg_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d6tky"]
+bg_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_qxiha"]
 properties/0/path = NodePath(".:position")
 properties/0/spawn = true
@@ -667,13 +681,37 @@ offset_right = 882.56006
 offset_bottom = 82.07999
 theme_override_styles/panel = SubResource("StyleBoxFlat_yr1n6")
 
-[node name="Label" type="Label" parent="HUD/GameNotification" unique_id=588089903]
+[node name="MarginContainer" type="MarginContainer" parent="HUD/GameNotification" unique_id=1811088918]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/GameNotification/MarginContainer" unique_id=1183672065]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 12
+
+[node name="Label" type="Label" parent="HUD/GameNotification/MarginContainer/VBoxContainer" unique_id=588089903]
 custom_minimum_size = Vector2(100, 60)
 layout_mode = 2
 text = "<Notification Text>"
 label_settings = SubResource("LabelSettings_l5ull")
 horizontal_alignment = 1
 autowrap_mode = 2
+
+[node name="JoinTagButton" type="Button" parent="HUD/GameNotification/MarginContainer/VBoxContainer" unique_id=311062896]
+visible = false
+custom_minimum_size = Vector2(200, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_lplgh")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_lplgh")
+theme_override_styles/hover = SubResource("StyleBoxFlat_d6tky")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_d6tky")
+text = "Join Tag"
 
 [node name="LoadingSpinner" parent="HUD" unique_id=837070289 instance=ExtResource("7_qh0kd")]
 visible = false

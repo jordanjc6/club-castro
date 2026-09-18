@@ -1,4 +1,3 @@
 Updates
 
-- create tag and manhunt:
-- make minigames popup ui
+- create tag and manhunt
