@@ -89,13 +89,14 @@ corner_radius_bottom_right = 25
 corner_radius_bottom_left = 25
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0duuj"]
-bg_color = Color(0, 0, 0, 0.6862745)
+bg_color = Color(0.25490198, 0.4117647, 0.88235295, 1)
 corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o0dc1"]
+bg_color = Color(0.13725491, 0.22352941, 0.3647059, 1)
 corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
@@ -114,6 +115,27 @@ corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jy5j1"]
+bg_color = Color(0, 0, 0, 0.23529412)
+corner_radius_top_left = 50
+corner_radius_top_right = 50
+corner_radius_bottom_right = 50
+corner_radius_bottom_left = 50
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_umbuh"]
+bg_color = Color(0.23137255, 0.69411767, 0.2627451, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_juaju"]
+bg_color = Color(0.015686275, 0.22352941, 0.15294118, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8xm5o"]
 bg_color = Color(0, 0, 0, 1)
@@ -410,12 +432,13 @@ theme_override_constants/margin_bottom = 15
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HUD/MinigamesPopup/TagMenu/MarginContainer" unique_id=1253381276]
 layout_mode = 2
+theme_override_constants/separation = 15
 
-[node name="Control" type="Control" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer" unique_id=1180630777]
+[node name="Header" type="Control" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer" unique_id=1180630777]
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Control" unique_id=799057225]
+[node name="Label" type="Label" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Header" unique_id=799057225]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -430,7 +453,7 @@ text = "Tag"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Control" unique_id=153833588]
+[node name="HBoxContainer" type="HBoxContainer" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Header" unique_id=153833588]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -438,7 +461,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="InviteButton" type="Button" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Control/HBoxContainer" unique_id=29041404]
+[node name="InviteButton" type="Button" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Header/HBoxContainer" unique_id=29041404]
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 size_flags_horizontal = 0
@@ -450,11 +473,11 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_0duuj")
 text = "Invite Lobby Members"
 autowrap_mode = 2
 
-[node name="Spacer" type="Control" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Control/HBoxContainer" unique_id=546677011]
+[node name="Spacer" type="Control" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Header/HBoxContainer" unique_id=546677011]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="CloseTagMenuButton" type="Button" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Control/HBoxContainer" unique_id=1561271557]
+[node name="CloseTagMenuButton" type="Button" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Header/HBoxContainer" unique_id=1561271557]
 custom_minimum_size = Vector2(75, 75)
 custom_maximum_size = Vector2(75, 75)
 layout_mode = 2
@@ -465,6 +488,113 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_mmgww")
 theme_override_styles/hover = SubResource("StyleBoxFlat_mmgww")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_400s5")
 text = "X"
+
+[node name="Players" type="GridContainer" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer" unique_id=965698165]
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 3
+
+[node name="Player1" type="Label" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Players" unique_id=1742168770]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 5
+theme_override_font_sizes/font_size = 29
+theme_override_styles/normal = SubResource("StyleBoxFlat_jy5j1")
+text = "Waiting..."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Player2" type="Label" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Players" unique_id=924175635]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 5
+theme_override_font_sizes/font_size = 29
+theme_override_styles/normal = SubResource("StyleBoxFlat_jy5j1")
+text = "Waiting..."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Player3" type="Label" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Players" unique_id=1851784974]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 5
+theme_override_font_sizes/font_size = 29
+theme_override_styles/normal = SubResource("StyleBoxFlat_jy5j1")
+text = "Waiting..."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Player4" type="Label" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Players" unique_id=1372699458]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 5
+theme_override_font_sizes/font_size = 29
+theme_override_styles/normal = SubResource("StyleBoxFlat_jy5j1")
+text = "Waiting..."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Player5" type="Label" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Players" unique_id=2136927371]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 5
+theme_override_font_sizes/font_size = 29
+theme_override_styles/normal = SubResource("StyleBoxFlat_jy5j1")
+text = "Waiting..."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Player6" type="Label" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Players" unique_id=1157444541]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 5
+theme_override_font_sizes/font_size = 29
+theme_override_styles/normal = SubResource("StyleBoxFlat_jy5j1")
+text = "Waiting..."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Footer" type="HBoxContainer" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer" unique_id=2080372119]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Footer" unique_id=530285901]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Heading" type="Label" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Footer/VBoxContainer" unique_id=1374475441]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 36
+text = "How to Play:"
+
+[node name="Text" type="Label" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Footer/VBoxContainer" unique_id=362693472]
+custom_minimum_size = Vector2(1, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 29
+text = "One player is randomly selected to be \"it\", everyone else runs away and tries not to be tagged. The player who is \"it\" at the end of the timer loses!"
+autowrap_mode = 2
+
+[node name="Button" type="Button" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Footer" unique_id=1236386162]
+custom_minimum_size = Vector2(150, 150)
+custom_maximum_size = Vector2(150, 150)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_umbuh")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_juaju")
+theme_override_styles/hover = SubResource("StyleBoxFlat_juaju")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_umbuh")
+text = "Start Game"
+autowrap_mode = 2
 
 [node name="JoinPopup" type="PanelContainer" parent="HUD" unique_id=1040910293]
 visible = false
