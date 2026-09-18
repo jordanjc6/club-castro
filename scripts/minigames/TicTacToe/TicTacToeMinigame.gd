@@ -113,6 +113,8 @@ func _on_body_entered(body: Node) -> void:
 				
 				hud.get_node("LobbyNav").visible = false
 				hud.get_node("LobbyPopup").visible = false
+				hud.get_node("MinigamesPopup").visible = false
+				hud.get_node("LobbyNav/MultiplayerHUD/VBoxContainer/MinigamesButton").disabled = false
 				hud.get_node("LobbyNav/MultiplayerHUD/VBoxContainer/ExitButton").disabled = false
 
 # close local game prompt / quit game upon leaving game area

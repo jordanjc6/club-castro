@@ -1,6 +1,7 @@
 extends HBoxContainer
 
 @onready var multiplayer_hud: Control = $MultiplayerHUD
+@onready var lobby_nav: HBoxContainer = self
 @onready var toggle_button: Button = $ToggleButton
 
 var icon_open: Texture2D = preload("res://assets/icons/left-arrow.svg")
@@ -11,6 +12,7 @@ var tween: Tween
 
 
 func _ready() -> void:
+	lobby_nav.visible = false
 	toggle_button.pressed.connect(_on_toggle_pressed)
 
 func _on_toggle_pressed() -> void:

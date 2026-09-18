@@ -214,6 +214,8 @@ func _on_body_entered(body: Node) -> void:
 	if (input_sync and input_sync.is_multiplayer_authority()):
 		hud.get_node("LobbyNav").visible = false
 		hud.get_node("LobbyPopup").visible = false
+		hud.get_node("MinigamesPopup").visible = false
+		hud.get_node("LobbyNav/MultiplayerHUD/VBoxContainer/MinigamesButton").disabled = false
 		hud.get_node("LobbyNav/MultiplayerHUD/VBoxContainer/ExitButton").disabled = false
 	elif body.name == "SinglePlayer":
 		hud.get_node("SideNav").visible = false

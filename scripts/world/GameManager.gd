@@ -1,15 +1,22 @@
 extends Node
 
+# single player sidenav
 @onready var side_nav: HBoxContainer = $"../HUD/SideNav"
-@onready var lobby_nav: HBoxContainer = $"../HUD/LobbyNav"
 @onready var host_button: Button = $"../HUD/SideNav/MultiplayerHUD/VBoxContainer/HostButton"
 @onready var join_button: Button = $"../HUD/SideNav/MultiplayerHUD/VBoxContainer/JoinButton"
+@onready var join_popup: PanelContainer = $"../HUD/JoinPopup"
+@onready var find_button: Button = $"../HUD/JoinPopup/VBoxContainer/FindButton"
+
+# multiplayer lobby nav
+@onready var lobby_nav: HBoxContainer = $"../HUD/LobbyNav"
 @onready var lobby_button: Button = $"../HUD/LobbyNav/MultiplayerHUD/VBoxContainer/LobbyButton"
+@onready var minigames_button: Button = $"../HUD/LobbyNav/MultiplayerHUD/VBoxContainer/MinigamesButton"
 @onready var exit_button: Button = $"../HUD/LobbyNav/MultiplayerHUD/VBoxContainer/ExitButton"
 @onready var lobby_popup: PanelContainer = $"../HUD/LobbyPopup"
 @onready var copy_button: Button = $"../HUD/LobbyPopup/VBoxContainer/CopyButton"
-@onready var join_popup: PanelContainer = $"../HUD/JoinPopup"
-@onready var find_button: Button = $"../HUD/JoinPopup/VBoxContainer/FindButton"
+@onready var minigames_popup: PanelContainer = $"../HUD/MinigamesPopup"
+
+# other
 @onready var game_notif: PanelContainer = $"../HUD/GameNotification"
 @onready var loading_spinner: TextureProgressBar = $"../HUD/LoadingSpinner"
 
@@ -18,10 +25,12 @@ func _ready() -> void:
 	host_button.pressed.connect(_host_button_pressed)
 	join_button.pressed.connect(_join_button_pressed)
 	lobby_button.pressed.connect(_lobby_button_pressed)
+	minigames_button.pressed.connect(_minigames_button_pressed)
 	exit_button.pressed.connect(_exit_button_pressed)
 	copy_button.pressed.connect(_copy_button_pressed)
 	find_button.pressed.connect(_find_button_pressed)
 	lobby_popup.hide()
+	minigames_popup.hide()
 	join_popup.hide()
 	game_notif.hide()
 	loading_spinner.hide()
@@ -81,21 +90,37 @@ func _lobby_button_pressed():
 	print("lobby btn")
 	if !lobby_popup.visible:
 		lobby_popup.get_node("VBoxContainer/Code").text  = MultiplayerManager.get_active_lobby_code()
+		minigames_button.disabled = true
 		exit_button.disabled = true
-	else: exit_button.disabled = false
+	else: 
+		minigames_button.disabled = false
+		exit_button.disabled = false
 	lobby_popup.visible = !lobby_popup.visible
+
+func _minigames_button_pressed():
+	print("minigames btn")
+	if !minigames_popup.visible:
+		lobby_button.disabled = true
+		exit_button.disabled = true
+	else: 
+		lobby_button.disabled = false
+		exit_button.disabled = false
+	minigames_popup.visible = !minigames_popup.visible
 
 func _exit_button_pressed():
 	print("exit btn")
 	lobby_button.disabled = true
+	minigames_button.disabled = true
 	exit_button.disabled = true
 	loading_spinner.show()
 	await MultiplayerManager._on_leave_lobby_button_pressed()
 	lobby_button.disabled = false
+	minigames_button.disabled = false
 	exit_button.disabled = false
 	loading_spinner.hide()
 	lobby_nav.hide()
 	lobby_popup.hide()
+	minigames_popup.hide()
 	side_nav.show()
 
 func _copy_button_pressed():
@@ -106,8 +131,12 @@ func on_player_disconnected(message: String):
 	side_nav.show()
 	lobby_nav.hide()
 	lobby_popup.hide()
+	minigames_popup.hide()
 	host_button.disabled = false
 	join_button.disabled = false
+	lobby_button.disabled = false
+	minigames_button.disabled = false
+	exit_button.disabled = false
 	show_temp_notif(message)
 
 func show_temp_notif(text: String):
