@@ -14,7 +14,15 @@ extends Node
 @onready var exit_button: Button = $"../HUD/LobbyNav/MultiplayerHUD/VBoxContainer/ExitButton"
 @onready var lobby_popup: PanelContainer = $"../HUD/LobbyPopup"
 @onready var copy_button: Button = $"../HUD/LobbyPopup/VBoxContainer/CopyButton"
+
+# minigames popup
 @onready var minigames_popup: Node2D = $"../HUD/MinigamesPopup"
+@onready var minigames_mainmenu: PanelContainer = $"../HUD/MinigamesPopup/MainMenu"
+@onready var tag_button: Button = $"../HUD/MinigamesPopup/MainMenu/MarginContainer/VBoxContainer/HBoxContainer/TagButton"
+@onready var minigames_tagmenu: PanelContainer = $"../HUD/MinigamesPopup/TagMenu"
+@onready var tag_invite_button: Button = $"../HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Header/HBoxContainer/InviteButton"
+@onready var tag_menu_close_button: Button = $"../HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Header/HBoxContainer/CloseTagMenuButton"
+@onready var tag_start_button: Button = $"../HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Footer/StartGameButton"
 
 # other
 @onready var game_notif: PanelContainer = $"../HUD/GameNotification"
@@ -31,6 +39,12 @@ func _ready() -> void:
 	find_button.pressed.connect(_find_button_pressed)
 	lobby_popup.hide()
 	minigames_popup.hide()
+	minigames_mainmenu.hide()
+	tag_button.pressed.connect(_tag_button_pressed)
+	minigames_tagmenu.hide()
+	tag_invite_button.pressed.connect(_tag_invite_pressed)
+	tag_menu_close_button.pressed.connect(_tag_close_pressed)
+	tag_start_button.pressed.connect(_tag_start_pressed)
 	join_popup.hide()
 	game_notif.hide()
 	loading_spinner.hide()
@@ -86,6 +100,28 @@ func _find_button_pressed():
 			show_temp_notif(text)
 		loading_spinner.hide()
 
+func _tag_button_pressed():
+	print("tag btn")
+	minigames_mainmenu.hide()
+	minigames_tagmenu.show()
+
+func _tag_invite_pressed():
+	print("invite to play tag")
+	# send temp invite notifs to all other players in lobby
+	return
+
+func _tag_close_pressed():
+	print("close tag menu")
+	lobby_button.disabled = false
+	exit_button.disabled = false
+	minigames_popup.visible = false
+	minigames_mainmenu.visible = false
+	minigames_tagmenu.hide()
+
+func _tag_start_pressed():
+	print("start tag game!")
+	return
+
 func _lobby_button_pressed():
 	print("lobby btn")
 	if !lobby_popup.visible:
@@ -102,6 +138,8 @@ func _minigames_button_pressed():
 	if !minigames_popup.visible:
 		lobby_button.disabled = true
 		exit_button.disabled = true
+		minigames_mainmenu.show()
+		minigames_tagmenu.hide()
 	else: 
 		lobby_button.disabled = false
 		exit_button.disabled = false
