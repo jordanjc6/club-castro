@@ -14,7 +14,7 @@ extends Node
 @onready var exit_button: Button = $"../HUD/LobbyNav/MultiplayerHUD/VBoxContainer/ExitButton"
 @onready var lobby_popup: PanelContainer = $"../HUD/LobbyPopup"
 @onready var copy_button: Button = $"../HUD/LobbyPopup/VBoxContainer/CopyButton"
-@onready var minigames_popup: PanelContainer = $"../HUD/MinigamesPopup"
+@onready var minigames_popup: Node2D = $"../HUD/MinigamesPopup"
 
 # other
 @onready var game_notif: PanelContainer = $"../HUD/GameNotification"

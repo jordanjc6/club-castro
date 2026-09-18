@@ -62,6 +62,59 @@ bg_color = Color(0, 0, 0, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ckp8c"]
 bg_color = Color(1, 1, 1, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fe1rh"]
+bg_color = Color(0, 0, 0, 0.6862745)
+corner_radius_top_left = 25
+corner_radius_top_right = 25
+corner_radius_bottom_right = 25
+corner_radius_bottom_left = 25
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i08rc"]
+corner_radius_top_left = 25
+corner_radius_top_right = 25
+corner_radius_bottom_right = 25
+corner_radius_bottom_left = 25
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wryly"]
+bg_color = Color(0, 0, 0, 0.6862745)
+corner_radius_top_left = 25
+corner_radius_top_right = 25
+corner_radius_bottom_right = 25
+corner_radius_bottom_left = 25
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d0ueh"]
+corner_radius_top_left = 25
+corner_radius_top_right = 25
+corner_radius_bottom_right = 25
+corner_radius_bottom_left = 25
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0duuj"]
+bg_color = Color(0, 0, 0, 0.6862745)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o0dc1"]
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_400s5"]
+bg_color = Color(0.8, 0, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mmgww"]
+bg_color = Color(1, 0, 0.050980393, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8xm5o"]
 bg_color = Color(0, 0, 0, 1)
 corner_radius_top_left = 40
@@ -97,6 +150,7 @@ position = Vector2(647, 528)
 [node name="HUD" type="CanvasLayer" parent="." unique_id=484417608]
 
 [node name="SideNav" type="HBoxContainer" parent="HUD" unique_id=1923128839]
+visible = false
 offset_right = 242.0
 offset_bottom = 160.0
 theme_override_constants/separation = 0
@@ -275,58 +329,142 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_ckp8c")
 theme_override_styles/focus = SubResource("StyleBoxFlat_ckp8c")
 text = "Copy Code"
 
-[node name="MinigamesPopup" type="PanelContainer" parent="HUD" unique_id=54406508]
+[node name="MinigamesPopup" type="Node2D" parent="HUD" unique_id=1504986407]
+
+[node name="MainMenu" type="PanelContainer" parent="HUD/MinigamesPopup" unique_id=272566831]
 visible = false
 anchors_preset = -1
 anchor_left = 0.07300001
 anchor_top = 0.16100001
 anchor_right = 0.07300001
 anchor_bottom = 0.16100001
-offset_left = 144.56
-offset_top = 80.07999
-offset_right = 978.56
-offset_bottom = 381.08
+offset_left = 231.0
+offset_top = 204.0
+offset_right = 1065.0
+offset_bottom = 505.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_16fjv")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HUD/MinigamesPopup" unique_id=2094749018]
+[node name="MarginContainer" type="MarginContainer" parent="HUD/MinigamesPopup/MainMenu" unique_id=1494717398]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/MinigamesPopup/MainMenu/MarginContainer" unique_id=136195769]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HUD/MinigamesPopup/VBoxContainer" unique_id=985612852]
+[node name="Label" type="Label" parent="HUD/MinigamesPopup/MainMenu/MarginContainer/VBoxContainer" unique_id=1996187901]
 custom_minimum_size = Vector2(100, 60)
 layout_mode = 2
-text = "Lobby Code:"
+text = "Choose a Minigame!"
 label_settings = SubResource("LabelSettings_l5ull")
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="Code" type="Label" parent="HUD/MinigamesPopup/VBoxContainer" unique_id=846936428]
-custom_minimum_size = Vector2(100, 60)
-layout_mode = 2
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 40
-text = "<Lobby Code>"
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 2
-
-[node name="CopyButton" type="Button" parent="HUD/MinigamesPopup/VBoxContainer" unique_id=1366294764]
-custom_minimum_size = Vector2(0, 70)
+[node name="HBoxContainer" type="HBoxContainer" parent="HUD/MinigamesPopup/MainMenu/MarginContainer/VBoxContainer" unique_id=1536937642]
 layout_mode = 2
 size_flags_vertical = 6
+theme_override_constants/separation = 10
+
+[node name="TagButton" type="Button" parent="HUD/MinigamesPopup/MainMenu/MarginContainer/VBoxContainer/HBoxContainer" unique_id=105284205]
+custom_minimum_size = Vector2(0, 175)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("StyleBoxFlat_fe1rh")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_i08rc")
+theme_override_styles/hover = SubResource("StyleBoxFlat_i08rc")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_fe1rh")
+text = "Tag"
+
+[node name="ManhuntButton" type="Button" parent="HUD/MinigamesPopup/MainMenu/MarginContainer/VBoxContainer/HBoxContainer" unique_id=206089835]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("StyleBoxFlat_wryly")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_d0ueh")
+theme_override_styles/hover = SubResource("StyleBoxFlat_d0ueh")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_wryly")
+disabled = true
+text = "Coming Soon!"
+
+[node name="TagMenu" type="PanelContainer" parent="HUD/MinigamesPopup" unique_id=675146810]
+anchors_preset = -1
+anchor_left = 0.07300001
+anchor_top = 0.16100001
+anchor_right = 0.07300001
+anchor_bottom = 0.16100001
+offset_left = 231.0
+offset_top = 27.0
+offset_right = 1065.0
+offset_bottom = 697.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_16fjv")
+
+[node name="MarginContainer" type="MarginContainer" parent="HUD/MinigamesPopup/TagMenu" unique_id=555457504]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/MinigamesPopup/TagMenu/MarginContainer" unique_id=1253381276]
+layout_mode = 2
+
+[node name="Control" type="Control" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer" unique_id=1180630777]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Control" unique_id=799057225]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 23.0
+grow_horizontal = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
-theme_override_colors/font_hover_pressed_color = Color(0, 0, 0, 1)
-theme_override_colors/font_disabled_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 48
+text = "Tag"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Control" unique_id=153833588]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="InviteButton" type="Button" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Control/HBoxContainer" unique_id=29041404]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+size_flags_horizontal = 0
 theme_override_font_sizes/font_size = 36
-theme_override_styles/normal = SubResource("StyleBoxFlat_l5ull")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_bw37h")
-theme_override_styles/hover = SubResource("StyleBoxFlat_l5ull")
-theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_l5ull")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_ckp8c")
-theme_override_styles/focus = SubResource("StyleBoxFlat_ckp8c")
-text = "Copy Code"
+theme_override_styles/normal = SubResource("StyleBoxFlat_0duuj")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_o0dc1")
+theme_override_styles/hover = SubResource("StyleBoxFlat_o0dc1")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_0duuj")
+text = "Invite Lobby Members"
+autowrap_mode = 2
+
+[node name="Spacer" type="Control" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Control/HBoxContainer" unique_id=546677011]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CloseTagMenuButton" type="Button" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Control/HBoxContainer" unique_id=1561271557]
+custom_minimum_size = Vector2(75, 75)
+custom_maximum_size = Vector2(75, 75)
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = SubResource("StyleBoxFlat_400s5")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_mmgww")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mmgww")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_400s5")
+text = "X"
 
 [node name="JoinPopup" type="PanelContainer" parent="HUD" unique_id=1040910293]
 visible = false
