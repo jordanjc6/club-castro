@@ -3,6 +3,7 @@ extends Node
 signal player_disconnected_notif(message: String)
 signal player_reconnecting_notif(message: String)
 signal player_reconnected_notif(message: String)
+signal tag_lobby_updated(joined_peers: Array[int])
 
 # --- EOS Credentials ---
 const PRODUCT_ID = "ec9ba98721e9490985c87199b1c2ad6b"
@@ -58,38 +59,35 @@ var _last_ping_msec: int = 0
 const PING_INTERVAL_SEC: float = 3.0
 var _consecutive_ping_failures: int = 0
 
-# Absorbs temporary Wi-Fi jitter (4 fails * 3s timeout = ~12s grace period)
+# Absorbs temporary Wi-Fi jitter
 const MAX_PING_FAILURES: int = 7
-var _is_reconnecting: bool = false # <--- ADD THIS TRACKING FLAG
+var _is_reconnecting: bool = false
+
+# Minigame lobby tracking
+var joined_tag_peers: Array[int] = []
 
 
 func _ready():
 	_setup_ping_request()
 	_setup_heartbeat_timer()
-	# Step 1: Initialize platform binaries once
 	await _initialize_eos_platform()
-	# Step 2: Attempt background login (won't block game if offline)
 	_login_eos_user()
 
 func _notification(what: int) -> void:
 	match what:
-		# Catch window close or quit request
 		NOTIFICATION_WM_CLOSE_REQUEST:
 			if not multiplayer.is_server() and multiplayer.multiplayer_peer and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED:
 				rpc_id(1, "notify_server_client_leaving", multiplayer.get_unique_id())
 
-		# App moves to background (checking notifications, pulling down control center, switching apps)
 		NOTIFICATION_APPLICATION_PAUSED:
 			_background_time_msec = Time.get_ticks_msec()
 			print("App paused at timestamp: ", _background_time_msec)
 			
-		# App returns to foreground
 		NOTIFICATION_APPLICATION_RESUMED:
 			if _background_time_msec > 0:
 				var elapsed_seconds = (Time.get_ticks_msec() - _background_time_msec) / 1000.0
 				print("App resumed after %.2f seconds." % elapsed_seconds)
 				
-				# If backgrounded too long, drop cleanly back to single player
 				if elapsed_seconds > MAX_BACKGROUND_SECONDS:
 					print("App backgrounded too long! Returning to single player...")
 					if host_mode_enabled:
@@ -99,14 +97,13 @@ func _notification(what: int) -> void:
 				
 				_background_time_msec = 0
 
-# Active internet verification for Host
 func _setup_ping_request():
 	if is_instance_valid(_ping_request):
 		_ping_request.queue_free()
 		
 	_ping_request = HTTPRequest.new()
 	_ping_request.name = "NetworkPingRequest"
-	_ping_request.timeout = 3.0 # Allow up to 3.0 seconds per HTTP attempt
+	_ping_request.timeout = 3.0
 	_ping_request.request_completed.connect(_on_ping_request_completed)
 	add_child(_ping_request)
 
@@ -115,14 +112,12 @@ func _on_ping_request_completed(result: int, response_code: int, _headers: Packe
 		_consecutive_ping_failures += 1
 		print("Host internet ping failed (%d/%d)" % [_consecutive_ping_failures, MAX_PING_FAILURES])
 	else:
-		# Connection is alive! Check if we were previously reconnecting
 		if _is_reconnecting:
 			_is_reconnecting = false
 			player_reconnected_notif.emit("Connection restored!")
 			
-		_consecutive_ping_failures = 0 # Reset counter
+		_consecutive_ping_failures = 0
 
-# Runs ONCE at app launch to load C++ SDK binaries into memory
 func _initialize_eos_platform():
 	var credentials = HCredentials.new()
 	credentials.product_name = "Club Castro"
@@ -139,7 +134,6 @@ func _initialize_eos_platform():
 	else:
 		print("EOS Platform already initialized or setup skipped.")
 
-# Can be safely retried multiple times when internet becomes available
 func _login_eos_user(force_retry: bool = false) -> bool:
 	if not force_retry and _eos_logged_in and is_instance_valid(HAuth) and HAuth.product_user_id != "":
 		return true
@@ -160,7 +154,6 @@ func _login_eos_user(force_retry: bool = false) -> bool:
 		_eos_logged_in = false
 		return false
 
-# Setup Heartbeat Timer for host dropouts and network connection monitoring
 func _setup_heartbeat_timer():
 	if is_instance_valid(_heartbeat_timer):
 		_heartbeat_timer.queue_free()
@@ -176,7 +169,6 @@ func _on_heartbeat_tick():
 	if multiplayer.multiplayer_peer == null:
 		return
 
-	# HOST NETWORK CHECK
 	if multiplayer.is_server():
 		if multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_DISCONNECTED:
 			print("[CRITICAL] Host peer disconnected! Returning to single player...")
@@ -195,7 +187,6 @@ func _on_heartbeat_tick():
 				_is_reconnecting = true
 				player_reconnecting_notif.emit("Internet connection unstable, attempting to reconnect...")
 
-		# Trigger ping request
 		var current_time = Time.get_ticks_msec()
 		if (current_time - _last_ping_msec) / 1000.0 >= PING_INTERVAL_SEC:
 			_last_ping_msec = current_time
@@ -204,7 +195,6 @@ func _on_heartbeat_tick():
 
 		rpc("receive_host_heartbeat")
 
-	# JOINER NETWORK CHECK
 	else:
 		if _last_host_heartbeat_msec > 0:
 			var time_since_last_ping = (Time.get_ticks_msec() - _last_host_heartbeat_msec) / 1000.0
@@ -243,18 +233,15 @@ func host_force_return_to_single_player():
 	var world_scene = get_tree().get_current_scene()
 	_players_spawn_node = world_scene.get_node_or_null("Players")
 
-	# 1. Clean up EOS Lobby non-blockingly
 	if active_lobby_id != "":
 		destroy_active_lobby_async()
 
-	# 2. Reset network peer
 	if eos_peer:
 		eos_peer.close()
 		eos_peer = null
 		
 	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 
-	# 3. Flush all network player instances from current world tree
 	if _players_spawn_node:
 		for child in _players_spawn_node.get_children():
 			_players_spawn_node.remove_child(child)
@@ -264,7 +251,6 @@ func host_force_return_to_single_player():
 	num_players_in_theatre = 0
 	_stop_video_stream()
 
-	# 4. Restore host's single player at fixed spawn
 	_restore_single_player(FIXED_SINGLEPLAYER_SPAWN, FIXED_GRID_OFFSET)
 	
 	player_disconnected_notif.emit.call_deferred("Host session ended. Returned to single player!")
@@ -281,52 +267,24 @@ func is_network_available(timeout_sec: float = 1.5) -> bool:
 		if (Time.get_ticks_msec() - start_time) > (timeout_sec * 1000):
 			http.close()
 			return false
-		
-		# YIELD TO MAIN THREAD: Allows rendering, UI, and Tweens to process
 		await get_tree().process_frame
 		
 	var status = http.get_status()
 	http.close()
 	return status == HTTPClient.STATUS_CONNECTED or status == HTTPClient.STATUS_REQUESTING
 
-#func is_network_available(timeout_sec: float = 1.5) -> bool:
-	#var http = HTTPClient.new()
-	## Connect to a fast, reliable endpoint
-	#var err = http.connect_to_host("1.1.1.1", 80)
-	#if err != OK:
-		#return false
-	#
-	#var start_time = Time.get_ticks_msec()
-	#while http.get_status() == HTTPClient.STATUS_CONNECTING or http.get_status() == HTTPClient.STATUS_RESOLVING:
-		#http.poll()
-		#if (Time.get_ticks_msec() - start_time) > (timeout_sec * 1000):
-			#http.close()
-			#return false
-		#OS.delay_msec(10)
-		#
-	#var status = http.get_status()
-	#http.close()
-	#return status == HTTPClient.STATUS_CONNECTED or status == HTTPClient.STATUS_REQUESTING
-
-# short code to be associated with longer EOS lobby code
 func generate_short_code(length: int = 5) -> String:
-	var chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789" # Excluded ambiguous characters like O/0/I/1
+	var chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 	var code = ""
 	for i in range(length):
 		code += chars[randi() % chars.length()]
 	return code
 
-# Called when Host presses Host Button
 func become_host() -> bool:
-	# FAST FAIL: Check physical internet connection before making any EOS calls
-	#if not is_network_available():
-		#print("Cannot host: No active internet connection detected.")
-		#return false
 	if not await is_network_available():
 		print("No internet connection.")
 		return false
 	
-	# check if logged into epic online services anonymously
 	if not _eos_logged_in or not is_instance_valid(HAuth) or HAuth.product_user_id == "":
 		print("Not connected to EOS. Retrying login...")
 		var success = await _login_eos_user()
@@ -334,7 +292,6 @@ func become_host() -> bool:
 			print("Cannot host: Unable to authenticate with EOS (check Wi-Fi connection).")
 			return false
 	
-	# If active_lobby_id was stuck from a previous session, try to destroy it
 	if active_lobby_id != "":
 		print("Cleaning up old lobby before creating a new one...")
 		destroy_active_lobby_async()
@@ -353,7 +310,6 @@ func become_host() -> bool:
 	
 	var lobby = await HLobbies.create_lobby_async(opts)
 	
-	# Fail-safe: Re-authenticate EOS if session expired after network reconnect and retry
 	if not lobby:
 		print("Lobby creation failed. Refreshing EOS login and retrying in 1.5s...")
 		await _login_eos_user(true)
@@ -365,10 +321,8 @@ func become_host() -> bool:
 		host_mode_enabled = false
 		return false
 	
-	# Add the short code attribute to the created lobby
 	lobby.add_attribute("ROOM_CODE", short_code, EOS.Lobby.LobbyAttributeVisibility.Public)
 	
-	# Commit changes to EOS servers
 	var updated = await lobby.update_async()
 	if not updated:
 		print("Failed to sync room code attribute to lobby.")
@@ -379,7 +333,6 @@ func become_host() -> bool:
 	print("EOS Lobby Created! Share this Lobby ID: ", short_lobby_code)
 	print("(long code: %s)" % active_lobby_id)
 	
-	# SAFEGUARD: Ensure eos_peer is not null before creating server
 	if eos_peer == null:
 		eos_peer = EOSGMultiplayerPeer.new()
 	
@@ -408,7 +361,6 @@ func become_host() -> bool:
 	
 	return true
 
-# Called when Client passes the Lobby Code to Join
 func join_game(id: String) -> Dictionary:
 	var code = id.strip_edges().to_upper()
 	
@@ -425,14 +377,6 @@ func join_game(id: String) -> Dictionary:
 	
 	print("Joining EOS Lobby: ", code)
 	
-	#var lobbies = await HLobbies.search_by_lobby_id_async(code)
-	#
-	#if not lobbies or lobbies.size() == 0:
-		#print("Failed to find EOS Lobby with ID: ", code)
-		#return {"success": false, "message": "No lobby with the entered ID exists!"}
-		#
-	#var target_lobby: HLobby = lobbies[0]
-	#var joined_lobby: HLobby = await HLobbies.join_async(target_lobby)
 	var lobbies = await HLobbies.search_by_attribute_async({
 		"key": "ROOM_CODE",
 		"value": code,
@@ -446,19 +390,10 @@ func join_game(id: String) -> Dictionary:
 	var target_lobby: HLobby = lobbies[0]
 	var joined_lobby: HLobby = await HLobbies.join_async(target_lobby)
 	
-	# Fail-safe retry if token expired
-	#if not joined_lobby:
-		#print("Initial join attempt failed. Refreshing login token and retrying...")
-		#await _login_eos_user(true)
-		#lobbies = await HLobbies.search_by_lobby_id_async(code)
-		#if lobbies and lobbies.size() > 0:
-			#joined_lobby = await HLobbies.join_async(lobbies[0])
-	# Fail-safe retry if token expired
 	if not joined_lobby:
 		print("Initial join attempt failed. Refreshing login token and retrying...")
 		await _login_eos_user(true)
 		
-		# Re-query by short code on retry
 		lobbies = await HLobbies.search_by_attribute_async({
 			"key": "ROOM_CODE",
 			"value": code,
@@ -468,14 +403,12 @@ func join_game(id: String) -> Dictionary:
 		if lobbies and lobbies.size() > 0:
 			joined_lobby = await HLobbies.join_async(lobbies[0])
 	
-	# HLobbies returns null when joining a lobby that is full
 	if not joined_lobby:
 		print("[EOS JOIN ERROR] Failed to join existing lobby. Returning 'Lobby is full!'")
 		return {"success": false, "message": "Lobby is full! (Max Size = %d)" % MAX_LOBBY_SIZE}
 		
 	print("Joined EOS Lobby successfully!")
 	
-	# set lobby code vars for joiner
 	active_lobby_id = joined_lobby.lobby_id
 	short_lobby_code = code
 	
@@ -503,27 +436,21 @@ func join_game(id: String) -> Dictionary:
 
 func _on_leave_lobby_button_pressed() -> void:
 	if multiplayer.is_server():
-		# HOST LEAVING: Destroys lobby, closes peer, and kicks all joiners back to single player
 		leave_or_close_host_lobby()
 	else:
-		# JOINER LEAVING: Sends disconnect RPC to host, leaves lobby, and restores local single player
 		leave_game_as_joiner()
 
-# Call this if Host manually closes or leaves the lobby room
 func leave_or_close_host_lobby():
 	if not host_mode_enabled:
 		return
 
-	# 1. Stop heartbeat timer immediately
 	if is_instance_valid(_heartbeat_timer):
 		_heartbeat_timer.stop()
 	_last_host_heartbeat_msec = 0
 
-	# 2. Fire-and-forget EOS lobby destruction (don't block local UI if offline)
 	if active_lobby_id != "":
 		destroy_active_lobby_async()
 
-	# 3. Shutdown network peer immediately (instantly notifies clients)
 	host_mode_enabled = false
 	if eos_peer:
 		eos_peer.close()
@@ -531,7 +458,6 @@ func leave_or_close_host_lobby():
 		
 	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 
-	# 4. Flush all network player instances
 	var world_scene = get_tree().get_current_scene()
 	_players_spawn_node = world_scene.get_node_or_null("Players")
 	if _players_spawn_node:
@@ -544,30 +470,24 @@ func leave_or_close_host_lobby():
 
 	_restore_single_player(FIXED_SINGLEPLAYER_SPAWN, FIXED_GRID_OFFSET)
 
-# Call this when a Joiner explicitly leaves via UI button
 func leave_game_as_joiner():
 	print("Leaving game as joiner...")
 	
-	# 1. Stop heartbeat timer immediately
 	if is_instance_valid(_heartbeat_timer):
 		_heartbeat_timer.stop()
 	_last_host_heartbeat_msec = 0
 
-	# 2. Try sending notification to host (best-effort, don't block if it fails)
 	if multiplayer.multiplayer_peer and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED:
 		rpc_id(1, "notify_server_client_leaving", multiplayer.get_unique_id())
 
-	# 3. Fire-and-forget EOS lobby exit (don't let EOS network timeouts delay local return)
 	if active_lobby_id != "":
-		leave_active_lobby_async() # Runs in background
+		leave_active_lobby_async()
 
-	# 4. Force local peer shutdown instantly
 	if eos_peer:
 		eos_peer.close()
 		eos_peer = null
 	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 
-	# 5. Clear network nodes
 	var world_scene = get_tree().get_current_scene()
 	_players_spawn_node = world_scene.get_node_or_null("Players")
 	if _players_spawn_node:
@@ -575,11 +495,6 @@ func leave_game_as_joiner():
 			_players_spawn_node.remove_child(child)
 			child.queue_free()
 
-	# 6. Fallback guard for single player node
-	if not is_instance_valid(stored_single_player):
-		push_warning("stored_single_player was invalid! Re-instantiating fallback...")
-		# Optional: Re-instantiate single player scene if stored node was freed
-		
 	_restore_single_player(FIXED_SINGLEPLAYER_SPAWN, FIXED_GRID_OFFSET)
 
 @rpc("any_peer", "call_remote", "reliable")
@@ -605,7 +520,6 @@ func destroy_active_lobby_async():
 	if is_instance_valid(HAuth) and HAuth.product_user_id != "":
 		opts.local_user_id = HAuth.product_user_id
 
-	# Clear local variable immediately so we don't double-trigger
 	active_lobby_id = ""
 	short_lobby_code = ""
 
@@ -683,7 +597,6 @@ func _delete_player(id: int):
 	if not _players_spawn_node:
 		return
 
-	# Search by exact node name or custom player_id / multiplayer authority
 	var player_node: Node = _players_spawn_node.get_node_or_null(str(id))
 	
 	if not player_node:
@@ -693,7 +606,6 @@ func _delete_player(id: int):
 				break
 
 	if player_node:
-		# Free synchronizer first to prevent lingering sync error packets
 		var sync_node = player_node.get_node_or_null("MultiplayerSynchronizer")
 		if sync_node:
 			sync_node.public_visibility = false
@@ -738,19 +650,16 @@ func _on_server_disconnected():
 	var world_scene = get_tree().get_current_scene()
 	_players_spawn_node = world_scene.get_node_or_null("Players")
 
-	# 1. Reset local multiplayer peer
 	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 	if eos_peer:
 		eos_peer.close()
 		eos_peer = null
 
-	# 2. Flush all network player instances from current world tree
 	if _players_spawn_node:
 		for child in _players_spawn_node.get_children():
 			_players_spawn_node.remove_child(child)
 			child.queue_free()
 
-	# 3. Clean up EOS lobby state
 	if active_lobby_id != "":
 		leave_active_lobby_async()
 		
@@ -758,7 +667,6 @@ func _on_server_disconnected():
 	num_players_in_theatre = 0
 	_stop_video_stream()
 
-	# 4. Restore stored single player at fixed position
 	_restore_single_player(FIXED_SINGLEPLAYER_SPAWN, FIXED_GRID_OFFSET)
 
 	if multiplayer.server_disconnected.is_connected(_on_server_disconnected):
@@ -773,7 +681,6 @@ func _restore_single_player(pos: Vector2, offset: Vector2):
 
 	var world_scene = get_tree().get_current_scene()
 	
-	# SAFEGUARD: Prevent crash if SinglePlayer is already added back to the tree
 	if stored_single_player.get_parent() == world_scene:
 		print("SinglePlayer is already active in scene tree.")
 		return
@@ -785,7 +692,6 @@ func _restore_single_player(pos: Vector2, offset: Vector2):
 	world_scene.add_child(stored_single_player)
 	print("SUCCESS: SinglePlayer restored at position: ", pos)
 
-	# Defer signal emission so UI nodes complete ready/setup before displaying popup
 	player_disconnected_notif.emit.call_deferred("Disconnected from lobby. Back to single player!")
 
 @rpc("any_peer", "call_local", "reliable")
@@ -823,8 +729,59 @@ func _stop_video_stream() -> void:
 	if movie_selector:
 		movie_selector.visible = false
 
-# Broadcasts a minigame invite to all other connected peers in the lobby
-@rpc("any_peer", "call_remote", "reliable")
-func send_minigame_invite_notif(sender_name: String, game_name: String) -> void:
-	# Emits a notification signal locally on the receiving peers
+# --- MINIGAME LOBBY RPCs ---
+
+#@rpc("any_peer", "call_remote", "reliable")
+#func send_minigame_invite_notif(sender_name: String, game_name: String = "Tag") -> void:
+	#player_reconnected_notif.emit("%s invited you to play %s!" % [sender_name, game_name], true)
+
+@rpc("any_peer", "call_local", "reliable")
+func send_minigame_invite_notif(sender_name: String, game_name: String = "Tag") -> void:
+	# Only the host calculates who needs an invite and sends targeted RPCs
+	if multiplayer.is_server():
+		var sender_id = multiplayer.get_remote_sender_id()
+		# Fallback to local peer ID if host pressed the invite button
+		if sender_id == 0:
+			sender_id = multiplayer.get_unique_id()
+			
+		for peer_id in multiplayer.get_peers():
+			# Skip the sender and skip anyone who has already joined the tag lobby
+			if peer_id != sender_id and not joined_tag_peers.has(peer_id):
+				rpc_id(peer_id, "receive_invite_notif", sender_name, game_name)
+
+# Executed only on peers who haven't joined yet
+@rpc("authority", "call_local", "reliable")
+func receive_invite_notif(sender_name: String, game_name: String) -> void:
 	player_reconnected_notif.emit("%s invited you to play %s!" % [sender_name, game_name], true)
+
+@rpc("any_peer", "call_local", "reliable")
+func register_tag_player(peer_id: int) -> void:
+	if multiplayer.is_server():
+		if not joined_tag_peers.has(peer_id):
+			joined_tag_peers.append(peer_id)
+			print("Registered peer %d for Tag. Current lobby: %s" % [peer_id, str(joined_tag_peers)])
+			rpc("sync_tag_lobby_ui", joined_tag_peers)
+
+@rpc("authority", "call_local", "reliable")
+func sync_tag_lobby_ui(peers: Array[int]) -> void:
+	joined_tag_peers = peers
+	tag_lobby_updated.emit(joined_tag_peers)
+
+func reset_tag_lobby() -> void:
+	if multiplayer.is_server():
+		joined_tag_peers.clear()
+		rpc("sync_tag_lobby_ui", joined_tag_peers)
+
+@rpc("any_peer", "call_local", "reliable")
+func request_start_tag_game() -> void:
+	if multiplayer.is_server():
+		if joined_tag_peers.size() > 0:
+			print("Server launching Tag game for peers: ", joined_tag_peers)
+			rpc("launch_tag_game_session", joined_tag_peers)
+		else:
+			print("Cannot start Tag game: No players registered in tag lobby.")
+
+@rpc("authority", "call_local", "reliable")
+func launch_tag_game_session(participating_peers: Array[int]) -> void:
+	print("Launching Tag Minigame session locally for: ", participating_peers)
+	# TODO: Initialize Tag minigame session locally
