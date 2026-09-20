@@ -617,7 +617,9 @@ func _delete_player(id: int):
 		if (x >= THEATRE_X1 and x <= THEATRE_X2 and y >= THEATRE_Y1 and y <= THEATRE_Y2):
 			if multiplayer.is_server():
 				decrement_players_in_theatre()
-
+		
+		unregister_tag_player(id)
+		
 		_players_spawn_node.remove_child(player_node)
 		player_node.queue_free()
 		print("Successfully removed player node for peer: ", id)
@@ -737,15 +739,19 @@ func _stop_video_stream() -> void:
 
 @rpc("any_peer", "call_local", "reliable")
 func send_minigame_invite_notif(sender_name: String, game_name: String = "Tag") -> void:
-	# Only the host calculates who needs an invite and sends targeted RPCs
 	if multiplayer.is_server():
 		var sender_id = multiplayer.get_remote_sender_id()
-		# Fallback to local peer ID if host pressed the invite button
+		# If host pressed the invite button locally, sender_id is local host ID (1)
 		if sender_id == 0:
 			sender_id = multiplayer.get_unique_id()
 			
+		# 1. Check if the Host (Peer ID 1) needs an invite (when sender is a Joiner)
+		if sender_id != 1 and not joined_tag_peers.has(1):
+			# Deliver notification directly to host locally
+			player_reconnected_notif.emit("%s invited you to play %s!" % [sender_name, game_name], true)
+			
+		# 2. Check all remote client peers
 		for peer_id in multiplayer.get_peers():
-			# Skip the sender and skip anyone who has already joined the tag lobby
 			if peer_id != sender_id and not joined_tag_peers.has(peer_id):
 				rpc_id(peer_id, "receive_invite_notif", sender_name, game_name)
 
@@ -760,6 +766,15 @@ func register_tag_player(peer_id: int) -> void:
 		if not joined_tag_peers.has(peer_id):
 			joined_tag_peers.append(peer_id)
 			print("Registered peer %d for Tag. Current lobby: %s" % [peer_id, str(joined_tag_peers)])
+			rpc("sync_tag_lobby_ui", joined_tag_peers)
+
+# Unregisters a player from the Tag lobby on the server and syncs the updated list
+@rpc("any_peer", "call_local", "reliable")
+func unregister_tag_player(peer_id: int) -> void:
+	if multiplayer.is_server():
+		if joined_tag_peers.has(peer_id):
+			joined_tag_peers.erase(peer_id)
+			print("Unregistered peer %d from Tag. Current lobby: %s" % [peer_id, str(joined_tag_peers)])
 			rpc("sync_tag_lobby_ui", joined_tag_peers)
 
 @rpc("authority", "call_local", "reliable")

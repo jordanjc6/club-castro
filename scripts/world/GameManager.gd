@@ -110,6 +110,7 @@ func _tag_button_pressed():
 	print("tag btn")
 	minigames_mainmenu.hide()
 	minigames_tagmenu.show()
+	MultiplayerManager.rpc("register_tag_player", multiplayer.get_unique_id())
 
 func has_other_players_in_lobby() -> bool:
 	if multiplayer.multiplayer_peer == null or multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
@@ -161,6 +162,8 @@ func _join_tag_pressed():
 	
 	# Register current player and open Tag menu
 	MultiplayerManager.rpc("register_tag_player", multiplayer.get_unique_id())
+	lobby_button.disabled = true
+	exit_button.disabled = true
 	minigames_popup.show()
 	minigames_mainmenu.hide()
 	minigames_tagmenu.show()
@@ -175,6 +178,12 @@ func _update_tag_player_grid(joined_peers: Array[int]):
 
 func _tag_close_pressed():
 	print("close tag menu")
+	
+	# Unregister local player from Tag lobby if currently joined
+	var my_id = multiplayer.get_unique_id()
+	if MultiplayerManager.joined_tag_peers.has(my_id):
+		MultiplayerManager.rpc("unregister_tag_player", my_id)
+
 	lobby_button.disabled = false
 	exit_button.disabled = false
 	minigames_popup.hide()
@@ -214,6 +223,10 @@ func _minigames_button_pressed():
 		exit_button.disabled = false
 		minigames_mainmenu.hide()
 		minigames_tagmenu.hide()
+		# Unregister local player from Tag lobby if currently joined
+		var my_id = multiplayer.get_unique_id()
+		if MultiplayerManager.joined_tag_peers.has(my_id):
+			MultiplayerManager.rpc("unregister_tag_player", my_id)
 	minigames_popup.visible = !minigames_popup.visible
 
 func _exit_button_pressed():
