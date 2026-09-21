@@ -260,3 +260,19 @@ color = Color(0, 0, 0, 1)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="ScreenFadeLayer" unique_id=923778978]
 libraries/ = SubResource("AnimationLibrary_8boaa")
+
+[node name="Label" type="Label" parent="." unique_id=1787565345]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -39.0
+offset_top = 56.0
+offset_right = 46.0
+offset_bottom = 95.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 28
+text = "Player"
+horizontal_alignment = 1

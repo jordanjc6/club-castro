@@ -172,7 +172,8 @@ func _update_tag_player_grid(joined_peers: Array[int]):
 	var labels = tag_players_grid.get_children()
 	for i in range(labels.size()):
 		if i < joined_peers.size():
-			labels[i].text = "Player %d" % joined_peers[i]
+			var peer_id = joined_peers[i]
+			labels[i].text = MultiplayerManager.get_player_name(peer_id)
 		else:
 			labels[i].text = "Awaiting Player..."
 

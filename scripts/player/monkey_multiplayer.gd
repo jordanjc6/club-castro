@@ -18,6 +18,7 @@ var current_grid_offset: Vector2 = Vector2.ZERO
 @onready var monkey = $AnimatedSprite2D
 @onready var camera = $Camera2D
 @onready var animation_player = $ScreenFadeLayer/AnimationPlayer
+@onready var name_label: Label = $Label
 
 @export var player_id := 1:
 	set(id):
@@ -28,6 +29,12 @@ var current_grid_offset: Vector2 = Vector2.ZERO
 func _ready() -> void:
 	add_to_group("player")
 	target_position = global_position
+	
+	# Listen for player name updates from MultiplayerManager
+	MultiplayerManager.player_names_updated.connect(_on_player_names_updated)
+	
+	# Apply initial name on spawn
+	_update_name_label()
 	
 	# Only enable the camera if this player instance belongs to the local machine
 	if %InputSynchronizer.is_multiplayer_authority():
@@ -40,6 +47,16 @@ func _ready() -> void:
 		get_tree().process_frame.connect(_init_camera_on_spawn, CONNECT_ONE_SHOT)
 	else:
 		camera.enabled = false
+
+
+func _on_player_names_updated(_names: Dictionary) -> void:
+	_update_name_label()
+
+
+func _update_name_label() -> void:
+	if is_instance_valid(name_label):
+		# Fetches the assigned monkey name using this player's peer ID
+		name_label.text = MultiplayerManager.get_player_name(player_id)
 
 
 func _init_camera_on_spawn() -> void:

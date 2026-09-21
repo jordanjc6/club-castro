@@ -4,6 +4,7 @@ signal player_disconnected_notif(message: String)
 signal player_reconnecting_notif(message: String)
 signal player_reconnected_notif(message: String)
 signal tag_lobby_updated(joined_peers: Array[int])
+signal player_names_updated(names: Dictionary)
 
 # --- EOS Credentials ---
 const PRODUCT_ID = "ec9ba98721e9490985c87199b1c2ad6b"
@@ -20,6 +21,17 @@ const MAX_LOBBY_SIZE = 6
 # Fixed spawn fallback coordinates when returning to single player
 const FIXED_SINGLEPLAYER_SPAWN = Vector2(647, 528)
 const FIXED_GRID_OFFSET = Vector2.ZERO
+
+# Pool of monkey names to assign
+const MONKEY_NAMES: Array[String] = [ "Chonk",
+	"Ape", "Baboon", "Capuchin", "Chimpanzee", "Chimp", "Colobus", "Dusty Leaf",
+	"Gibbon", "Gorilla", "Howler", "Langur", "Macaque", "Mandrill", "Marmoset", 
+	"Monkey", "Orangutan", "Proboscis", "Saki", "Spider", "Squirrel", "Titi", 
+	"Vervet"
+]
+
+# Stores mapping of peer_id -> String name (Server-Authoritative)
+var player_names: Dictionary = {}
 
 # (x1, y1) = top left theatremap offset
 # (x2, y2) = bottom right theatremap based on texturerect size (1280, 720)
@@ -72,6 +84,51 @@ func _ready():
 	_setup_heartbeat_timer()
 	await _initialize_eos_platform()
 	_login_eos_user()
+
+# Assigns a unique name to a joining peer ID
+func assign_unique_name_for_peer(peer_id: int) -> void:
+	if not multiplayer.is_server():
+		return
+		
+	if player_names.has(peer_id):
+		return
+
+	# Collect all names currently taken by connected peers
+	var used_names = player_names.values()
+	var available_names: Array[String] = []
+	
+	for n in MONKEY_NAMES:
+		if not used_names.has(n):
+			available_names.append(n)
+			
+	# Pick a random name from remaining pool (or fallback if empty)
+	var chosen_name: String
+	if available_names.size() > 0:
+		chosen_name = available_names[randi() % available_names.size()]
+	else:
+		chosen_name = "Monkey " + str(peer_id)
+		
+	player_names[peer_id] = chosen_name
+	print("Assigned name '%s' to peer %d" % [chosen_name, peer_id])
+	
+	# Sync full names map to all connected peers
+	rpc("sync_player_names", player_names)
+
+# Unregisters a player's name on disconnect
+func remove_peer_name(peer_id: int) -> void:
+	if multiplayer.is_server():
+		player_names.erase(peer_id)
+		rpc("sync_player_names", player_names)
+
+# Broadcasts updated names map to all clients
+@rpc("authority", "call_local", "reliable")
+func sync_player_names(updated_names: Dictionary) -> void:
+	player_names = updated_names
+	player_names_updated.emit(player_names)
+
+# Helper function to get a player's assigned name locally
+func get_player_name(peer_id: int) -> String:
+	return player_names.get(peer_id, "Player %d" % peer_id)
 
 func _notification(what: int) -> void:
 	match what:
@@ -469,6 +526,7 @@ func leave_or_close_host_lobby():
 	_stop_video_stream()
 
 	_restore_single_player(FIXED_SINGLEPLAYER_SPAWN, FIXED_GRID_OFFSET)
+	player_names.clear()
 
 func leave_game_as_joiner():
 	print("Leaving game as joiner...")
@@ -496,6 +554,7 @@ func leave_game_as_joiner():
 			child.queue_free()
 
 	_restore_single_player(FIXED_SINGLEPLAYER_SPAWN, FIXED_GRID_OFFSET)
+	player_names.clear()
 
 @rpc("any_peer", "call_remote", "reliable")
 func notify_server_client_leaving(client_id: int):
@@ -556,6 +615,10 @@ func get_active_lobby_code() -> String:
 func _add_player_to_game(id: int, position: Vector2 = Vector2.INF, offset: Vector2 = Vector2.INF):
 	print("player %s joined the game" % id)
 	
+	# Assign unique monkey name if host
+	if multiplayer.is_server():
+		assign_unique_name_for_peer(id)
+	
 	var player_to_add = multiplayer_scene.instantiate()
 	player_to_add.player_id = id
 	player_to_add.name = str(id)
@@ -588,6 +651,10 @@ func _add_player_to_game(id: int, position: Vector2 = Vector2.INF, offset: Vecto
 
 func _delete_player(id: int):
 	print("Player %s left the game" % id)
+	
+	# Free up the player's assigned name
+	if multiplayer.is_server():
+		remove_peer_name(id)
 	
 	if not is_instance_valid(_players_spawn_node):
 		var world_scene = get_tree().get_current_scene()
@@ -670,6 +737,7 @@ func _on_server_disconnected():
 	_stop_video_stream()
 
 	_restore_single_player(FIXED_SINGLEPLAYER_SPAWN, FIXED_GRID_OFFSET)
+	player_names.clear()
 
 	if multiplayer.server_disconnected.is_connected(_on_server_disconnected):
 		multiplayer.server_disconnected.disconnect(_on_server_disconnected)
