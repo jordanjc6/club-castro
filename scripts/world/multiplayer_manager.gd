@@ -78,6 +78,7 @@ var _is_reconnecting: bool = false
 
 # Minigame lobby tracking
 var joined_tag_peers: Array[int] = []
+var tag_it_peer_id: int = -1  # store who is "it" for tag
 
 
 func _ready():
@@ -856,14 +857,55 @@ func reset_tag_lobby() -> void:
 		joined_tag_peers.clear()
 		rpc("sync_tag_lobby_ui", joined_tag_peers)
 
+#@rpc("any_peer", "call_local", "reliable")
+#func request_start_tag_game() -> void:
+	#if multiplayer.is_server():
+		#if joined_tag_peers.size() > 0:
+			#print("Server launching Tag game for peers: ", joined_tag_peers)
+			#rpc("launch_tag_game_session", joined_tag_peers)
+		#else:
+			#print("Cannot start Tag game: No players registered in tag lobby.")
+
+@rpc("authority", "call_local", "reliable")
+func notify_not_enough_players() -> void:
+	var world_scene = get_tree().get_current_scene()
+	var game_manager = world_scene.get_node_or_null("GameManager")
+	if game_manager and game_manager.has_method("show_temp_notif"):
+		game_manager.show_temp_notif("At least 2 players are needed to start Tag!")
+
+@rpc("authority", "call_local", "reliable")
+func start_tag_roulette_sequence(participating_peers: Array[int], target_it_peer: int, total_steps: int) -> void:
+	tag_it_peer_id = target_it_peer
+	
+	# Call local UI roulette sequence on GameManager
+	var world_scene = get_tree().get_current_scene()
+	var game_manager = world_scene.get_node_or_null("GameManager")
+	if game_manager and game_manager.has_method("run_tag_roulette"):
+		game_manager.run_tag_roulette(participating_peers, target_it_peer, total_steps)
+
 @rpc("any_peer", "call_local", "reliable")
 func request_start_tag_game() -> void:
 	if multiplayer.is_server():
-		if joined_tag_peers.size() > 0:
-			print("Server launching Tag game for peers: ", joined_tag_peers)
-			rpc("launch_tag_game_session", joined_tag_peers)
+		# Require at least 2 players to start Tag
+		if joined_tag_peers.size() >= 2:
+			var target_index = randi() % joined_tag_peers.size()
+			var chosen_it_peer = joined_tag_peers[target_index]
+			
+			var full_laps = randi_range(4, 6)
+			var steps_count = (full_laps * joined_tag_peers.size()) + target_index + 1
+			
+			tag_it_peer_id = chosen_it_peer
+			print("Server selected peer %d as IT! Launching roulette with %d steps..." % [chosen_it_peer, steps_count])
+			
+			rpc("start_tag_roulette_sequence", joined_tag_peers, chosen_it_peer, steps_count)
 		else:
-			print("Cannot start Tag game: No players registered in tag lobby.")
+			print("Cannot start Tag game: At least 2 players are required.")
+			# Notify the peer who tried to start
+			var sender_id = multiplayer.get_remote_sender_id()
+			if sender_id == 0:
+				sender_id = multiplayer.get_unique_id()
+			
+			rpc_id(sender_id, "notify_not_enough_players")
 
 @rpc("authority", "call_local", "reliable")
 func launch_tag_game_session(participating_peers: Array[int]) -> void:

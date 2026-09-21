@@ -30,6 +30,13 @@ extends Node
 @onready var join_tag_button: Button = $"../HUD/GameNotification/MarginContainer/VBoxContainer/JoinTagButton"
 @onready var loading_spinner: TextureProgressBar = $"../HUD/LoadingSpinner"
 
+# tag minigame #
+################
+# Color Constants for Name Tag States
+const COLOR_BROWN = Color("3d251e")        # Joined player background
+const COLOR_GOLD = Color("ffd700")  
+const ROULETTE_BORDER_WIDTH = 8       # Roulette hop border highlight
+
 
 func _ready() -> void:
 	host_button.pressed.connect(_host_button_pressed)
@@ -164,9 +171,19 @@ func _join_tag_pressed():
 	MultiplayerManager.rpc("register_tag_player", multiplayer.get_unique_id())
 	lobby_button.disabled = true
 	exit_button.disabled = true
+	minigames_button.disabled = false
 	minigames_popup.show()
 	minigames_mainmenu.hide()
 	minigames_tagmenu.show()
+
+#func _update_tag_player_grid(joined_peers: Array[int]):
+	#var labels = tag_players_grid.get_children()
+	#for i in range(labels.size()):
+		#if i < joined_peers.size():
+			#var peer_id = joined_peers[i]
+			#labels[i].text = MultiplayerManager.get_player_name(peer_id)
+		#else:
+			#labels[i].text = "Awaiting Player..."
 
 func _update_tag_player_grid(joined_peers: Array[int]):
 	var labels = tag_players_grid.get_children()
@@ -174,8 +191,10 @@ func _update_tag_player_grid(joined_peers: Array[int]):
 		if i < joined_peers.size():
 			var peer_id = joined_peers[i]
 			labels[i].text = MultiplayerManager.get_player_name(peer_id)
+			_style_player_label(labels[i]) # Sets joined player background to Brown
 		else:
-			labels[i].text = "Awaiting Player..."
+			labels[i].text = "Waiting..."
+			# Do not touch or modify the Inspector stylebox for unjoined slots at all
 
 func _tag_close_pressed():
 	print("close tag menu")
@@ -190,6 +209,8 @@ func _tag_close_pressed():
 	minigames_popup.hide()
 	minigames_mainmenu.hide()
 	minigames_tagmenu.hide()
+	
+	reset_tag_player_colors()
 
 func _tag_start_pressed():
 	print("start tag game!")
@@ -302,3 +323,145 @@ func show_perm_notif(text: String):
 
 func on_player_reconnected(message: String, flag: bool = false):
 	show_temp_notif(message, flag)
+
+# Disables lobby action buttons during the roulette
+func set_tag_menu_buttons_disabled(disabled: bool) -> void:
+	tag_start_button.disabled = disabled
+	tag_invite_button.disabled = disabled
+	tag_menu_close_button.disabled = disabled
+
+# Creates a StyleBoxFlat with optional colored border
+func _create_tag_stylebox(bg_color: Color, border_color: Color = Color.TRANSPARENT, border_width: int = 0) -> StyleBoxFlat:
+	var stylebox = StyleBoxFlat.new()
+	stylebox.bg_color = bg_color
+	
+	if border_width > 0:
+		stylebox.border_color = border_color
+		stylebox.set_border_width_all(border_width)
+		
+	# Corner rounding and margins matching your UI tags
+	stylebox.corner_radius_top_left = 50
+	stylebox.corner_radius_top_right = 50
+	stylebox.corner_radius_bottom_left = 50
+	stylebox.corner_radius_bottom_right = 50
+	
+	return stylebox
+
+# Apply brown background (and optional border) to a label
+#func _style_player_label(label_node: Label, border_color: Color = Color.TRANSPARENT, border_width: int = 0) -> void:
+	#if is_instance_valid(label_node):
+		#var stylebox = _create_tag_stylebox(COLOR_BROWN, border_color, border_width)
+		#label_node.add_theme_stylebox_override("normal", stylebox)
+
+# Apply brown background, optional border, and optional font color to a label
+func _style_player_label(label_node: Label, border_color: Color = Color.TRANSPARENT, border_width: int = 0, font_color: Color = Color.TRANSPARENT) -> void:
+	if is_instance_valid(label_node):
+		var stylebox = _create_tag_stylebox(COLOR_BROWN, border_color, border_width)
+		label_node.add_theme_stylebox_override("normal", stylebox)
+		
+		if font_color != Color.TRANSPARENT:
+			label_node.add_theme_color_override("font_color", font_color)
+		else:
+			label_node.remove_theme_color_override("font_color")
+
+#func reset_tag_player_colors() -> void:
+	#var labels = tag_players_grid.get_children()
+	#for i in range(labels.size()):
+		#if i < MultiplayerManager.joined_tag_peers.size():
+			#_style_player_label(labels[i])
+		## Unjoined slots are left untouched
+
+func reset_tag_player_colors() -> void:
+	var labels = tag_players_grid.get_children()
+	for i in range(labels.size()):
+		if i < MultiplayerManager.joined_tag_peers.size():
+			_style_player_label(labels[i])
+		# Unjoined slots are left untouched
+
+#func run_tag_roulette(participating_peers: Array[int], target_it_peer: int, total_steps: int) -> void:
+	## 1. Lock menu buttons
+	#set_tag_menu_buttons_disabled(true)
+	#
+	## 2. Ensure all participating labels have the base brown background
+	#var labels = tag_players_grid.get_children()
+	#for i in range(participating_peers.size()):
+		#_style_player_label(labels[i])
+		#
+	## 3. Target slot calculation
+	#var target_index = participating_peers.find(target_it_peer)
+	#var current_index = 0
+	#var delay = 0.08
+	#
+	## 4. Run Golden Border Roulette animation
+	#for step in range(total_steps):
+		## Highlight current slot with a 3px Golden Border
+		#_style_player_label(labels[current_index], COLOR_GOLD, ROULETTE_BORDER_WIDTH)
+		#
+		#await get_tree().create_timer(delay).timeout
+		#
+		#if step == total_steps - 1:
+			## Final stop: Lock on target index and keep the Golden Border!
+			#current_index = target_index
+			#_style_player_label(labels[current_index], COLOR_GOLD, ROULETTE_BORDER_WIDTH)
+		#else:
+			## Remove border from current slot before hopping to the next
+			#_style_player_label(labels[current_index])
+			#current_index = (current_index + 1) % participating_peers.size()
+			#
+			#if step > total_steps - 6:
+				#delay += 0.06
+				#
+	#print("Roulette finished! Peer %d is IT." % target_it_peer)
+	#
+	## 5. Delay before transitioning out of lobby
+	#await get_tree().create_timer(1).timeout
+	#
+	#tag_start_button.disabled = false
+	##set_tag_menu_buttons_disabled(false)
+	##reset_tag_player_colors()
+	##minigames_popup.hide()
+	##minigames_tagmenu.hide()
+
+func run_tag_roulette(participating_peers: Array[int], target_it_peer: int, total_steps: int) -> void:
+	# 1. Lock menu buttons
+	set_tag_menu_buttons_disabled(true)
+	
+	# 2. Ensure all participating labels have the base brown background and default font color
+	var labels = tag_players_grid.get_children()
+	for i in range(participating_peers.size()):
+		_style_player_label(labels[i])
+		
+	# 3. Target slot calculation
+	var target_index = participating_peers.find(target_it_peer)
+	var current_index = 0
+	var delay = 0.08
+	
+	# 4. Run Golden Border & Font Roulette animation
+	for step in range(total_steps):
+		# Highlight current slot with Golden Border AND Golden Font
+		_style_player_label(labels[current_index], COLOR_GOLD, ROULETTE_BORDER_WIDTH, COLOR_GOLD)
+		
+		await get_tree().create_timer(delay).timeout
+		
+		if step == total_steps - 1:
+			# Final stop: Lock on target index and keep Golden Border AND Golden Font!
+			current_index = target_index
+			_style_player_label(labels[current_index], COLOR_GOLD, ROULETTE_BORDER_WIDTH, COLOR_GOLD)
+		else:
+			# Reset current slot before hopping to the next
+			_style_player_label(labels[current_index])
+			current_index = (current_index + 1) % participating_peers.size()
+			
+			if step > total_steps - 6:
+				delay += 0.06
+				
+	print("Roulette finished! Peer %d is IT." % target_it_peer)
+	
+	# 5. Delay before transitioning out of lobby
+	await get_tree().create_timer(1).timeout
+	
+	tag_start_button.disabled = false
+	#set_tag_menu_buttons_disabled(false)
+	#reset_tag_player_colors()
+	#minigames_popup.hide()
+	#minigames_tagmenu.hide()
