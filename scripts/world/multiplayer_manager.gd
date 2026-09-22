@@ -85,13 +85,13 @@ var tag_it_peer_id: int = -1  # store who is "it" for tag
 var is_tag_minigame_started: bool = false
 
 # Spawn locations (Adjust Vector2 values to match your game arena layout)
-const IT_SPAWN_POS = Vector2(647, 527 + 150)
+const IT_SPAWN_POS = Vector2(647, 527 + 75)
 const PLAYER_SPAWN_POSITIONS = [
 	Vector2(647, 527 - 100),
-	Vector2(647 - 125, 527),
-	Vector2(647 - 125 - 125, 527),
-	Vector2(647 + 125, 527),
-	Vector2(647 + 125 + 125, 527)
+	Vector2(647 - 125, 527 - 100),
+	Vector2(647 - 125 - 125, 527 - 100),
+	Vector2(647 + 125, 527 - 100),
+	Vector2(647 + 125 + 125, 527 - 100)
 ]
 
 #############################################################################
