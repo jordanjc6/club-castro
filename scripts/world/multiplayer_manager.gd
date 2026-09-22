@@ -94,6 +94,9 @@ const PLAYER_SPAWN_POSITIONS = [
 	Vector2(647 + 125 + 125, 527 - 100)
 ]
 
+# Server tag cooldown timestamp
+var tag_cooldown_until_ms: int = 0
+
 #############################################################################
 
 
@@ -877,6 +880,8 @@ func reset_tag_lobby() -> void:
 	if multiplayer.is_server():
 		joined_tag_peers.clear()
 		is_tag_minigame_started = false
+		tag_it_peer_id = -1
+		tag_cooldown_until_ms = 0
 		rpc("sync_tag_lobby_ui", joined_tag_peers)
 
 #@rpc("any_peer", "call_local", "reliable")
@@ -973,6 +978,8 @@ func unfreeze_it_player(target_it_peer: int) -> void:
 @rpc("authority", "call_local", "reliable")
 func setup_tag_game_session(participating_peers: Array[int], target_it_peer: int) -> void:
 	tag_it_peer_id = target_it_peer
+	is_tag_minigame_started = true
+	tag_cooldown_until_ms = 0 # Reset cooldown lock on game start!
 	
 	var world_scene = get_tree().get_current_scene()
 	var game_manager = world_scene.get_node_or_null("GameManager")
@@ -1023,3 +1030,68 @@ func setup_tag_game_session(participating_peers: Array[int], target_it_peer: int
 # Returns true if the specified peer ID is actively participating in an ongoing Tag match
 func is_player_in_tag_game(peer_id: int) -> bool:
 	return is_tag_minigame_started and joined_tag_peers.has(peer_id)
+
+@rpc("any_peer", "call_local", "reliable")
+func request_player_tag(tagged_peer_id: int) -> void:
+	print("request player tag")
+	# Only the server evaluates tag collisions
+	if not multiplayer.is_server():
+		return
+		
+	# Security & Cooldown checks
+	if not is_tag_minigame_started:
+		return
+		
+	# Check 2-second cooldown timestamp
+	if Time.get_ticks_msec() < tag_cooldown_until_ms:
+		return
+		
+	# Ensure the target is actually registered in the match and isn't already "It"
+	if not joined_tag_peers.has(tagged_peer_id) or tagged_peer_id == tag_it_peer_id:
+		return
+		
+	# Set 2-second cooldown timestamp on server
+	tag_cooldown_until_ms = Time.get_ticks_msec() + 2000
+	
+	# Cache OLD "It" peer before updating tag_it_peer_id
+	var old_it_peer = tag_it_peer_id
+	tag_it_peer_id = tagged_peer_id
+	
+	print("Server validated tag! Swapping 'It' from peer %d to peer %d" % [old_it_peer, tagged_peer_id])
+	
+	# Broadcast role swap across all clients
+	rpc("sync_player_tagged", old_it_peer, tagged_peer_id)
+
+@rpc("authority", "call_local", "reliable")
+func sync_player_tagged(old_it_peer: int, new_it_peer: int) -> void:
+	# Explicitly update tag_it_peer_id on all receiving clients
+	print("sync player tagged")
+	tag_it_peer_id = new_it_peer
+
+	var world_scene = get_tree().get_current_scene()
+	var game_manager = world_scene.get_node_or_null("GameManager")
+	var players_node = world_scene.get_node_or_null("Players")
+	
+	if players_node:
+		# 1. Turn old "It" player indicator back to WHITE
+		var old_it_node = players_node.get_node_or_null(str(old_it_peer))
+		if is_instance_valid(old_it_node) and old_it_node.has_method("set_tag_indicator"):
+			old_it_node.set_tag_indicator(false)
+			
+		# 2. Turn new "It" player indicator to GOLD
+		var new_it_node = players_node.get_node_or_null(str(new_it_peer))
+		if is_instance_valid(new_it_node) and new_it_node.has_method("set_tag_indicator"):
+			new_it_node.set_tag_indicator(true)
+			
+	# 3. Handle local notification UI
+	var local_peer = multiplayer.get_unique_id()
+	if game_manager:
+		if local_peer == new_it_peer:
+			game_manager.show_temp_notif("You're it! (2s timer until you can tag others)", 2)
+			game_manager.start_tag_cooldown_ui(2.0)
+		elif local_peer == old_it_peer:
+			var new_it_name = get_player_name(new_it_peer)
+			game_manager.show_temp_notif("You tagged %s!" % new_it_name, 2)
+		#elif joined_tag_peers.has(local_peer):
+			#var new_it_name = get_player_name(new_it_peer)
+			#game_manager.show_temp_notif("%s is now it, run!!" % new_it_name)

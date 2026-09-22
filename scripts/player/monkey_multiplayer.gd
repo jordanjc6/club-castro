@@ -145,6 +145,17 @@ func _physics_process(delta: float) -> void:
 		else:
 			velocity = velocity.move_toward(Vector2.ZERO, SPEED)
 			move_and_slide()
+		
+		# Check for Tag Minigame collsions
+		if MultiplayerManager.is_tag_minigame_started and player_id == MultiplayerManager.tag_it_peer_id:
+			for i in range(get_slide_collision_count()):
+				var collision = get_slide_collision(i)
+				var collider = collision.get_collider()
+				if is_instance_valid(collider) and collider.is_in_group("player"):
+					var target_peer = collider.player_id
+					if target_peer != player_id:
+						MultiplayerManager.request_player_tag(target_peer)
+						break # Exit the loop so we don't send multiple tag requests in 1 frame
 
 	# Client / Host Animation Rendering
 	if not multiplayer.is_server() or MultiplayerManager.host_mode_enabled:

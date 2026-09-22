@@ -27,6 +27,7 @@ extends Node
 
 # other
 @onready var game_notif: PanelContainer = $"../HUD/GameNotification"
+var _notif_tween: Tween = null
 @onready var join_tag_button: Button = $"../HUD/GameNotification/MarginContainer/VBoxContainer/JoinTagButton"
 @onready var loading_spinner: TextureProgressBar = $"../HUD/LoadingSpinner"
 
@@ -193,6 +194,7 @@ func _join_tag_pressed():
 	minigames_popup.show()
 	minigames_mainmenu.hide()
 	minigames_tagmenu.show()
+	lobby_popup.hide()
 
 #func _update_tag_player_grid(joined_peers: Array[int]):
 	#var labels = tag_players_grid.get_children()
@@ -318,7 +320,11 @@ func on_player_disconnected(message: String):
 	exit_button.disabled = false
 	show_temp_notif(message)
 
-func show_temp_notif(text: String, is_tag_invite: bool = false):
+func show_temp_notif(text: String, time: float = 4.5, is_tag_invite: bool = false):
+	# Kill any existing notification tween to cancel its hide timer
+	if _notif_tween and _notif_tween.is_valid():
+		_notif_tween.kill()
+		
 	var label_node: Label = game_notif.get_node("MarginContainer/VBoxContainer/Label")
 	if is_instance_valid(label_node):
 		label_node.text = text
@@ -328,9 +334,10 @@ func show_temp_notif(text: String, is_tag_invite: bool = false):
 	
 	game_notif.show()
 	
-	var tween = create_tween()
-	tween.tween_interval(4.5)
-	tween.tween_callback(func():
+	# 2. Create and store a fresh 4.5s tween timer
+	_notif_tween = create_tween()
+	_notif_tween.tween_interval(time)
+	_notif_tween.tween_callback(func():
 		if is_instance_valid(join_tag_button) and join_tag_button.visible:
 			join_tag_button.hide()
 		game_notif.hide()
@@ -346,7 +353,7 @@ func show_perm_notif(text: String):
 	game_notif.show()
 
 func on_player_reconnected(message: String, flag: bool = false):
-	show_temp_notif(message, flag)
+	show_temp_notif(message, 4.5, flag)
 
 # Disables lobby action buttons during the roulette
 func set_tag_menu_buttons_disabled(disabled: bool) -> void:
@@ -534,3 +541,16 @@ func start_tag_match_timer(duration_seconds: int = TAG_MINIGAME_TIME_LIMIT) -> v
 		
 	# Timer reached 00:00 (Functionality for when time runs out will be added here later)
 	print("Tag match time expired!")
+
+# Label for Tag Cooldown UI (e.g., reuse countdown_label or a dedicated Label node)
+func start_tag_cooldown_ui(duration_seconds: float = 2.0) -> void:
+	if is_instance_valid(countdown_label):
+		countdown_label.show()
+		var time_left = duration_seconds
+		
+		while time_left > 0.0:
+			countdown_label.text = "%.1fs" % time_left
+			await get_tree().create_timer(0.1).timeout
+			time_left -= 0.1
+			
+		countdown_label.hide()

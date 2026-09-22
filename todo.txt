@@ -1,5 +1,6 @@
 Updates
 
 0 create tag
-- implement tagging players
+- implement tagging players: try implement area2d collision (currently set monkey_multiplayer mask 2)
 - update sidenav for when in tag minigame
+- implement game over at 2min timer end
