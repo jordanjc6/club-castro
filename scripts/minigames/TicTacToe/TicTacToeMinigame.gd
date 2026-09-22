@@ -101,6 +101,10 @@ func _move_local_player_to_position(target_pos: Vector2) -> bool:
 func _on_body_entered(body: Node) -> void:
 	# ensure entered by player that is hosting/joined multiplayer
 	if body is MultiPlayer:
+		# Guard: Skip showing prompt if the local player is currently in a Tag match
+		if MultiplayerManager.is_player_in_tag_game(body.player_id):
+			return
+			
 		var input_sync = body.get_node_or_null("InputSynchronizer")
 		
 		# only show popup for the player that entered

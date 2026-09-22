@@ -511,7 +511,7 @@ theme_override_constants/v_separation = 10
 columns = 3
 
 [node name="Player1" type="Label" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Players" unique_id=1742168770]
-custom_minimum_size = Vector2(0, 100)
+custom_minimum_size = Vector2(0, 75)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 5
@@ -522,7 +522,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Player2" type="Label" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Players" unique_id=924175635]
-custom_minimum_size = Vector2(0, 100)
+custom_minimum_size = Vector2(0, 75)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 5
@@ -533,7 +533,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Player3" type="Label" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Players" unique_id=1851784974]
-custom_minimum_size = Vector2(0, 100)
+custom_minimum_size = Vector2(0, 75)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 5
@@ -544,7 +544,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Player4" type="Label" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Players" unique_id=1372699458]
-custom_minimum_size = Vector2(0, 100)
+custom_minimum_size = Vector2(0, 75)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 5
@@ -555,7 +555,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Player5" type="Label" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Players" unique_id=2136927371]
-custom_minimum_size = Vector2(0, 100)
+custom_minimum_size = Vector2(0, 75)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 5
@@ -566,7 +566,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Player6" type="Label" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Players" unique_id=1157444541]
-custom_minimum_size = Vector2(0, 100)
+custom_minimum_size = Vector2(0, 75)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 5

@@ -991,6 +991,7 @@ func setup_tag_game_session(participating_peers: Array[int], target_it_peer: int
 			# 1. Position players around "It"
 			if is_it:
 				player_instance.global_position = IT_SPAWN_POS
+				player_instance.update_zone_offset(Vector2.ZERO)
 			else:
 				var pos_idx = non_it_index % PLAYER_SPAWN_POSITIONS.size()
 				player_instance.global_position = PLAYER_SPAWN_POSITIONS[pos_idx]
@@ -1018,3 +1019,7 @@ func setup_tag_game_session(participating_peers: Array[int], target_it_peer: int
 	var it_player = players_node.get_node_or_null(str(target_it_peer))
 	if is_instance_valid(it_player) and it_player.has_method("set_movement_disabled"):
 		it_player.rpc("set_movement_disabled", true)
+
+# Returns true if the specified peer ID is actively participating in an ongoing Tag match
+func is_player_in_tag_game(peer_id: int) -> bool:
+	return is_tag_minigame_started and joined_tag_peers.has(peer_id)

@@ -203,6 +203,10 @@ func _move_local_player_to_position(target_pos: Vector2) -> bool:
 # show local game prompt upon entering game area
 #
 func _on_body_entered(body: Node) -> void:
+	# Guard: Skip showing prompt if the local player is currently in a Tag match
+	if MultiplayerManager.is_player_in_tag_game(body.player_id):
+		return
+		
 	var input_sync = body.get_node_or_null("InputSynchronizer")
 		
 	# only show popup for the player that entered
