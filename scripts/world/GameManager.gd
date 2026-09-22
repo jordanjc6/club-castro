@@ -41,6 +41,8 @@ const ROULETTE_BORDER_WIDTH = 8       # Roulette hop border highlight
 
 # Label Node for visible countdown on screen HUD (e.g., HUD/CountdownLabel)
 @onready var countdown_label: Label = $"../HUD/CountdownLabel"
+@onready var match_timer_label: Label = $"../HUD/MatchTimerLabel"
+const TAG_MINIGAME_TIME_LIMIT: int = 120  # seconds
 
 ##############################################################################
 
@@ -70,6 +72,7 @@ func _ready() -> void:
 	loading_spinner.hide()
 	
 	countdown_label.hide()
+	match_timer_label.hide()
 	
 	# Listen for network status signals
 	MultiplayerManager.player_disconnected_notif.connect(on_player_disconnected)
@@ -505,3 +508,29 @@ func start_tag_countdown(seconds: int) -> void:
 		# Unfreeze the "It" player when countdown reaches 0
 		if multiplayer.is_server():
 			MultiplayerManager.rpc("unfreeze_it_player", MultiplayerManager.tag_it_peer_id)
+		
+		# Start the 2-minute (120s) match timer on all screens
+		start_tag_match_timer()
+
+# Format seconds (e.g., 120) into MM:SS string ("02:00")
+func _format_time(total_seconds: int) -> String:
+	var minutes: int = total_seconds / 60
+	var seconds: int = total_seconds % 60
+	return "%d:%02d" % [minutes, seconds]
+
+# Runs the 2-minute match timer across all local screens
+func start_tag_match_timer(duration_seconds: int = TAG_MINIGAME_TIME_LIMIT) -> void:
+	if not is_instance_valid(match_timer_label):
+		return
+		
+	match_timer_label.text = _format_time(duration_seconds)
+	match_timer_label.show()
+	
+	var time_left = duration_seconds
+	while time_left > 0:
+		await get_tree().create_timer(1.0).timeout
+		time_left -= 1
+		match_timer_label.text = _format_time(time_left)
+		
+	# Timer reached 00:00 (Functionality for when time runs out will be added here later)
+	print("Tag match time expired!")

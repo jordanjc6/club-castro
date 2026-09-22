@@ -2,5 +2,4 @@ Updates
 
 0 create tag
 - implement tagging players
-- add game timer
 - update sidenav for when in tag minigame
