@@ -30,12 +30,19 @@ extends Node
 @onready var join_tag_button: Button = $"../HUD/GameNotification/MarginContainer/VBoxContainer/JoinTagButton"
 @onready var loading_spinner: TextureProgressBar = $"../HUD/LoadingSpinner"
 
-# tag minigame #
-################
+# tag minigame ##############################################################
+#############################################################################
+
 # Color Constants for Name Tag States
 const COLOR_BROWN = Color("3d251e")        # Joined player background
 const COLOR_GOLD = Color("ffd700")  
+const DEFAULT_NAMETAG_COLOR = Color("0000003c")
 const ROULETTE_BORDER_WIDTH = 8       # Roulette hop border highlight
+
+# Label Node for visible countdown on screen HUD (e.g., HUD/CountdownLabel)
+@onready var countdown_label: Label = $"../HUD/CountdownLabel"
+
+##############################################################################
 
 
 func _ready() -> void:
@@ -61,6 +68,8 @@ func _ready() -> void:
 	game_notif.hide()
 	join_tag_button.pressed.connect(_join_tag_pressed)
 	loading_spinner.hide()
+	
+	countdown_label.hide()
 	
 	# Listen for network status signals
 	MultiplayerManager.player_disconnected_notif.connect(on_player_disconnected)
@@ -115,6 +124,9 @@ func _find_button_pressed():
 
 func _tag_button_pressed():
 	print("tag btn")
+	if MultiplayerManager.is_tag_minigame_started:
+		show_temp_notif("A Tag game is currently in progress!")
+		return
 	minigames_mainmenu.hide()
 	minigames_tagmenu.show()
 	MultiplayerManager.rpc("register_tag_player", multiplayer.get_unique_id())
@@ -166,6 +178,9 @@ func _tag_invite_pressed():
 func _join_tag_pressed():
 	print("join tag minigame!")
 	game_notif.hide()
+	if MultiplayerManager.is_tag_minigame_started:
+		show_temp_notif("A Tag game is currently in progress!")
+		return
 	
 	# Register current player and open Tag menu
 	MultiplayerManager.rpc("register_tag_player", multiplayer.get_unique_id())
@@ -194,7 +209,13 @@ func _update_tag_player_grid(joined_peers: Array[int]):
 			_style_player_label(labels[i]) # Sets joined player background to Brown
 		else:
 			labels[i].text = "Waiting..."
-			# Do not touch or modify the Inspector stylebox for unjoined slots at all
+			# Remove runtime brown/font overrides so it reverts to the Inspector default style
+			labels[i].remove_theme_stylebox_override("normal")
+			labels[i].remove_theme_color_override("font_color")
+			
+			var stylebox = _create_tag_stylebox(DEFAULT_NAMETAG_COLOR)
+			labels[i].add_theme_stylebox_override("normal", stylebox)
+			labels[i].add_theme_color_override("font_color", "FFFFFF")
 
 func _tag_close_pressed():
 	print("close tag menu")
@@ -458,10 +479,29 @@ func run_tag_roulette(participating_peers: Array[int], target_it_peer: int, tota
 	print("Roulette finished! Peer %d is IT." % target_it_peer)
 	
 	# 5. Delay before transitioning out of lobby
-	await get_tree().create_timer(1).timeout
+	await get_tree().create_timer(1.0).timeout
+	set_tag_menu_buttons_disabled(false)
 	
-	tag_start_button.disabled = false
-	#set_tag_menu_buttons_disabled(false)
-	#reset_tag_player_colors()
-	#minigames_popup.hide()
-	#minigames_tagmenu.hide()
+	# Hide Minigame UI Popups
+	minigames_popup.hide()
+	minigames_tagmenu.hide()
+	
+	# Trigger spawning, notifications, indicators, and 5s countdown across network
+	if multiplayer.is_server():
+		MultiplayerManager.rpc("setup_tag_game_session", participating_peers, target_it_peer)
+
+func start_tag_countdown(seconds: int) -> void:
+	if is_instance_valid(countdown_label):
+		countdown_label.show()
+		
+		for t in range(seconds, 0, -1):
+			countdown_label.text = str(t)
+			await get_tree().create_timer(1.0).timeout
+			
+		countdown_label.text = "GO!"
+		await get_tree().create_timer(0.8).timeout
+		countdown_label.hide()
+		
+		# Unfreeze the "It" player when countdown reaches 0
+		if multiplayer.is_server():
+			MultiplayerManager.rpc("unfreeze_it_player", MultiplayerManager.tag_it_peer_id)

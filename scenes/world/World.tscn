@@ -432,9 +432,9 @@ anchor_top = 0.16100001
 anchor_right = 0.07300001
 anchor_bottom = 0.16100001
 offset_left = 231.0
-offset_top = 27.0
+offset_top = 17.0
 offset_right = 1065.0
-offset_bottom = 697.0
+offset_bottom = 704.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_16fjv")
 
 [node name="MarginContainer" type="MarginContainer" parent="HUD/MinigamesPopup/TagMenu" unique_id=555457504]
@@ -594,7 +594,7 @@ custom_minimum_size = Vector2(1, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 29
-text = "One player is randomly selected to be \"it\", everyone else runs away and tries not to be tagged. The player who is \"it\" at the end of the timer loses!"
+text = "One player is randomly selected to be \"it\" (red arrow), everyone else (blue arrows) runs away and tries not to be tagged. The \"it\" player has a 5s countdown before they can move at game start. The player who is \"it\" at the end of the timer loses!"
 autowrap_mode = 2
 
 [node name="StartGameButton" type="Button" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Footer" unique_id=1236386162]
@@ -715,6 +715,18 @@ text = "Join Tag"
 
 [node name="LoadingSpinner" parent="HUD" unique_id=837070289 instance=ExtResource("7_qh0kd")]
 visible = false
+
+[node name="CountdownLabel" type="Label" parent="HUD" unique_id=1394539045]
+visible = false
+offset_left = 572.0
+offset_top = 302.0
+offset_right = 729.0
+offset_bottom = 439.0
+theme_override_constants/outline_size = 16
+theme_override_font_sizes/font_size = 100
+text = "#"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="GameManager" type="Node" parent="." unique_id=619952250]
 script = ExtResource("5_qxiha")

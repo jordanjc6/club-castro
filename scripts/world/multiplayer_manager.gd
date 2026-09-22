@@ -76,9 +76,25 @@ var _consecutive_ping_failures: int = 0
 const MAX_PING_FAILURES: int = 7
 var _is_reconnecting: bool = false
 
-# Minigame lobby tracking
+# tag minigame ##############################################################
+#############################################################################
 var joined_tag_peers: Array[int] = []
 var tag_it_peer_id: int = -1  # store who is "it" for tag
+
+# Tracks active Tag minigame session state across network
+var is_tag_minigame_started: bool = false
+
+# Spawn locations (Adjust Vector2 values to match your game arena layout)
+const IT_SPAWN_POS = Vector2(647, 527 + 150)
+const PLAYER_SPAWN_POSITIONS = [
+	Vector2(647, 527 - 100),
+	Vector2(647 - 125, 527),
+	Vector2(647 - 125 - 125, 527),
+	Vector2(647 + 125, 527),
+	Vector2(647 + 125 + 125, 527)
+]
+
+#############################################################################
 
 
 func _ready():
@@ -833,6 +849,11 @@ func receive_invite_notif(sender_name: String, game_name: String) -> void:
 @rpc("any_peer", "call_local", "reliable")
 func register_tag_player(peer_id: int) -> void:
 	if multiplayer.is_server():
+		# Block new entries if a minigame is actively running
+		if is_tag_minigame_started:
+			rpc_id(peer_id, "notify_tag_in_progress")
+			return
+			
 		if not joined_tag_peers.has(peer_id):
 			joined_tag_peers.append(peer_id)
 			print("Registered peer %d for Tag. Current lobby: %s" % [peer_id, str(joined_tag_peers)])
@@ -855,6 +876,7 @@ func sync_tag_lobby_ui(peers: Array[int]) -> void:
 func reset_tag_lobby() -> void:
 	if multiplayer.is_server():
 		joined_tag_peers.clear()
+		is_tag_minigame_started = false
 		rpc("sync_tag_lobby_ui", joined_tag_peers)
 
 #@rpc("any_peer", "call_local", "reliable")
@@ -888,6 +910,9 @@ func request_start_tag_game() -> void:
 	if multiplayer.is_server():
 		# Require at least 2 players to start Tag
 		if joined_tag_peers.size() >= 2:
+			# Lock the Tag lobby so no outside players can join mid-match
+			rpc("set_tag_minigame_started", true)
+			
 			var target_index = randi() % joined_tag_peers.size()
 			var chosen_it_peer = joined_tag_peers[target_index]
 			
@@ -907,7 +932,88 @@ func request_start_tag_game() -> void:
 			
 			rpc_id(sender_id, "notify_not_enough_players")
 
+# Call this when the Tag match finishes or is forcibly reset
+func end_tag_minigame() -> void:
+	if multiplayer.is_server():
+		rpc("set_tag_minigame_started", false)
+
+# Server broadcasts minigame start/stop state
 @rpc("authority", "call_local", "reliable")
-func launch_tag_game_session(participating_peers: Array[int]) -> void:
-	print("Launching Tag Minigame session locally for: ", participating_peers)
-	# TODO: Initialize Tag minigame session locally
+func set_tag_minigame_started(started: bool) -> void:
+	is_tag_minigame_started = started
+	print("Tag minigame active state set to: ", is_tag_minigame_started)
+
+# Notify a client when they attempt to join an active session
+@rpc("authority", "call_local", "reliable")
+func notify_tag_in_progress() -> void:
+	var world_scene = get_tree().get_current_scene()
+	var game_manager = world_scene.get_node_or_null("GameManager")
+	if game_manager and game_manager.has_method("show_temp_notif"):
+		game_manager.show_temp_notif("Cannot join: A Tag game is currently in progress!")
+
+func _set_local_player_frozen(target_it_peer: int, frozen: bool) -> void:
+	if multiplayer.get_unique_id() == target_it_peer:
+		var world_scene = get_tree().get_current_scene()
+		var players_node = world_scene.get_node_or_null("Players")
+		if players_node:
+			var local_player = players_node.get_node_or_null(str(target_it_peer))
+			if is_instance_valid(local_player) and "is_frozen" in local_player:
+				local_player.is_frozen = frozen
+
+@rpc("authority", "call_local", "reliable")
+func unfreeze_it_player(target_it_peer: int) -> void:
+	var world_scene = get_tree().get_current_scene()
+	var players_node = world_scene.get_node_or_null("Players")
+	if players_node:
+		var it_player = players_node.get_node_or_null(str(target_it_peer))
+		if is_instance_valid(it_player) and it_player.has_method("set_movement_disabled"):
+			it_player.rpc("set_movement_disabled", false)
+
+# RPC to synchronized spawning and initial state on all clients
+@rpc("authority", "call_local", "reliable")
+func setup_tag_game_session(participating_peers: Array[int], target_it_peer: int) -> void:
+	tag_it_peer_id = target_it_peer
+	
+	var world_scene = get_tree().get_current_scene()
+	var game_manager = world_scene.get_node_or_null("GameManager")
+	var players_node = world_scene.get_node_or_null("Players") # Node containing character instances
+	
+	if not players_node:
+		return
+
+	var non_it_index = 0
+	
+	for peer_id in participating_peers:
+		var player_instance = players_node.get_node_or_null(str(peer_id))
+		if is_instance_valid(player_instance):
+			var is_it = (peer_id == target_it_peer)
+			
+			# 1. Position players around "It"
+			if is_it:
+				player_instance.global_position = IT_SPAWN_POS
+			else:
+				var pos_idx = non_it_index % PLAYER_SPAWN_POSITIONS.size()
+				player_instance.global_position = PLAYER_SPAWN_POSITIONS[pos_idx]
+				non_it_index += 1
+			
+			# 2. Update overhead player indicator (red vs blue)
+			if player_instance.has_method("set_tag_indicator"):
+				player_instance.set_tag_indicator(is_it)
+
+	# 3. Handle local notifications & UI timer setup
+	if game_manager:
+		var local_id = multiplayer.get_unique_id()
+		if participating_peers.has(local_id):
+			var it_name = get_player_name(target_it_peer)
+			if local_id == target_it_peer:
+				game_manager.show_temp_notif("You're it!")
+			else:
+				game_manager.show_temp_notif("%s is it, run!!" % it_name)
+				
+		# Start 5s countdown
+		game_manager.start_tag_countdown(5)
+	
+	# 4. Disable movement for the "It" player during the countdown
+	var it_player = players_node.get_node_or_null(str(target_it_peer))
+	if is_instance_valid(it_player) and it_player.has_method("set_movement_disabled"):
+		it_player.rpc("set_movement_disabled", true)

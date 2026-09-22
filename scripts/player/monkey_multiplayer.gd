@@ -20,6 +20,14 @@ var current_grid_offset: Vector2 = Vector2.ZERO
 @onready var animation_player = $ScreenFadeLayer/AnimationPlayer
 @onready var name_label: Label = $Label
 
+# tag minigame ###########################################
+##########################################################
+
+# Example indicator Sprite2D or Label child node reference
+@onready var tag_indicator: Sprite2D = $TagIndicator # Adjust path to your indicator node
+
+##########################################################
+
 @export var player_id := 1:
 	set(id):
 		player_id = id
@@ -29,6 +37,7 @@ var current_grid_offset: Vector2 = Vector2.ZERO
 func _ready() -> void:
 	add_to_group("player")
 	target_position = global_position
+	tag_indicator.hide()  # ensure indicator for tag minigame hidden
 	
 	# Listen for player name updates from MultiplayerManager
 	MultiplayerManager.player_names_updated.connect(_on_player_names_updated)
@@ -203,8 +212,12 @@ func update_walk_animation(dir: Vector2) -> void:
 		monkey.play("walking-back-diagonal")
 		monkey.flip_h = true
 
-
 @rpc("any_peer", "call_local", "reliable")
 func set_movement_disabled(disabled: bool) -> void:
 	is_movement_disabled = disabled
 	stop_movement_rpc()
+
+func set_tag_indicator(is_it: bool) -> void:
+	if is_instance_valid(tag_indicator):
+		tag_indicator.show()
+		tag_indicator.modulate = Color("e74c3c") if is_it else Color("3498db") # Red vs Blue
