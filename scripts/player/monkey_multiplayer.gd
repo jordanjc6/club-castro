@@ -25,6 +25,8 @@ var current_grid_offset: Vector2 = Vector2.ZERO
 
 # Example indicator Sprite2D or Label child node reference
 @onready var tag_indicator: Sprite2D = $TagIndicator # Adjust path to your indicator node
+@onready var tag_indicator_outline: Sprite2D = $TagIndicatorOutline # Adjust path to your indicator node
+const COLOR_GOLD = Color("ffd700")  
 
 ##########################################################
 
@@ -38,6 +40,7 @@ func _ready() -> void:
 	add_to_group("player")
 	target_position = global_position
 	tag_indicator.hide()  # ensure indicator for tag minigame hidden
+	tag_indicator_outline.hide()
 	
 	# Listen for player name updates from MultiplayerManager
 	MultiplayerManager.player_names_updated.connect(_on_player_names_updated)
@@ -220,4 +223,5 @@ func set_movement_disabled(disabled: bool) -> void:
 func set_tag_indicator(is_it: bool) -> void:
 	if is_instance_valid(tag_indicator):
 		tag_indicator.show()
-		tag_indicator.modulate = Color("e74c3c") if is_it else Color("3498db") # Red vs Blue
+		tag_indicator.modulate = COLOR_GOLD if is_it else Color("ffffff") # Red vs Blue
+		tag_indicator_outline.show()

@@ -279,6 +279,12 @@ theme_override_font_sizes/font_size = 28
 text = "Player"
 horizontal_alignment = 1
 
+[node name="TagIndicatorOutline" type="Sprite2D" parent="." unique_id=333459172]
+modulate = Color(0, 0, 0, 1)
+position = Vector2(5.200001, -63.800003)
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("22_bdlv7")
+
 [node name="TagIndicator" type="Sprite2D" parent="." unique_id=2657899]
-position = Vector2(5, -61)
+position = Vector2(5.200001, -63.800003)
 texture = ExtResource("22_bdlv7")

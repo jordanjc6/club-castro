@@ -994,6 +994,7 @@ func setup_tag_game_session(participating_peers: Array[int], target_it_peer: int
 			else:
 				var pos_idx = non_it_index % PLAYER_SPAWN_POSITIONS.size()
 				player_instance.global_position = PLAYER_SPAWN_POSITIONS[pos_idx]
+				player_instance.update_zone_offset(Vector2.ZERO)
 				non_it_index += 1
 			
 			# 2. Update overhead player indicator (red vs blue)

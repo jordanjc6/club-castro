@@ -1,7 +1,6 @@
 Updates
 
 0 create tag
-- bug: joining from room other than jungle plaza
 - disable other minigames in overworld when in tag minigame
 - implement tagging players
 - add game timer

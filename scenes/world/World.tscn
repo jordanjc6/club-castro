@@ -594,7 +594,7 @@ custom_minimum_size = Vector2(1, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 29
-text = "One player is randomly selected to be \"it\" (red arrow), everyone else (blue arrows) runs away and tries not to be tagged. The \"it\" player has a 5s countdown before they can move at game start. The player who is \"it\" at the end of the timer loses!"
+text = "One player is randomly selected to be \"it\" (gold arrow), everyone else (white arrows) runs away and tries not to be tagged. The \"it\" player has a 5s countdown before they can move at game start. The player who is \"it\" at the end of the timer loses!"
 autowrap_mode = 2
 
 [node name="StartGameButton" type="Button" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Footer" unique_id=1236386162]
