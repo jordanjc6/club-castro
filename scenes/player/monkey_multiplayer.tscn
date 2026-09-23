@@ -221,9 +221,13 @@ _data = {
 &"fade_to_black": SubResource("Animation_bdlv7")
 }
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_bdlv7"]
+radius = 25.0
+height = 94.0
+
 [node name="MultiPlayer" type="CharacterBody2D" unique_id=128853272]
 collision_layer = 2
-collision_mask = 7
+collision_mask = 5
 motion_mode = 1
 script = ExtResource("1_b6687")
 
@@ -242,6 +246,7 @@ sprite_frames = SubResource("SpriteFrames_uw3v7")
 animation = &"standing-front"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=412955455]
+visible = false
 position = Vector2(6, 49)
 shape = SubResource("RectangleShape2D_cd356")
 
@@ -287,3 +292,11 @@ texture = ExtResource("22_bdlv7")
 [node name="TagIndicator" type="Sprite2D" parent="." unique_id=2657899]
 position = Vector2(5.200001, -63.800003)
 texture = ExtResource("22_bdlv7")
+
+[node name="TagArea" type="Area2D" parent="." unique_id=1684652724]
+collision_layer = 8
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TagArea" unique_id=1023638181]
+position = Vector2(5, 11)
+shape = SubResource("CapsuleShape2D_bdlv7")

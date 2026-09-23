@@ -1,6 +1,5 @@
 Updates
 
 0 create tag
-- implement tagging players: try implement area2d collision (currently set monkey_multiplayer mask 2)
-- update sidenav for when in tag minigame
-- implement game over at 2min timer end
+- update sidenav for when in tag minigame: new sidenav with just a leave game btn
+- implement game over at 2min timer end: bring players back to tag menu, reset tag game state

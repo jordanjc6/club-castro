@@ -27,6 +27,7 @@ var current_grid_offset: Vector2 = Vector2.ZERO
 @onready var tag_indicator: Sprite2D = $TagIndicator # Adjust path to your indicator node
 @onready var tag_indicator_outline: Sprite2D = $TagIndicatorOutline # Adjust path to your indicator node
 const COLOR_GOLD = Color("ffd700")  
+@onready var tag_area: Area2D = $TagArea
 
 ##########################################################
 
@@ -41,10 +42,12 @@ func _ready() -> void:
 	target_position = global_position
 	tag_indicator.hide()  # ensure indicator for tag minigame hidden
 	tag_indicator_outline.hide()
+	# Connect area_entered so TagArea touching TagArea triggers the tag
+	if has_node("TagArea"):
+		$TagArea.area_entered.connect(_on_tag_area_area_entered)
 	
 	# Listen for player name updates from MultiplayerManager
 	MultiplayerManager.player_names_updated.connect(_on_player_names_updated)
-	
 	# Apply initial name on spawn
 	_update_name_label()
 	
@@ -146,16 +149,22 @@ func _physics_process(delta: float) -> void:
 			velocity = velocity.move_toward(Vector2.ZERO, SPEED)
 			move_and_slide()
 		
+		#if MultiplayerManager.is_tag_minigame_started and player_id == MultiplayerManager.tag_it_peer_id:
+			#for body in tag_area.get_overlapping_bodies():
+				#if body.is_in_group("player") and body.player_id != player_id:
+					#MultiplayerManager.request_player_tag(body.player_id)
+					#break
+		
 		# Check for Tag Minigame collsions
-		if MultiplayerManager.is_tag_minigame_started and player_id == MultiplayerManager.tag_it_peer_id:
-			for i in range(get_slide_collision_count()):
-				var collision = get_slide_collision(i)
-				var collider = collision.get_collider()
-				if is_instance_valid(collider) and collider.is_in_group("player"):
-					var target_peer = collider.player_id
-					if target_peer != player_id:
-						MultiplayerManager.request_player_tag(target_peer)
-						break # Exit the loop so we don't send multiple tag requests in 1 frame
+		#if MultiplayerManager.is_tag_minigame_started and player_id == MultiplayerManager.tag_it_peer_id:
+			#for i in range(get_slide_collision_count()):
+				#var collision = get_slide_collision(i)
+				#var collider = collision.get_collider()
+				#if is_instance_valid(collider) and collider.is_in_group("player"):
+					#var target_peer = collider.player_id
+					#if target_peer != player_id:
+						#MultiplayerManager.request_player_tag(target_peer)
+						#break # Exit the loop so we don't send multiple tag requests in 1 frame
 
 	# Client / Host Animation Rendering
 	if not multiplayer.is_server() or MultiplayerManager.host_mode_enabled:
@@ -236,3 +245,17 @@ func set_tag_indicator(is_it: bool) -> void:
 		tag_indicator.show()
 		tag_indicator.modulate = COLOR_GOLD if is_it else Color("ffffff") # Red vs Blue
 		tag_indicator_outline.show()
+
+func _on_tag_area_area_entered(area: Area2D) -> void:
+	# Only the server processes tags
+	if not multiplayer.is_server():
+		return
+		
+	# Check if minigame is active and THIS player is currently "It"
+	if MultiplayerManager.is_tag_minigame_started and player_id == MultiplayerManager.tag_it_peer_id:
+		# Get the parent player node of the TagArea we just touched
+		var other_player = area.get_parent()
+		
+		if is_instance_valid(other_player) and other_player.is_in_group("player") and other_player != self:
+			if "player_id" in other_player and other_player.player_id != player_id:
+				MultiplayerManager.request_player_tag(other_player.player_id)
