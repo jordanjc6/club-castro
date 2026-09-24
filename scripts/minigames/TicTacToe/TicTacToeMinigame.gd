@@ -129,6 +129,10 @@ func _on_body_exited(body: Node) -> void:
 		return
 	
 	if body is MultiPlayer:
+		# Guard: Skip showing prompt if the local player is currently in a Tag match
+		if MultiplayerManager.is_player_in_tag_game(body.player_id):
+			return
+			
 		var input_sync = body.get_node_or_null("InputSynchronizer")
 		
 		if input_sync and input_sync.is_inside_tree() and input_sync.is_multiplayer_authority():

@@ -1,4 +1,4 @@
 Updates
 
-0 create tag
-- beanbags and barista onexit; don't update sidenavs when in tag game
+0 add pond/river cozy open campfire area to left of jungle plaza
+0 implement fishing

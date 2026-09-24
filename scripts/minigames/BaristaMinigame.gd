@@ -203,10 +203,6 @@ func _move_local_player_to_position(target_pos: Vector2) -> bool:
 # show local game prompt upon entering game area
 #
 func _on_body_entered(body: Node) -> void:
-	# Guard: Skip showing prompt if the local player is currently in a Tag match
-	if MultiplayerManager.is_player_in_tag_game(body.player_id):
-		return
-		
 	var input_sync = body.get_node_or_null("InputSynchronizer")
 		
 	# only show popup for the player that entered
@@ -216,6 +212,9 @@ func _on_body_entered(body: Node) -> void:
 		game_result_panel.visible = false
 	
 	if (input_sync and input_sync.is_multiplayer_authority()):
+		# Guard: Skip showing prompt if the local player is currently in a Tag match
+		if MultiplayerManager.is_player_in_tag_game(body.player_id):
+			return
 		hud.get_node("LobbyNav").visible = false
 		hud.get_node("LobbyPopup").visible = false
 		hud.get_node("MinigamesPopup").visible = false
@@ -243,6 +242,9 @@ func _on_body_exited(body: Node) -> void:
 			_on_cancel_button_pressed()
 	
 	if is_local_mp:
+		# Guard: Skip showing prompt if the local player is currently in a Tag match
+		if MultiplayerManager.is_player_in_tag_game(body.player_id):
+			return
 		if hud.has_node("LobbyNav"):
 			hud.get_node("LobbyNav").visible = true
 	elif is_local_sp:
