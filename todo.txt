@@ -1,4 +1,4 @@
 Updates
 
 0 create tag
-- implement game over at 2min timer end: reset tag game state, bring players back to tag menu
+- beanbags and barista onexit; don't update sidenavs when in tag game

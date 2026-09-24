@@ -256,7 +256,11 @@ func _on_tag_area_area_entered(area: Area2D) -> void:
 	# Only the server processes tags
 	if not multiplayer.is_server():
 		return
-		
+	
+	# Block tagging if game hasn't started or countdown is actively running
+	if MultiplayerManager.is_tag_countdown_active or not MultiplayerManager.is_tag_minigame_started:
+		return
+	
 	# Check if minigame is active and THIS player is currently "It"
 	if MultiplayerManager.is_tag_minigame_started and player_id == MultiplayerManager.tag_it_peer_id:
 		# Get the parent player node of the TagArea we just touched

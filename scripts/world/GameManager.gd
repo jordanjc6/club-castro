@@ -373,6 +373,7 @@ func set_tag_menu_buttons_disabled(disabled: bool) -> void:
 	tag_start_button.disabled = disabled
 	tag_invite_button.disabled = disabled
 	tag_menu_close_button.disabled = disabled
+	leave_tag_button.disabled = disabled
 
 # Creates a StyleBoxFlat with optional colored border
 func _create_tag_stylebox(bg_color: Color, border_color: Color = Color.TRANSPARENT, border_width: int = 0) -> StyleBoxFlat:
@@ -423,56 +424,69 @@ func reset_tag_player_colors() -> void:
 		# Unjoined slots are left untouched
 
 #func run_tag_roulette(participating_peers: Array[int], target_it_peer: int, total_steps: int) -> void:
-	## 1. Lock menu buttons
-	#set_tag_menu_buttons_disabled(true)
+	## Increment match session ID
+	#_current_tag_match_id += 1
+	#var my_match_id = _current_tag_match_id
 	#
-	## 2. Ensure all participating labels have the base brown background
+	#set_tag_menu_buttons_disabled(true)
+	#minigames_button.disabled = true
+	#
 	#var labels = tag_players_grid.get_children()
 	#for i in range(participating_peers.size()):
 		#_style_player_label(labels[i])
 		#
-	## 3. Target slot calculation
 	#var target_index = participating_peers.find(target_it_peer)
 	#var current_index = 0
 	#var delay = 0.08
 	#
-	## 4. Run Golden Border Roulette animation
 	#for step in range(total_steps):
-		## Highlight current slot with a 3px Golden Border
-		#_style_player_label(labels[current_index], COLOR_GOLD, ROULETTE_BORDER_WIDTH)
-		#
+		## ABORT ROULETTE IF MATCH WAS CANCELLED MID-ANIMATION
+		#if my_match_id != _current_tag_match_id or not MultiplayerManager.is_tag_minigame_started:
+			#print("Roulette aborted due to match cancellation.")
+			#return
+			#
+		#_style_player_label(labels[current_index], COLOR_GOLD, ROULETTE_BORDER_WIDTH, COLOR_GOLD)
 		#await get_tree().create_timer(delay).timeout
 		#
 		#if step == total_steps - 1:
-			## Final stop: Lock on target index and keep the Golden Border!
 			#current_index = target_index
-			#_style_player_label(labels[current_index], COLOR_GOLD, ROULETTE_BORDER_WIDTH)
+			#_style_player_label(labels[current_index], COLOR_GOLD, ROULETTE_BORDER_WIDTH, COLOR_GOLD)
 		#else:
-			## Remove border from current slot before hopping to the next
 			#_style_player_label(labels[current_index])
 			#current_index = (current_index + 1) % participating_peers.size()
-			#
 			#if step > total_steps - 6:
 				#delay += 0.06
 				#
+	## ABORT BEFORE GAME SETUP IF CANCELLED
+	#if my_match_id != _current_tag_match_id or not MultiplayerManager.is_tag_minigame_started:
+		#return
+		#
 	#print("Roulette finished! Peer %d is IT." % target_it_peer)
 	#
-	## 5. Delay before transitioning out of lobby
-	#await get_tree().create_timer(1).timeout
+	#await get_tree().create_timer(1.0).timeout
+	#set_tag_menu_buttons_disabled(false)
 	#
-	#tag_start_button.disabled = false
-	##set_tag_menu_buttons_disabled(false)
-	##reset_tag_player_colors()
-	##minigames_popup.hide()
-	##minigames_tagmenu.hide()
+	#minigames_popup.hide()
+	#minigames_tagmenu.hide()
+	#show_tag_nav(participating_peers)
+	#reset_tag_player_colors()
+	#
+	#if multiplayer.is_server():
+		#MultiplayerManager.rpc("setup_tag_game_session", participating_peers, target_it_peer)
 
 func run_tag_roulette(participating_peers: Array[int], target_it_peer: int, total_steps: int) -> void:
+	var local_id = multiplayer.get_unique_id()
+	var is_participant = participating_peers.has(local_id)
+	
 	# Increment match session ID
 	_current_tag_match_id += 1
 	var my_match_id = _current_tag_match_id
 	
-	set_tag_menu_buttons_disabled(true)
-	minigames_button.disabled = true
+	# ONLY disable UI elements for active match participants
+	if is_participant:
+		set_tag_menu_buttons_disabled(true)
+		if is_instance_valid(minigames_button):
+			minigames_button.disabled = true
 	
 	var labels = tag_players_grid.get_children()
 	for i in range(participating_peers.size()):
@@ -507,68 +521,32 @@ func run_tag_roulette(participating_peers: Array[int], target_it_peer: int, tota
 	print("Roulette finished! Peer %d is IT." % target_it_peer)
 	
 	await get_tree().create_timer(1.0).timeout
-	set_tag_menu_buttons_disabled(false)
 	
-	minigames_popup.hide()
-	minigames_tagmenu.hide()
-	show_tag_nav(participating_peers)
+	if is_participant:
+		set_tag_menu_buttons_disabled(false)
+		if is_instance_valid(minigames_popup):
+			minigames_popup.hide()
+		if is_instance_valid(minigames_tagmenu):
+			minigames_tagmenu.hide()
+		show_tag_nav(participating_peers)
+		
 	reset_tag_player_colors()
 	
 	if multiplayer.is_server():
 		MultiplayerManager.rpc("setup_tag_game_session", participating_peers, target_it_peer)
 
-#func run_tag_roulette(participating_peers: Array[int], target_it_peer: int, total_steps: int) -> void:
-	## 1. Lock menu buttons
-	#set_tag_menu_buttons_disabled(true)
-	#minigames_button.disabled = true
-	#
-	## 2. Ensure all participating labels have the base brown background and default font color
-	#var labels = tag_players_grid.get_children()
-	#for i in range(participating_peers.size()):
-		#_style_player_label(labels[i])
-		#
-	## 3. Target slot calculation
-	#var target_index = participating_peers.find(target_it_peer)
-	#var current_index = 0
-	#var delay = 0.08
-	#
-	## 4. Run Golden Border & Font Roulette animation
-	#for step in range(total_steps):
-		## Highlight current slot with Golden Border AND Golden Font
-		#_style_player_label(labels[current_index], COLOR_GOLD, ROULETTE_BORDER_WIDTH, COLOR_GOLD)
-		#
-		#await get_tree().create_timer(delay).timeout
-		#
-		#if step == total_steps - 1:
-			## Final stop: Lock on target index and keep Golden Border AND Golden Font!
-			#current_index = target_index
-			#_style_player_label(labels[current_index], COLOR_GOLD, ROULETTE_BORDER_WIDTH, COLOR_GOLD)
-		#else:
-			## Reset current slot before hopping to the next
-			#_style_player_label(labels[current_index])
-			#current_index = (current_index + 1) % participating_peers.size()
-			#
-			#if step > total_steps - 6:
-				#delay += 0.06
-				#
-	#print("Roulette finished! Peer %d is IT." % target_it_peer)
-	#
-	## 5. Delay before transitioning out of lobby
-	#await get_tree().create_timer(1.0).timeout
-	#set_tag_menu_buttons_disabled(false)
-	#
-	## Hide Minigame UI Popups
-	#minigames_popup.hide()
-	#minigames_tagmenu.hide()
-	#show_tag_nav(participating_peers)
-	#reset_tag_player_colors()
-	#
-	## Trigger spawning, notifications, indicators, and 5s countdown across network
-	#if multiplayer.is_server():
-		#MultiplayerManager.rpc("setup_tag_game_session", participating_peers, target_it_peer)
-
 func start_tag_countdown(seconds: int) -> void:
+	var local_id = multiplayer.get_unique_id()
+	
+	# Do NOT show countdown HUD for lobby spectators / non-participants
+	if not MultiplayerManager.joined_tag_peers.has(local_id):
+		return
+
 	var my_match_id = _current_tag_match_id
+	
+	# Lock leave button during countdown for active participants
+	if is_instance_valid(leave_tag_button):
+		leave_tag_button.disabled = true
 	
 	if is_instance_valid(countdown_label):
 		countdown_label.show()
@@ -577,6 +555,8 @@ func start_tag_countdown(seconds: int) -> void:
 			# ABORT COUNTDOWN IF MATCH WAS CANCELLED
 			if my_match_id != _current_tag_match_id or not MultiplayerManager.is_tag_minigame_started:
 				countdown_label.hide()
+				if is_instance_valid(leave_tag_button):
+					leave_tag_button.disabled = false
 				return
 				
 			countdown_label.text = str(t)
@@ -584,35 +564,59 @@ func start_tag_countdown(seconds: int) -> void:
 			
 		if my_match_id != _current_tag_match_id or not MultiplayerManager.is_tag_minigame_started:
 			countdown_label.hide()
+			if is_instance_valid(leave_tag_button):
+				leave_tag_button.disabled = false
+			MultiplayerManager.restore_all_players_movement()
 			return
-			
+		
 		countdown_label.text = "GO!"
 		await get_tree().create_timer(0.8).timeout
 		countdown_label.hide()
 		
+		# Countdown finished! RE-ENABLE LEAVE BUTTON
+		if is_instance_valid(leave_tag_button):
+			leave_tag_button.disabled = false
+
 		if multiplayer.is_server():
 			MultiplayerManager.rpc("unfreeze_it_player", MultiplayerManager.tag_it_peer_id)
 		
 		start_tag_match_timer()
 
 #func start_tag_countdown(seconds: int) -> void:
+	#var my_match_id = _current_tag_match_id
+	#
+	## Lock leave button during countdown
+	#if is_instance_valid(leave_tag_button):
+		#leave_tag_button.disabled = true
+	#
 	#if is_instance_valid(countdown_label):
 		#countdown_label.show()
 		#
 		#for t in range(seconds, 0, -1):
+			## ABORT COUNTDOWN IF MATCH WAS CANCELLED
+			#if my_match_id != _current_tag_match_id or not MultiplayerManager.is_tag_minigame_started:
+				#countdown_label.hide()
+				#return
+				#
 			#countdown_label.text = str(t)
 			#await get_tree().create_timer(1.0).timeout
 			#
+		#if my_match_id != _current_tag_match_id or not MultiplayerManager.is_tag_minigame_started:
+			#countdown_label.hide()
+			#return
+		#
 		#countdown_label.text = "GO!"
 		#await get_tree().create_timer(0.8).timeout
 		#countdown_label.hide()
 		#
-		## Unfreeze the "It" player when countdown reaches 0
 		#if multiplayer.is_server():
 			#MultiplayerManager.rpc("unfreeze_it_player", MultiplayerManager.tag_it_peer_id)
 		#
-		## Start the 2-minute (120s) match timer on all screens
 		#start_tag_match_timer()
+		#
+		## Countdown finished! RE-ENABLE LEAVE BUTTON
+		#if is_instance_valid(leave_tag_button):
+			#leave_tag_button.disabled = false
 
 # Format seconds (e.g., 120) into MM:SS string ("02:00")
 func _format_time(total_seconds: int) -> String:
@@ -620,8 +624,13 @@ func _format_time(total_seconds: int) -> String:
 	var seconds: int = total_seconds % 60
 	return "%d:%02d" % [minutes, seconds]
 
-# Runs the 2-minute match timer across all local screens
 func start_tag_match_timer(duration_seconds: int = TAG_MINIGAME_TIME_LIMIT) -> void:
+	var local_id = multiplayer.get_unique_id()
+	
+	# Do NOT show match timer HUD for lobby spectators / non-participants
+	if not MultiplayerManager.joined_tag_peers.has(local_id):
+		return
+
 	if not is_instance_valid(match_timer_label):
 		return
 		
@@ -647,6 +656,40 @@ func start_tag_match_timer(duration_seconds: int = TAG_MINIGAME_TIME_LIMIT) -> v
 	# Verify this is still the active match before handling timeout
 	if my_match_id == _current_tag_match_id:
 		print("Tag match time expired!")
+		# Server evaluates the loser ("It") and broadcasts match completion
+		if multiplayer.is_server():
+			MultiplayerManager.request_end_tag_match_naturally()
+
+## Runs the 2-minute match timer across all local screens
+#func start_tag_match_timer(duration_seconds: int = TAG_MINIGAME_TIME_LIMIT) -> void:
+	#if not is_instance_valid(match_timer_label):
+		#return
+		#
+	## Increment match ID so any previous running match loops immediately kill themselves
+	#_current_tag_match_id += 1
+	#var my_match_id = _current_tag_match_id
+	#
+	#match_timer_label.text = _format_time(duration_seconds)
+	#match_timer_label.show()
+	#
+	#var time_left = duration_seconds
+	#while time_left > 0:
+		#await get_tree().create_timer(1.0).timeout
+		#
+		## CANCEL STALE TIMERS: If match was cancelled or a new match started, exit loop
+		#if my_match_id != _current_tag_match_id:
+			#print("Killed stale tag match timer loop.")
+			#return
+			#
+		#time_left -= 1
+		#match_timer_label.text = _format_time(time_left)
+		#
+	## Verify this is still the active match before handling timeout
+	#if my_match_id == _current_tag_match_id:
+		#print("Tag match time expired!")
+		## Server evaluates the loser ("It") and broadcasts match completion
+		#if multiplayer.is_server():
+			#MultiplayerManager.request_end_tag_match_naturally()
 
 # Label for Tag Cooldown UI (e.g., reuse countdown_label or a dedicated Label node)
 func start_tag_cooldown_ui(duration_seconds: float = 2.0) -> void:
@@ -670,11 +713,16 @@ func show_tag_nav(participating_peers: Array[int]) -> void:
 			lobby_nav.hide()
 		if is_instance_valid(tag_nav):
 			tag_nav.show()
+		# LOCK LEAVE BUTTON FOR ALL PARTICIPANTS WHEN TAG NAV SHOWS
+		if is_instance_valid(leave_tag_button):
+			leave_tag_button.disabled = true
 
 func cleanup_tag_ui_local() -> void:
 	# Invalidate active match ID to kill any running match timer loops instantly
 	_current_tag_match_id += 1
 	
+	if is_instance_valid(leave_tag_button):
+		leave_tag_button.disabled = false
 	if is_instance_valid(tag_nav):
 		tag_nav.hide()
 	if is_instance_valid(match_timer_label):
@@ -706,3 +754,41 @@ func cleanup_tag_ui_local() -> void:
 			lobby_nav.hide()
 		if is_instance_valid(side_nav):
 			side_nav.show()
+
+func return_participants_to_tag_menu(participants: Array[int], loser_id: int) -> void:
+	# 1. Kill active match timer session loop
+	_current_tag_match_id += 1
+	
+	# 2. Hide HUD elements and restore navigation bar
+	if is_instance_valid(match_timer_label):
+		match_timer_label.hide()
+	if is_instance_valid(countdown_label):
+		countdown_label.hide()
+	if is_instance_valid(tag_nav):
+		tag_nav.hide()
+	if is_instance_valid(lobby_nav):
+		lobby_nav.show()
+		minigames_button.disabled = false
+		
+	# 3. Announce Match Result
+	var local_id = multiplayer.get_unique_id()
+	var loser_name = MultiplayerManager.get_player_name(loser_id)
+	
+	if local_id == loser_id:
+		show_temp_notif("Time's up! You were IT and lost the match!", 5.0)
+	else:
+		show_temp_notif("Time's up! %s was IT and lost!" % loser_name, 5.0)
+		
+	# 4. Open Minigames Tag Menu Popup
+	if is_instance_valid(minigames_popup):
+		minigames_popup.show()
+	if is_instance_valid(minigames_mainmenu):
+		minigames_mainmenu.hide()
+	if is_instance_valid(minigames_tagmenu):
+		minigames_tagmenu.show()
+		
+	# 5. Enable menu action buttons
+	set_tag_menu_buttons_disabled(false)
+	
+	# 6. Re-render player grid so all remaining participants keep their Brown tags
+	_update_tag_player_grid(MultiplayerManager.joined_tag_peers)

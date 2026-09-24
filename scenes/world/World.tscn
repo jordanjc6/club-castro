@@ -470,7 +470,6 @@ disabled = true
 text = "Coming Soon!"
 
 [node name="TagMenu" type="PanelContainer" parent="HUD/MinigamesPopup" unique_id=675146810]
-visible = false
 anchors_preset = -1
 anchor_left = 0.07300001
 anchor_top = 0.16100001
@@ -639,7 +638,7 @@ custom_minimum_size = Vector2(1, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 29
-text = "One player is randomly selected to be \"it\" (gold arrow), everyone else (white arrows) runs away and tries not to be tagged. The \"it\" player has a 5s countdown before they can move at game start. The player who is \"it\" at the end of the timer loses!"
+text = "One player is randomly selected to be 'IT' (gold arrow), everyone else (white arrows) runs away and tries not to be tagged. The 'IT' player has a 5s countdown before they can move at game start. The player who is 'IT' at the end of the timer loses!"
 autowrap_mode = 2
 
 [node name="StartGameButton" type="Button" parent="HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Footer" unique_id=1236386162]
