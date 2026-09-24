@@ -246,6 +246,12 @@ func set_tag_indicator(is_it: bool) -> void:
 		tag_indicator.modulate = COLOR_GOLD if is_it else Color("ffffff") # Red vs Blue
 		tag_indicator_outline.show()
 
+func hide_tag_indicator() -> void:
+	if is_instance_valid(tag_indicator):
+		tag_indicator.hide()
+	if is_instance_valid(tag_indicator_outline):
+		tag_indicator_outline.hide()
+
 func _on_tag_area_area_entered(area: Area2D) -> void:
 	# Only the server processes tags
 	if not multiplayer.is_server():

@@ -303,6 +303,9 @@ func force_return_to_single_player():
 func host_force_return_to_single_player():
 	print("[CRITICAL] Host lost network connection! Restoring SinglePlayer...")
 	
+	# Reset Tag minigame state and UI completely
+	cleanup_tag_state_full()
+	
 	if is_instance_valid(_heartbeat_timer):
 		_heartbeat_timer.stop()
 		
@@ -521,7 +524,10 @@ func _on_leave_lobby_button_pressed() -> void:
 func leave_or_close_host_lobby():
 	if not host_mode_enabled:
 		return
-
+	
+	# Reset Tag minigame state and UI completely
+	cleanup_tag_state_full()
+	
 	if is_instance_valid(_heartbeat_timer):
 		_heartbeat_timer.stop()
 	_last_host_heartbeat_msec = 0
@@ -673,6 +679,12 @@ func _add_player_to_game(id: int, position: Vector2 = Vector2.INF, offset: Vecto
 func _delete_player(id: int):
 	print("Player %s left the game" % id)
 	
+	# If player disconnects during an active Tag game, trigger mid-game removal
+	if is_tag_minigame_started and joined_tag_peers.has(id):
+		request_leave_tag_game(id)
+	else:
+		unregister_tag_player(id)
+	
 	# Free up the player's assigned name
 	if multiplayer.is_server():
 		remove_peer_name(id)
@@ -732,6 +744,9 @@ func _remove_single_player():
 
 func _on_server_disconnected():
 	print("Host disconnected. Returning joiner to single player mode at default spawn...")
+	
+	# Reset Tag minigame state and UI completely
+	cleanup_tag_state_full()
 	
 	if is_instance_valid(_heartbeat_timer):
 		_heartbeat_timer.stop()
@@ -1018,7 +1033,7 @@ func setup_tag_game_session(participating_peers: Array[int], target_it_peer: int
 				game_manager.show_temp_notif("You're it!")
 			else:
 				game_manager.show_temp_notif("%s is it, run!!" % it_name)
-				
+		
 		# Start 5s countdown
 		game_manager.start_tag_countdown(5)
 	
@@ -1095,3 +1110,148 @@ func sync_player_tagged(old_it_peer: int, new_it_peer: int) -> void:
 		#elif joined_tag_peers.has(local_peer):
 			#var new_it_name = get_player_name(new_it_peer)
 			#game_manager.show_temp_notif("%s is now it, run!!" % new_it_name)
+
+# Triggered when a player leaves the active minigame mid-match
+@rpc("any_peer", "call_local", "reliable")
+func request_leave_tag_game(leaving_peer_id: int) -> void:
+	if not multiplayer.is_server():
+		return
+		
+	if not is_tag_minigame_started or not joined_tag_peers.has(leaving_peer_id):
+		return
+		
+	print("Server handling mid-game departure for peer: ", leaving_peer_id)
+	
+	# 1. Snapshot participants BEFORE modifying the list
+	var active_participants = joined_tag_peers.duplicate()
+	
+	# 2. Remove departing player from active participants
+	joined_tag_peers.erase(leaving_peer_id)
+	
+	# 3. Check if departing player was "It"
+	var was_it = (leaving_peer_id == tag_it_peer_id)
+	var new_it_peer = -1
+	
+	# 4. Evaluate remaining players
+	if joined_tag_peers.size() >= 2:
+		rpc("sync_tag_lobby_ui", joined_tag_peers)
+		if was_it:
+			new_it_peer = joined_tag_peers[randi() % joined_tag_peers.size()]
+			tag_it_peer_id = new_it_peer
+		rpc("sync_player_left_tag", leaving_peer_id, was_it, new_it_peer)
+	else:
+		# Match CANNOT continue: Stop game state first
+		end_tag_minigame()
+		
+		# Global broadcast: Cleans indicators for EVERYONE, but filters notif for participants
+		rpc("broadcast_tag_match_cancelled", active_participants, "Match cancelled: Not enough players remaining!")
+		
+		# Reset and wipe Tag lobby state across network
+		reset_tag_lobby()
+
+# Executed ONLY on client instances that were in the match (via rpc_id)
+@rpc("authority", "call_local", "reliable")
+func receive_tag_match_cancelled(reason: String) -> void:
+	is_tag_minigame_started = false
+	tag_it_peer_id = -1
+	
+	var world_scene = get_tree().get_current_scene()
+	var game_manager = world_scene.get_node_or_null("GameManager")
+	var players_node = world_scene.get_node_or_null("Players")
+	
+	# Hide overhead indicators for remaining players
+	if players_node:
+		for child in players_node.get_children():
+			if child.has_method("hide_tag_indicator"):
+				child.hide_tag_indicator()
+				
+	if game_manager:
+		game_manager.cleanup_tag_ui_local()
+		game_manager.show_temp_notif(reason)
+		
+		if game_manager.has_method("_update_tag_player_grid"):
+			game_manager._update_tag_player_grid(joined_tag_peers)
+
+@rpc("authority", "call_local", "reliable")
+func sync_player_left_tag(leaving_peer_id: int, was_it: bool, new_it_peer: int) -> void:
+	var world_scene = get_tree().get_current_scene()
+	var game_manager = world_scene.get_node_or_null("GameManager")
+	var players_node = world_scene.get_node_or_null("Players")
+	
+	if players_node:
+		# 1. Hide the departing player's tag indicator
+		var leaving_node = players_node.get_node_or_null(str(leaving_peer_id))
+		if is_instance_valid(leaving_node) and leaving_node.has_method("hide_tag_indicator"):
+			leaving_node.hide_tag_indicator()
+			
+		# 2. If "It" was reassigned, update the new "It" player's indicator
+		if was_it and new_it_peer != -1:
+			tag_it_peer_id = new_it_peer
+			var new_it_node = players_node.get_node_or_null(str(new_it_peer))
+			if is_instance_valid(new_it_node) and new_it_node.has_method("set_tag_indicator"):
+				new_it_node.set_tag_indicator(true) # Set to Gold
+
+	# 3. UI notifications
+	var local_id = multiplayer.get_unique_id()
+	if game_manager:
+		var leaving_name = get_player_name(leaving_peer_id)
+		
+		if local_id == leaving_peer_id:
+			# Local player is the one who left
+			game_manager.cleanup_tag_ui_local()
+			game_manager.show_temp_notif("You left the Tag game.")
+		elif joined_tag_peers.has(local_id):
+			# Remaining participants
+			if was_it and new_it_peer != -1:
+				var new_it_name = get_player_name(new_it_peer)
+				game_manager.show_temp_notif("%s left! %s is now IT!" % [leaving_name, new_it_name])
+			else:
+				game_manager.show_temp_notif("%s left the Tag game." % leaving_name)
+				
+		# Refresh grid UI in case the minigame popup is open
+		game_manager._update_tag_player_grid(joined_tag_peers)
+
+@rpc("authority", "call_local", "reliable")
+func broadcast_tag_match_cancelled(affected_peers: Array[int], reason: String) -> void:
+	var local_id = multiplayer.get_unique_id()
+	
+	is_tag_minigame_started = false
+	tag_it_peer_id = -1
+	
+	var world_scene = get_tree().get_current_scene()
+	var game_manager = world_scene.get_node_or_null("GameManager")
+	var players_node = world_scene.get_node_or_null("Players")
+	
+	# Ensure local player movement is un-disabled if match was cancelled during 5s countdown
+	if players_node:
+		var local_player = players_node.get_node_or_null(str(local_id))
+		if is_instance_valid(local_player) and local_player.has_method("set_movement_disabled"):
+			local_player.set_movement_disabled(false)
+	
+	# 1. WIPE INDICATORS FOR EVERYONE (Fixes lingering arrows for departed players & spectators)
+	if players_node:
+		for child in players_node.get_children():
+			if child.has_method("hide_tag_indicator"):
+				child.hide_tag_indicator()
+				
+	# 2. FILTER NOTIFICATION POPUP (Only show notif to players who were actually in the match)
+	if game_manager:
+		if affected_peers.has(local_id):
+			game_manager.cleanup_tag_ui_local()
+			game_manager.show_temp_notif(reason)
+			
+		if game_manager.has_method("_update_tag_player_grid"):
+			game_manager._update_tag_player_grid(joined_tag_peers)
+
+func cleanup_tag_state_full() -> void:
+	is_tag_minigame_started = false
+	tag_it_peer_id = -1
+	tag_cooldown_until_ms = 0
+	joined_tag_peers.clear()
+	
+	# Notify GameManager to hide all tag UI locally
+	var world_scene = get_tree().get_current_scene()
+	if world_scene:
+		var game_manager = world_scene.get_node_or_null("GameManager")
+		if is_instance_valid(game_manager) and game_manager.has_method("cleanup_tag_ui_local"):
+			game_manager.cleanup_tag_ui_local()

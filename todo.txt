@@ -1,5 +1,4 @@
 Updates
 
 0 create tag
-- update sidenav for when in tag minigame: new sidenav with just a leave game btn
-- implement game over at 2min timer end: bring players back to tag menu, reset tag game state
+- implement game over at 2min timer end: reset tag game state, bring players back to tag menu
