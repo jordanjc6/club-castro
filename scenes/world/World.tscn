@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://dc4doea3ehha5" path="res://scenes/world/JunglePlaza.tscn" id="1_qxiha"]
 [ext_resource type="PackedScene" uid="uid://bq0dam8ufvp3i" path="res://scenes/world/BBT.tscn" id="2_i1jm3"]
 [ext_resource type="PackedScene" uid="uid://bannfykn1ryhq" path="res://scenes/world/TheCinema.tscn" id="3_252at"]
+[ext_resource type="PackedScene" uid="uid://c6cd153nsg4te" path="res://scenes/world/CampfirePond.tscn" id="4_fe1rh"]
 [ext_resource type="PackedScene" uid="uid://5ouahpp03mnv" path="res://scenes/player/monkey.tscn" id="4_qh0kd"]
 [ext_resource type="Script" uid="uid://bknaby53d7dgl" path="res://scripts/world/side_nav.gd" id="5_252at"]
 [ext_resource type="Texture2D" uid="uid://egdknrgtofd" path="res://assets/icons/left-arrow.svg" id="5_i1jm3"]
@@ -180,6 +181,8 @@ properties/0/replication_mode = 1
 [node name="BBT" parent="." unique_id=323713113 instance=ExtResource("2_i1jm3")]
 
 [node name="TheCinema" parent="." unique_id=1682686883 instance=ExtResource("3_252at")]
+
+[node name="CampfirePond" parent="." unique_id=397203819 instance=ExtResource("4_fe1rh")]
 
 [node name="SinglePlayer" parent="." unique_id=1112790412 instance=ExtResource("4_qh0kd")]
 position = Vector2(647, 528)

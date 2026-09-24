@@ -17,12 +17,17 @@ blend_mode = 1
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_bw37h"]
 blend_mode = 1
 
-[node name="JunglePlaza" type="Node2D" unique_id=1739898985 node_paths=PackedStringArray("bbt_entrance_polygon", "bbt_entrance_button", "cinema_entrance_polygon", "cinema_entrance_button")]
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_00mmp"]
+blend_mode = 1
+
+[node name="JunglePlaza" type="Node2D" unique_id=1739898985 node_paths=PackedStringArray("bbt_entrance_polygon", "bbt_entrance_button", "cinema_entrance_polygon", "cinema_entrance_button", "to_campfire_pond_polygon", "to_campfire_pond_button")]
 script = ExtResource("1_bw37h")
 bbt_entrance_polygon = NodePath("Doors/BBTDoor")
 bbt_entrance_button = NodePath("Doors/BBTDoorButton")
 cinema_entrance_polygon = NodePath("Doors/TheCinemaDoor")
 cinema_entrance_button = NodePath("Doors/TheCinemaDoorButton")
+to_campfire_pond_polygon = NodePath("Doors/ToCampfirePond")
+to_campfire_pond_button = NodePath("Doors/ToCampfirePondButton")
 
 [node name="JunglePlazaMap" type="CanvasLayer" parent="." unique_id=1438311061]
 layer = -1
@@ -76,15 +81,23 @@ collision_mask = 2
 position = Vector2(420, 348)
 shape = SubResource("RectangleShape2D_wgrbw")
 
+[node name="to-campfire-pond" type="Area2D" parent="JunglePlazaCollisions" unique_id=1757073624]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("2_3ayop")
+target_position = Vector2(-855, 660)
+new_zone_offset = Vector2(-1500, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="JunglePlazaCollisions/to-campfire-pond" unique_id=687489416]
+position = Vector2(60, 383)
+shape = SubResource("RectangleShape2D_wgrbw")
+
 [node name="TemporaryBarriers" type="Node2D" parent="." unique_id=1052889402]
 
 [node name="AreaBarrier" parent="TemporaryBarriers" unique_id=1631110596 instance=ExtResource("3_34nx0")]
 position = Vector2(418, 383)
 
-[node name="AreaBarrier2" parent="TemporaryBarriers" unique_id=551761632 instance=ExtResource("3_34nx0")]
-position = Vector2(39, 355)
-
-[node name="AreaBarrier3" parent="TemporaryBarriers" unique_id=1413912426 instance=ExtResource("3_34nx0")]
+[node name="AreaBarrier2" parent="TemporaryBarriers" unique_id=1413912426 instance=ExtResource("3_34nx0")]
 position = Vector2(1101, 467)
 
 [node name="Doors" type="Node2D" parent="." unique_id=56704563]
@@ -113,6 +126,19 @@ offset_right = 708.0
 offset_bottom = 413.0
 flat = true
 
+[node name="ToCampfirePond" type="Polygon2D" parent="Doors" unique_id=1943412695]
+modulate = Color(1, 1, 1, 0)
+material = SubResource("CanvasItemMaterial_00mmp")
+polygon = PackedVector2Array(66, 466, 3, 463, 6, 304, 112, 304, 114, 468)
+
+[node name="ToCampfirePondButton" type="Button" parent="Doors" unique_id=1024897510]
+offset_left = 1.0
+offset_top = 275.0
+offset_right = 192.0
+offset_bottom = 467.0
+flat = true
+
 [connection signal="body_entered" from="JunglePlazaCollisions/bbt-door" to="JunglePlazaCollisions/bbt-door" method="_on_body_entered"]
 [connection signal="body_entered" from="JunglePlazaCollisions/the-cinema-door" to="JunglePlazaCollisions/the-cinema-door" method="_on_body_entered"]
 [connection signal="body_entered" from="JunglePlazaCollisions/rec-center-door" to="JunglePlazaCollisions/rec-center-door" method="_on_body_entered"]
+[connection signal="body_entered" from="JunglePlazaCollisions/to-campfire-pond" to="JunglePlazaCollisions/to-campfire-pond" method="_on_body_entered"]

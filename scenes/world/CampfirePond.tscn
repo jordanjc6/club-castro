@@ -1,0 +1,90 @@
+[gd_scene format=3 uid="uid://c6cd153nsg4te"]
+
+[ext_resource type="Script" uid="uid://dv7cryrjawiyq" path="res://scripts/world/campfire_pond.gd" id="1_j447e"]
+[ext_resource type="Texture2D" uid="uid://b1g6l8vryrsmx" path="res://assets/backgrounds/areas/campfire-pond.png" id="2_vdrlb"]
+[ext_resource type="Script" uid="uid://c1meexkm7ti74" path="res://scripts/world/Teleporter.gd" id="3_8gcwh"]
+[ext_resource type="PackedScene" uid="uid://eghfg8h23uwq" path="res://scenes/world/area_barrier.tscn" id="4_fhkwy"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_00mmp"]
+radius = 28.02266
+height = 112.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_04rbq"]
+size = Vector2(61, 110.5)
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_00mmp"]
+blend_mode = 1
+
+[node name="CampfirePond" type="Node2D" unique_id=1739898985 node_paths=PackedStringArray("exit_polygon", "exit_button")]
+script = ExtResource("1_j447e")
+exit_polygon = NodePath("Doors/to-jungle-plaza")
+exit_button = NodePath("Doors/to-jungle-plaza-button")
+
+[node name="CampfireMap" type="CanvasLayer" parent="." unique_id=1438311061]
+layer = -1
+offset = Vector2(-1500, 0)
+transform = Transform2D(1, 0, 0, 1, -1500, 0)
+follow_viewport_enabled = true
+
+[node name="TextureRect" type="TextureRect" parent="CampfireMap" unique_id=735928923]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_vdrlb")
+expand_mode = 1
+stretch_mode = 6
+metadata/_edit_use_anchors_ = true
+
+[node name="CampfirePondCollisions" type="Node2D" parent="." unique_id=1647931020]
+
+[node name="campfire-pond-barrier" type="StaticBody2D" parent="CampfirePondCollisions" unique_id=1856242003]
+collision_mask = 0
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="CampfirePondCollisions/campfire-pond-barrier" unique_id=1606202432]
+polygon = PackedVector2Array(-860, 721, -1349, 722, -1503, 613, -1505, 320, -1462, 284, -1499, 215, -1297, 186, -1351, 129, -1332, 92, -900, 40, -900, -7, -815, -6, -817, 40, -253, 131, -257, 300, -214, 340, -217, 636, -390, 722, -843, 724, -841, 760, -177, 761, -193, -39, -1539, -39, -1540, 756, -872, 752, -837, 723)
+
+[node name="fire-barrier" type="StaticBody2D" parent="CampfirePondCollisions" unique_id=2090387809]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CampfirePondCollisions/fire-barrier" unique_id=1251724439]
+position = Vector2(-851.0001, 184.99998)
+rotation = 1.578628
+shape = SubResource("CapsuleShape2D_00mmp")
+
+[node name="to-jungle-plaza" type="Area2D" parent="CampfirePondCollisions" unique_id=1845687201]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("3_8gcwh")
+target_position = Vector2(89, 405)
+new_zone_offset = Vector2(0, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CampfirePondCollisions/to-jungle-plaza" unique_id=1324070534]
+position = Vector2(-862, 596)
+shape = SubResource("RectangleShape2D_04rbq")
+
+[node name="pond-barrier" type="StaticBody2D" parent="CampfirePondCollisions" unique_id=813588552]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="CampfirePondCollisions/pond-barrier" unique_id=690163986]
+polygon = PackedVector2Array(-853, 362, -960, 372, -1095, 395, -1157, 403, -1214, 397, -1295, 411, -1376, 378, -1380, 397, -1378, 427, -1363, 465, -1317, 527, -1234, 578, -1153, 603, -1051, 623, -898, 629, -805, 630, -689, 627, -561, 606, -458, 570, -390, 526, -351, 471, -336, 434, -390, 418, -433, 426, -522, 414, -659, 392, -749, 371)
+
+[node name="TemporaryBarriers" type="Node2D" parent="." unique_id=1052889402]
+
+[node name="AreaBarrier" parent="TemporaryBarriers" unique_id=1631110596 instance=ExtResource("4_fhkwy")]
+position = Vector2(-859, 26)
+
+[node name="Doors" type="Node2D" parent="." unique_id=56704563]
+
+[node name="to-jungle-plaza" type="Polygon2D" parent="Doors" unique_id=1577590742]
+modulate = Color(1, 1, 1, 0)
+material = SubResource("CanvasItemMaterial_00mmp")
+polygon = PackedVector2Array(-880, 661, -880, 568, -860, 566, -841, 569, -841, 660, -858, 673)
+
+[node name="to-jungle-plaza-button" type="Button" parent="Doors" unique_id=961889149]
+offset_left = -892.0
+offset_top = 544.0
+offset_right = -832.0
+offset_bottom = 658.0
+flat = true
+
+[connection signal="body_entered" from="CampfirePondCollisions/to-jungle-plaza" to="CampfirePondCollisions/to-jungle-plaza" method="_on_body_entered"]

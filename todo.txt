@@ -1,4 +1,3 @@
 Updates
 
-0 add pond/river cozy open campfire area to left of jungle plaza
 0 implement fishing
