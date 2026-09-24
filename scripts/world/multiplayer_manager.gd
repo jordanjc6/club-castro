@@ -24,8 +24,8 @@ const FIXED_GRID_OFFSET = Vector2.ZERO
 
 # Pool of monkey names to assign
 const MONKEY_NAMES: Array[String] = [ "Chonk",
-	"Ape", "Baboon", "Blue", "Capuchin", "Chimpanzee", "Chimp", "Colobus", 
-	"Dryas", "Gelada", "Gibbon", "Gorilla", "Green", "Grivet", 
+	"Ape", "Baboon", "Blue", "Bonobo", "Capuchin", "Chimpanzee", "Chimp", 
+	"Colobus", "Dryas", "Gelada", "Gibbon", "Gorilla", "Green", "Grivet", 
 	"Guenon", "Howler", "Langur", "Leaf", "Macaque", "Mandrill", "Mangabey", 
 	"Marmoset", "Monkey", "Night", "Orangutan", "Owl", "Proboscis", "Saki", 
 	"Spider", "Squirrel", "Talapoin", "Tamarin", "Titi", "Vervet", "Woolly",
