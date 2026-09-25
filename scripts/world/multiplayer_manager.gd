@@ -715,6 +715,8 @@ func _delete_player(id: int):
 	else:
 		unregister_tag_player(id)
 	
+	player_rods.erase(id)
+	
 	# Free up the player's assigned name
 	if multiplayer.is_server():
 		remove_peer_name(id)
@@ -1407,6 +1409,17 @@ func request_equip_rod(rod: FishingRod) -> void:
 		player_rods[sender_id] = rod
 		rpc("sync_player_rod", sender_id, rod)
 
+@rpc("any_peer", "call_local", "reliable")
+func request_unequip_rod() -> void:
+	var sender_id = multiplayer.get_remote_sender_id()
+	if sender_id == 0:
+		sender_id = multiplayer.get_unique_id() # Host local fallback
+		
+	if multiplayer.is_server():
+		player_rods.erase(sender_id)
+		# Broadcast unequip to all clients
+		rpc("sync_player_unequip_rod", sender_id)
+
 @rpc("authority", "call_local", "reliable")
 func sync_player_rod(peer_id: int, rod: FishingRod) -> void:
 	print("sync_player_rod: %s" % rod)
@@ -1421,3 +1434,18 @@ func sync_player_rod(peer_id: int, rod: FishingRod) -> void:
 		var player_node = players_node.get_node_or_null(str(peer_id))
 		if is_instance_valid(player_node) and player_node.has_method("equip_rod_visual"):
 			player_node.equip_rod_visual(rod)
+
+@rpc("authority", "call_local", "reliable")
+func sync_player_unequip_rod(peer_id: int) -> void:
+	player_rods.erase(peer_id)
+	
+	# Find the player node on scene tree and remove/hide their rod visual
+	var world_scene = get_tree().get_current_scene()
+	if not world_scene:
+		return
+		
+	var players_node = world_scene.get_node_or_null("Players")
+	if is_instance_valid(players_node):
+		var player_node = players_node.get_node_or_null(str(peer_id))
+		if is_instance_valid(player_node) and player_node.has_method("unequip_rod_visual"):
+			player_node.unequip_rod_visual()

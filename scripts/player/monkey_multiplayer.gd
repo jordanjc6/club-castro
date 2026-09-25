@@ -282,4 +282,8 @@ func equip_rod_visual(rod: MultiplayerManager.FishingRod) -> void:
 	if is_instance_valid(rod_sprite):
 		rod_sprite.show()
 		rod_sprite.modulate = MultiplayerManager.ROD_COLORS.get(rod)
-	
+
+func unequip_rod_visual() -> void:
+	print("%s unequipped fishing rod" % name)
+	if is_instance_valid(rod_sprite):
+		rod_sprite.hide()

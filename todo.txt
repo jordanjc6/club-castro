@@ -2,6 +2,5 @@ Updates
 
 0 fishing
 - add fishing prompt area highlight
-- implement removing rod from player
 - implement casting bobber out onto water
 - implement fishing waiting, odds, and catching

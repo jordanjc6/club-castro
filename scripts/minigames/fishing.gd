@@ -4,6 +4,7 @@ extends Node2D
 @onready var prompt: PanelContainer = $Prompt
 @onready var acceptPromptButton: Button = $Prompt/VBoxContainer/HBoxContainer/YesButton
 @onready var rejectPromptButton: Button = $Prompt/VBoxContainer/HBoxContainer/NoButton
+@onready var unequipRodButton: Button = $Prompt/VBoxContainer/HBoxContainer/UnequipButton
 @onready var rodSelection: PanelContainer = $RodSelection
 @onready var redBtn: Button = $RodSelection/MarginContainer/VBoxContainer/GridContainer/RedButton
 @onready var orangeBtn: Button = $RodSelection/MarginContainer/VBoxContainer/GridContainer/OrangeButton
@@ -18,6 +19,7 @@ func _ready() -> void:
 	prompt.hide()
 	acceptPromptButton.pressed.connect(_prompt_accepted)
 	rejectPromptButton.pressed.connect(_prompt_rejected)
+	unequipRodButton.pressed.connect(_unequip_rod)
 	rodSelection.hide()
 	redBtn.pressed.connect(_rod_selected.bind(MultiplayerManager.FishingRod.RED))
 	orangeBtn.pressed.connect(_rod_selected.bind(MultiplayerManager.FishingRod.ORANGE))
@@ -68,3 +70,16 @@ func _rod_selected(rod: MultiplayerManager.FishingRod):
 		if is_instance_valid(single_player) and single_player.has_method("equip_rod_visual"):
 			single_player.equip_rod_visual(rod)
 	rodSelection.hide()
+
+func _unequip_rod():
+	var world_scene = get_tree().get_current_scene()
+	var single_player = world_scene.get_node_or_null("SinglePlayer")
+	
+	# multiplayer
+	if single_player == null and multiplayer.multiplayer_peer and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED:
+		MultiplayerManager.rpc("request_unequip_rod")
+	# singleplayer
+	else:
+		if is_instance_valid(single_player) and single_player.has_method("unequip_rod_visual"):
+			single_player.unequip_rod_visual()
+	prompt.hide()
