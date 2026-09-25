@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://b1g6l8vryrsmx" path="res://assets/backgrounds/areas/campfire-pond.png" id="2_vdrlb"]
 [ext_resource type="Script" uid="uid://c1meexkm7ti74" path="res://scripts/world/Teleporter.gd" id="3_8gcwh"]
 [ext_resource type="PackedScene" uid="uid://eghfg8h23uwq" path="res://scenes/world/area_barrier.tscn" id="4_fhkwy"]
+[ext_resource type="Script" uid="uid://cr3e12rq0h6qy" path="res://scripts/minigames/fishing.gd" id="5_vdrlb"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_00mmp"]
 radius = 28.02266
@@ -14,6 +15,117 @@ size = Vector2(61, 110.5)
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_00mmp"]
 blend_mode = 1
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_00mmp"]
+size = Vector2(118, 73)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vdrlb"]
+bg_color = Color(0.7764706, 0.8745098, 0.9647059, 1)
+border_width_left = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_bottom_right = 40
+corner_radius_bottom_left = 40
+
+[sub_resource type="LabelSettings" id="LabelSettings_8gcwh"]
+font_size = 48
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fhkwy"]
+bg_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 35
+corner_radius_top_right = 35
+corner_radius_bottom_right = 35
+corner_radius_bottom_left = 35
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8gcwh"]
+bg_color = Color(0.7764706, 0.8745098, 0.9647059, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 40
+corner_radius_top_right = 40
+corner_radius_bottom_right = 40
+corner_radius_bottom_left = 40
+
+[sub_resource type="LabelSettings" id="LabelSettings_fhkwy"]
+font_size = 48
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2soi7"]
+bg_color = Color(1, 0.09411765, 0.09411765, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 25
+corner_radius_top_right = 25
+corner_radius_bottom_right = 25
+corner_radius_bottom_left = 25
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3w3do"]
+bg_color = Color(1, 0.36078432, 0, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 25
+corner_radius_top_right = 25
+corner_radius_bottom_right = 25
+corner_radius_bottom_left = 25
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_a2g68"]
+bg_color = Color(1, 0.9411765, 0.12156863, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 25
+corner_radius_top_right = 25
+corner_radius_bottom_right = 25
+corner_radius_bottom_left = 25
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pnjpx"]
+bg_color = Color(0.17254902, 1, 0.019607844, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 25
+corner_radius_top_right = 25
+corner_radius_bottom_right = 25
+corner_radius_bottom_left = 25
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h2jmr"]
+bg_color = Color(0.13725491, 0.13725491, 1, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 25
+corner_radius_top_right = 25
+corner_radius_bottom_right = 25
+corner_radius_bottom_left = 25
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mbqrm"]
+bg_color = Color(0.62352943, 0, 1, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 25
+corner_radius_top_right = 25
+corner_radius_bottom_right = 25
+corner_radius_bottom_left = 25
 
 [node name="CampfirePond" type="Node2D" unique_id=1739898985 node_paths=PackedStringArray("exit_polygon", "exit_button")]
 script = ExtResource("1_j447e")
@@ -86,5 +198,179 @@ offset_top = 544.0
 offset_right = -832.0
 offset_bottom = 658.0
 flat = true
+
+[node name="Fishing" type="Node2D" parent="." unique_id=60747428]
+script = ExtResource("5_vdrlb")
+
+[node name="prompt-area" type="Area2D" parent="Fishing" unique_id=1462965809]
+collision_layer = 4
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Fishing/prompt-area" unique_id=1348615539]
+position = Vector2(-1408, 226.5)
+shape = SubResource("RectangleShape2D_00mmp")
+
+[node name="Prompt" type="PanelContainer" parent="Fishing" unique_id=955626076]
+visible = false
+anchors_preset = -1
+anchor_left = 0.07300001
+anchor_top = 0.16100001
+anchor_right = 0.07300001
+anchor_bottom = 0.16100001
+offset_left = -1183.0
+offset_top = -2.0
+offset_right = -532.9999
+offset_bottom = 198.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_vdrlb")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Fishing/Prompt" unique_id=1396352754]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Fishing/Prompt/VBoxContainer" unique_id=1584919505]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "Wanna fish?"
+label_settings = SubResource("LabelSettings_8gcwh")
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Fishing/Prompt/VBoxContainer" unique_id=170319310]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_constants/separation = 75
+alignment = 1
+
+[node name="YesButton" type="Button" parent="Fishing/Prompt/VBoxContainer/HBoxContainer" unique_id=1631480498]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 42
+theme_override_styles/normal = SubResource("StyleBoxFlat_fhkwy")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_fhkwy")
+theme_override_styles/hover = SubResource("StyleBoxFlat_fhkwy")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_fhkwy")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_fhkwy")
+theme_override_styles/focus = SubResource("StyleBoxFlat_fhkwy")
+text = "Yes"
+
+[node name="NoButton" type="Button" parent="Fishing/Prompt/VBoxContainer/HBoxContainer" unique_id=871063701]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 42
+theme_override_styles/normal = SubResource("StyleBoxFlat_fhkwy")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_fhkwy")
+theme_override_styles/hover = SubResource("StyleBoxFlat_fhkwy")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_fhkwy")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_fhkwy")
+theme_override_styles/focus = SubResource("StyleBoxFlat_fhkwy")
+text = "No"
+
+[node name="RodSelection" type="PanelContainer" parent="Fishing" unique_id=1390511809]
+anchors_preset = -1
+anchor_left = 0.07300001
+anchor_top = 0.16100001
+anchor_right = 0.07300001
+anchor_bottom = 0.16100001
+offset_left = -1280.0
+offset_top = 118.0
+offset_right = -446.0
+offset_bottom = 593.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_8gcwh")
+
+[node name="MarginContainer" type="MarginContainer" parent="Fishing/RodSelection" unique_id=2040067730]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Fishing/RodSelection/MarginContainer" unique_id=354373281]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Label" type="Label" parent="Fishing/RodSelection/MarginContainer/VBoxContainer" unique_id=808664148]
+custom_minimum_size = Vector2(100, 60)
+layout_mode = 2
+text = "Choose a rod:"
+label_settings = SubResource("LabelSettings_fhkwy")
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="Fishing/RodSelection/MarginContainer/VBoxContainer" unique_id=237622807]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 3
+
+[node name="RedButton" type="Button" parent="Fishing/RodSelection/MarginContainer/VBoxContainer/GridContainer" unique_id=892216616]
+custom_minimum_size = Vector2(0, 175)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("StyleBoxFlat_2soi7")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_2soi7")
+theme_override_styles/hover = SubResource("StyleBoxFlat_2soi7")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_2soi7")
+text = "Red"
+
+[node name="OrangeButton" type="Button" parent="Fishing/RodSelection/MarginContainer/VBoxContainer/GridContainer" unique_id=803113012]
+custom_minimum_size = Vector2(0, 175)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("StyleBoxFlat_3w3do")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_3w3do")
+theme_override_styles/hover = SubResource("StyleBoxFlat_3w3do")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_3w3do")
+theme_override_styles/focus = SubResource("StyleBoxFlat_3w3do")
+text = "Orange"
+
+[node name="YellowButton" type="Button" parent="Fishing/RodSelection/MarginContainer/VBoxContainer/GridContainer" unique_id=1786920900]
+custom_minimum_size = Vector2(0, 175)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("StyleBoxFlat_a2g68")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_a2g68")
+theme_override_styles/hover = SubResource("StyleBoxFlat_a2g68")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_a2g68")
+text = "Yellow"
+
+[node name="GreenButton" type="Button" parent="Fishing/RodSelection/MarginContainer/VBoxContainer/GridContainer" unique_id=422110851]
+custom_minimum_size = Vector2(0, 175)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("StyleBoxFlat_pnjpx")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_pnjpx")
+theme_override_styles/hover = SubResource("StyleBoxFlat_pnjpx")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_pnjpx")
+text = "Green"
+
+[node name="BlueButton" type="Button" parent="Fishing/RodSelection/MarginContainer/VBoxContainer/GridContainer" unique_id=1185922061]
+custom_minimum_size = Vector2(0, 175)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("StyleBoxFlat_h2jmr")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_h2jmr")
+theme_override_styles/hover = SubResource("StyleBoxFlat_h2jmr")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_h2jmr")
+text = "Blue"
+
+[node name="VioletButton" type="Button" parent="Fishing/RodSelection/MarginContainer/VBoxContainer/GridContainer" unique_id=944835783]
+custom_minimum_size = Vector2(0, 175)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("StyleBoxFlat_mbqrm")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_mbqrm")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mbqrm")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_mbqrm")
+text = "Violet"
 
 [connection signal="body_entered" from="CampfirePondCollisions/to-jungle-plaza" to="CampfirePondCollisions/to-jungle-plaza" method="_on_body_entered"]

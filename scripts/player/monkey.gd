@@ -17,9 +17,15 @@ var current_grid_offset: Vector2 = Vector2.ZERO
 @onready var camera = $Camera2D
 @onready var animation_player = $ScreenFadeLayer/AnimationPlayer
 
+# fishing ###################
+#############################
+@onready var rod_sprite: Sprite2D = $FishingRod
+
+#############################
 
 func _ready() -> void:
 	add_to_group("player")
+	rod_sprite.hide()
 	
 	# Enable the camera
 	camera.make_current()
@@ -163,3 +169,9 @@ func set_movement_disabled(disabled: bool) -> void:
 	is_movement_disabled = disabled
 	if disabled:
 		stop_movement()
+
+func equip_rod_visual(rod: MultiplayerManager.FishingRod) -> void:
+	print("equip_rod_visual: %s" % rod)
+	if is_instance_valid(rod_sprite):
+		rod_sprite.show()
+		rod_sprite.modulate = MultiplayerManager.ROD_COLORS.get(rod)

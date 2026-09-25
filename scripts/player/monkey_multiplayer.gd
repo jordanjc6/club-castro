@@ -31,6 +31,12 @@ const COLOR_GOLD = Color("ffd700")
 
 ##########################################################
 
+# fishing ###################
+#############################
+@onready var rod_sprite: Sprite2D = $FishingRod
+
+#############################
+
 @export var player_id := 1:
 	set(id):
 		player_id = id
@@ -42,6 +48,7 @@ func _ready() -> void:
 	target_position = global_position
 	tag_indicator.hide()  # ensure indicator for tag minigame hidden
 	tag_indicator_outline.hide()
+	rod_sprite.hide()
 	# Connect area_entered so TagArea touching TagArea triggers the tag
 	if has_node("TagArea"):
 		$TagArea.area_entered.connect(_on_tag_area_area_entered)
@@ -269,3 +276,10 @@ func _on_tag_area_area_entered(area: Area2D) -> void:
 		if is_instance_valid(other_player) and other_player.is_in_group("player") and other_player != self:
 			if "player_id" in other_player and other_player.player_id != player_id:
 				MultiplayerManager.request_player_tag(other_player.player_id)
+
+func equip_rod_visual(rod: MultiplayerManager.FishingRod) -> void:
+	print("equip_rod_visual: %s" % rod)
+	if is_instance_valid(rod_sprite):
+		rod_sprite.show()
+		rod_sprite.modulate = MultiplayerManager.ROD_COLORS.get(rod)
+	

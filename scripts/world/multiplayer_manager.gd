@@ -101,6 +101,29 @@ var is_tag_countdown_active: bool = false
 
 #############################################################################
 
+# fishing #######################
+#################################
+enum FishingRod {
+	RED,
+	ORANGE,
+	YELLOW,
+	GREEN,
+	BLUE,
+	VIOLET
+}
+const ROD_COLORS: Dictionary = {
+	FishingRod.RED: Color("ff1818"),
+	FishingRod.ORANGE: Color("ff5c00"),
+	FishingRod.YELLOW: Color("fff01f"),
+	FishingRod.GREEN: Color("2cff05"),
+	FishingRod.BLUE: Color("2323ff"),
+	FishingRod.VIOLET: Color("9f00ff")
+}
+
+# Map of peer_id -> FishingRod (enum)
+var player_rods: Dictionary = {}
+
+#################################
 
 func _ready():
 	_setup_ping_request()
@@ -647,6 +670,11 @@ func _add_player_to_game(id: int, position: Vector2 = Vector2.INF, offset: Vecto
 	# Assign unique monkey name if host
 	if multiplayer.is_server():
 		assign_unique_name_for_peer(id)
+		
+		# Sync all existing players' chosen rods to the newly connected joiner
+		print("sync rods to new player")
+		for peer_id in player_rods:
+			rpc_id(id, "sync_player_rod", peer_id, player_rods[peer_id])
 	
 	var player_to_add = multiplayer_scene.instantiate()
 	player_to_add.player_id = id
@@ -1367,3 +1395,29 @@ func restore_all_players_movement() -> void:
 		for child in players_node.get_children():
 			if is_instance_valid(child) and child.has_method("set_movement_disabled"):
 				child.set_movement_disabled(false)
+
+@rpc("any_peer", "call_local", "reliable")
+func request_equip_rod(rod: FishingRod) -> void:
+	print("request_equip_rod: %s" % rod)
+	var sender_id = multiplayer.get_remote_sender_id()
+	if sender_id == 0:
+		sender_id = multiplayer.get_unique_id()
+		
+	if multiplayer.is_server():
+		player_rods[sender_id] = rod
+		rpc("sync_player_rod", sender_id, rod)
+
+@rpc("authority", "call_local", "reliable")
+func sync_player_rod(peer_id: int, rod: FishingRod) -> void:
+	print("sync_player_rod: %s" % rod)
+	player_rods[peer_id] = rod
+	
+	var world_scene = get_tree().get_current_scene()
+	if not world_scene:
+		return
+		
+	var players_node = world_scene.get_node_or_null("Players")
+	if is_instance_valid(players_node):
+		var player_node = players_node.get_node_or_null(str(peer_id))
+		if is_instance_valid(player_node) and player_node.has_method("equip_rod_visual"):
+			player_node.equip_rod_visual(rod)
