@@ -16,6 +16,9 @@ size = Vector2(61, 110.5)
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_00mmp"]
 blend_mode = 1
 
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_t5v6p"]
+blend_mode = 1
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_00mmp"]
 size = Vector2(118, 73)
 
@@ -127,10 +130,12 @@ corner_radius_top_right = 25
 corner_radius_bottom_right = 25
 corner_radius_bottom_left = 25
 
-[node name="CampfirePond" type="Node2D" unique_id=1739898985 node_paths=PackedStringArray("exit_polygon", "exit_button")]
+[node name="CampfirePond" type="Node2D" unique_id=1739898985 node_paths=PackedStringArray("exit_polygon", "exit_button", "fishing_area_polygon", "fishing_area_button")]
 script = ExtResource("1_j447e")
-exit_polygon = NodePath("Doors/to-jungle-plaza")
-exit_button = NodePath("Doors/to-jungle-plaza-button")
+exit_polygon = NodePath("HighlightAreas/to-jungle-plaza")
+exit_button = NodePath("HighlightAreas/to-jungle-plaza-button")
+fishing_area_polygon = NodePath("HighlightAreas/fishing-area")
+fishing_area_button = NodePath("HighlightAreas/fishing-area-button")
 
 [node name="CampfireMap" type="CanvasLayer" parent="." unique_id=1438311061]
 layer = -1
@@ -185,18 +190,30 @@ polygon = PackedVector2Array(-853, 362, -960, 372, -1095, 395, -1157, 403, -1214
 [node name="AreaBarrier" parent="TemporaryBarriers" unique_id=1631110596 instance=ExtResource("4_fhkwy")]
 position = Vector2(-859, 26)
 
-[node name="Doors" type="Node2D" parent="." unique_id=56704563]
+[node name="HighlightAreas" type="Node2D" parent="." unique_id=56704563]
 
-[node name="to-jungle-plaza" type="Polygon2D" parent="Doors" unique_id=1577590742]
+[node name="to-jungle-plaza" type="Polygon2D" parent="HighlightAreas" unique_id=1577590742]
 modulate = Color(1, 1, 1, 0)
 material = SubResource("CanvasItemMaterial_00mmp")
 polygon = PackedVector2Array(-880, 661, -880, 568, -860, 566, -841, 569, -841, 660, -858, 673)
 
-[node name="to-jungle-plaza-button" type="Button" parent="Doors" unique_id=961889149]
+[node name="to-jungle-plaza-button" type="Button" parent="HighlightAreas" unique_id=961889149]
 offset_left = -892.0
 offset_top = 544.0
 offset_right = -832.0
 offset_bottom = 658.0
+flat = true
+
+[node name="fishing-area" type="Polygon2D" parent="HighlightAreas" unique_id=596699128]
+modulate = Color(1, 1, 1, 0)
+material = SubResource("CanvasItemMaterial_t5v6p")
+polygon = PackedVector2Array(-1378, 263, -1416, 257, -1446, 257, -1453, 221, -1436, 217, -1417, 221, -1462, 102, -1434, 91, -1369, 215, -1358, 219, -1358, 226, -1362, 230, -1351, 255)
+
+[node name="fishing-area-button" type="Button" parent="HighlightAreas" unique_id=671546772]
+offset_left = -1484.0
+offset_top = 93.0
+offset_right = -1348.0
+offset_bottom = 265.0
 flat = true
 
 [node name="Fishing" type="Node2D" parent="." unique_id=60747428]
