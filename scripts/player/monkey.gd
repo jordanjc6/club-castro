@@ -193,6 +193,8 @@ func equip_rod_visual(rod: MultiplayerManager.FishingRod) -> void:
 func unequip_rod_visual() -> void:
 	print("%s unequipped fishing rod" % name)
 	is_rod_equipped = false
+	if is_instance_valid(active_lure):
+		active_lure.queue_free()
 	if is_instance_valid(rod_sprite):
 		rod_sprite.hide()
 	_update_cast_button()
@@ -229,11 +231,8 @@ func _on_cast_pressed() -> void:
 		target_land_pos = global_position.lerp(pond_center.global_position, 0.55)
 	else:
 		target_land_pos = global_position + Vector2(0, 150)
-
-	if has_node("InputSynchronizer"):
-		rpc("broadcast_lure_cast", global_position, target_land_pos, equipped_rod_color)
-	else:
-		perform_lure_cast_visual(global_position, target_land_pos, equipped_rod_color)
+	
+	perform_lure_cast_visual(global_position, target_land_pos, equipped_rod_color)
 
 func perform_lure_cast_visual(start_pos: Vector2, end_pos: Vector2, color: Color) -> void:
 	# Clear previous lure if it's still floating in the water

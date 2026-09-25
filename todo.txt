@@ -1,7 +1,12 @@
 Updates
 
 0 fishing
-- implement casting bobber out onto water
+- bug: not showing cast lure btn on lobby joiner's screen
+- only show cast lure btn on local player's screen
+- show lures in water for new joiners
+- delete local player's lure on walk away from pond area
+- delete singleplayer lures upon entering multiplayer lobby
+- bug: lures and players drawn over fishing rod color menu
 - implement fishing waiting, odds, and catching
 - maybe: take fishing rod equipped in singleplayer to multiplayer lobby
   and vice versa? (currently leaves it but back upon return)

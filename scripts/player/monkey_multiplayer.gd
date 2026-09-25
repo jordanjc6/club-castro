@@ -38,6 +38,9 @@ const COLOR_GOLD = Color("ffd700")
 @onready var fishing_detector: Area2D = $FishingAreaCollider
 var is_rod_equipped: bool = false
 var is_at_pond: bool = false
+var lure_scene = preload("res://scenes/minigames/FishingLure.tscn") # Adjust path if needed
+var equipped_rod_color: Color = Color.WHITE
+var active_lure: Node2D = null
 
 #############################
 
@@ -288,14 +291,17 @@ func _on_tag_area_area_entered(area: Area2D) -> void:
 func equip_rod_visual(rod: MultiplayerManager.FishingRod) -> void:
 	print("equip_rod_visual: %s" % rod)
 	is_rod_equipped = true
+	equipped_rod_color = MultiplayerManager.ROD_COLORS.get(rod)
 	if is_instance_valid(rod_sprite):
 		rod_sprite.show()
-		rod_sprite.modulate = MultiplayerManager.ROD_COLORS.get(rod)
+		rod_sprite.modulate = equipped_rod_color
 	_update_cast_button()
 
 func unequip_rod_visual() -> void:
 	print("%s unequipped fishing rod" % name)
 	is_rod_equipped = false
+	if is_instance_valid(active_lure):
+		active_lure.queue_free()
 	if is_instance_valid(rod_sprite):
 		rod_sprite.hide()
 	_update_cast_button()
@@ -322,5 +328,58 @@ func _update_cast_button() -> void:
 		cast_lure_button.hide()
 
 func _on_cast_pressed() -> void:
-	print("Casting fishing line!")
-	# TODO
+	var world_scene = get_tree().get_current_scene()
+	var pond_center = world_scene.get_node_or_null("CampfirePond/PondCenter")
+	
+	var target_land_pos: Vector2
+	
+	if is_instance_valid(pond_center):
+		# lerp 55% toward the pond center
+		target_land_pos = global_position.lerp(pond_center.global_position, 0.55)
+	else:
+		target_land_pos = global_position + Vector2(0, 150)
+
+	# Send RPC to broadcast the lure cast across all clients in the lobby
+	rpc("broadcast_lure_cast", global_position, target_land_pos, equipped_rod_color)
+
+@rpc("any_peer", "call_local", "reliable")
+func broadcast_lure_cast(start_pos: Vector2, end_pos: Vector2, color: Color) -> void:
+	perform_lure_cast_visual(start_pos, end_pos, color)
+
+func perform_lure_cast_visual(start_pos: Vector2, end_pos: Vector2, color: Color) -> void:
+	# Clear previous lure if this player already has one floating in the water
+	if is_instance_valid(active_lure):
+		active_lure.queue_free()
+	
+	var lure_instance = lure_scene.instantiate()
+	get_parent().add_child(lure_instance)
+	lure_instance.global_position = start_pos
+	active_lure = lure_instance # Track active lure reference locally on every client
+	
+	if lure_instance.has_method("setup_lure"):
+		lure_instance.setup_lure(color)
+
+	# Calculate high peak for the parabolic arc trajectory
+	var peak_height = 80.0
+	var mid_point = (start_pos + end_pos) / 2.0
+	var arc_peak = Vector2(mid_point.x, min(start_pos.y, end_pos.y) - peak_height)
+
+	# Animate the arc using a Godot Tween
+	var tween = create_tween().set_parallel(true)
+	
+	# Linear horizontal X move
+	tween.tween_property(lure_instance, "global_position:x", end_pos.x, 0.8)\
+		.set_trans(Tween.TRANS_LINEAR)
+		
+	# Curved vertical Y arc (up to peak, then down to water)
+	var y_tween = create_tween()
+	y_tween.tween_property(lure_instance, "global_position:y", arc_peak.y, 0.4)\
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	y_tween.tween_property(lure_instance, "global_position:y", end_pos.y, 0.4)\
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+	# Trigger water bobbing animation upon landing
+	y_tween.tween_callback(func():
+		if is_instance_valid(lure_instance) and lure_instance.has_method("on_land_in_water"):
+			lure_instance.on_land_in_water()
+	)
