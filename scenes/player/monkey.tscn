@@ -20,7 +20,7 @@
 [ext_resource type="Texture2D" uid="uid://dfwmamkrbesgk" path="res://assets/monkey-sprites/walking/front-diagonal/3.png" id="18_ucw3d"]
 [ext_resource type="Texture2D" uid="uid://bs381ij3i1gq3" path="res://assets/monkey-sprites/walking/side/walking-side2.png" id="19_nbekv"]
 [ext_resource type="Texture2D" uid="uid://cjohnlinqiga3" path="res://assets/monkey-sprites/walking/side/walking-side3.png" id="20_veeye"]
-[ext_resource type="Texture2D" uid="uid://bsmmdqhw4qyu1" path="res://assets/icons/fishing-tool.png" id="21_veeye"]
+[ext_resource type="Texture2D" uid="uid://bsmmdqhw4qyu1" path="res://assets/icons/fishing-rod.png" id="21_veeye"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wtx44"]
 animations = [{

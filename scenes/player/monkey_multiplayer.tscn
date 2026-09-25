@@ -22,7 +22,7 @@
 [ext_resource type="Texture2D" uid="uid://bs381ij3i1gq3" path="res://assets/monkey-sprites/walking/side/walking-side2.png" id="18_gh7n5"]
 [ext_resource type="Texture2D" uid="uid://cjohnlinqiga3" path="res://assets/monkey-sprites/walking/side/walking-side3.png" id="19_eh8vr"]
 [ext_resource type="Texture2D" uid="uid://d13k0ydttxrku" path="res://assets/icons/player-indicator.png" id="22_bdlv7"]
-[ext_resource type="Texture2D" uid="uid://bsmmdqhw4qyu1" path="res://assets/icons/fishing-tool.png" id="23_8boaa"]
+[ext_resource type="Texture2D" uid="uid://bsmmdqhw4qyu1" path="res://assets/icons/fishing-rod.png" id="23_8boaa"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ovbpe"]
 properties/0/path = NodePath(".:player_id")

@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bsmmdqhw4qyu1"
-path="res://.godot/imported/fishing-tool.png-498e5a703117269f86d8763f568e6ac5.ctex"
+path="res://.godot/imported/fishing-rod.png-8888c82b5b8c8c669ef5041178f47ded.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/icons/fishing-tool.png"
-dest_files=["res://.godot/imported/fishing-tool.png-498e5a703117269f86d8763f568e6ac5.ctex"]
+source_file="res://assets/icons/fishing-rod.png"
+dest_files=["res://.godot/imported/fishing-rod.png-8888c82b5b8c8c669ef5041178f47ded.ctex"]
 
 [params]
 

@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://clojonl18peaa"]
+
+[ext_resource type="Script" uid="uid://1a2fqrm840qx" path="res://scripts/minigames/FishingLure.gd" id="1_4xi8c"]
+[ext_resource type="Texture2D" uid="uid://blfstbj6agxrw" path="res://assets/icons/fishing-lure.png" id="1_v0frv"]
+
+[node name="FishingLure" type="Node2D" unique_id=2091383149]
+script = ExtResource("1_4xi8c")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=581819776]
+scale = Vector2(0.32, 0.32)
+texture = ExtResource("1_v0frv")

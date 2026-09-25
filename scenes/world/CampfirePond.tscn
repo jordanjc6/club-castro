@@ -413,4 +413,7 @@ collision_mask = 0
 visible = false
 polygon = PackedVector2Array(-853, 368, -1233, 421, -1369, 403, -1234, 573, -935, 621, -936, 510, -791, 511, -784, 620, -550, 596, -400, 517, -349, 438, -617, 412, -827, 369, -824, 330, -563, 379, -315, 386, -332, 466, -384, 550, -529, 615, -774, 646, -815, 624, -819, 528, -924, 529, -922, 643, -1052, 637, -1228, 600, -1347, 527, -1408, 408, -1392, 345, -1281, 373, -1183, 355, -1109, 375, -862, 328, -822, 327)
 
+[node name="PondCenter" type="Marker2D" parent="." unique_id=109448620]
+position = Vector2(-871, 487)
+
 [connection signal="body_entered" from="CampfirePondCollisions/to-jungle-plaza" to="CampfirePondCollisions/to-jungle-plaza" method="_on_body_entered"]
