@@ -3,3 +3,5 @@ Updates
 0 fishing
 - implement casting bobber out onto water
 - implement fishing waiting, odds, and catching
+- maybe: take fishing rod equipped in singleplayer to multiplayer lobby
+  and vice versa? (currently leaves it but back upon return)

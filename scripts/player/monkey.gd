@@ -20,12 +20,20 @@ var current_grid_offset: Vector2 = Vector2.ZERO
 # fishing ###################
 #############################
 @onready var rod_sprite: Sprite2D = $FishingRod
+@onready var cast_lure_button: Button = $CastLureButton
+@onready var fishing_detector: Area2D = $FishingAreaCollider
+var is_rod_equipped: bool = false
+var is_at_pond: bool = false
 
 #############################
 
 func _ready() -> void:
 	add_to_group("player")
 	rod_sprite.hide()
+	cast_lure_button.hide()
+	cast_lure_button.pressed.connect(_on_cast_pressed)
+	fishing_detector.area_entered.connect(_at_pond)
+	fishing_detector.area_exited.connect(_left_pond)
 	
 	# Enable the camera
 	camera.make_current()
@@ -172,11 +180,40 @@ func set_movement_disabled(disabled: bool) -> void:
 
 func equip_rod_visual(rod: MultiplayerManager.FishingRod) -> void:
 	print("equip_rod_visual: %s" % rod)
+	is_rod_equipped = true
 	if is_instance_valid(rod_sprite):
 		rod_sprite.show()
 		rod_sprite.modulate = MultiplayerManager.ROD_COLORS.get(rod)
+	_update_cast_button()
 
 func unequip_rod_visual() -> void:
 	print("%s unequipped fishing rod" % name)
+	is_rod_equipped = false
 	if is_instance_valid(rod_sprite):
 		rod_sprite.hide()
+	_update_cast_button()
+
+# Detection callbacks
+func _at_pond(_area: Area2D) -> void:
+	is_at_pond = true
+	_update_cast_button()
+
+func _left_pond(_area: Area2D) -> void:
+	is_at_pond = false
+	_update_cast_button()
+
+func _update_cast_button() -> void:
+	if not is_instance_valid(cast_lure_button):
+		return
+
+	# Only show CAST for the local player's character
+	var is_local = is_multiplayer_authority() if has_node("InputSynchronizer") else true
+	
+	if is_local and is_rod_equipped and is_at_pond:
+		cast_lure_button.show()
+	else:
+		cast_lure_button.hide()
+
+func _on_cast_pressed() -> void:
+	print("Casting fishing line!")
+	# TODO

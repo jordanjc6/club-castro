@@ -204,6 +204,9 @@ _data = {
 &"fade_to_black": SubResource("Animation_bdlv7")
 }
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_veeye"]
+size = Vector2(25, 12)
+
 [node name="SinglePlayer" type="CharacterBody2D" unique_id=1112790412]
 collision_layer = 2
 collision_mask = 5
@@ -239,3 +242,19 @@ libraries/ = SubResource("AnimationLibrary_nbekv")
 [node name="FishingRod" type="Sprite2D" parent="." unique_id=1737538958]
 position = Vector2(25, 15)
 texture = ExtResource("21_veeye")
+
+[node name="FishingAreaCollider" type="Area2D" parent="." unique_id=1567401354]
+collision_layer = 0
+collision_mask = 16
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FishingAreaCollider" unique_id=17530855]
+position = Vector2(6, 50)
+shape = SubResource("RectangleShape2D_veeye")
+
+[node name="CastLureButton" type="Button" parent="." unique_id=1323846817]
+offset_left = -67.0
+offset_top = -99.0
+offset_right = 77.0
+offset_bottom = -49.0
+theme_override_font_sizes/font_size = 30
+text = "Cast Lure"
