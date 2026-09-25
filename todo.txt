@@ -10,3 +10,5 @@ Updates
 - implement fishing waiting, odds, and catching
 - maybe: take fishing rod equipped in singleplayer to multiplayer lobby
   and vice versa? (currently leaves it but back upon return)
+
+0 jina's blue bow
