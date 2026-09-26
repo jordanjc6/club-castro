@@ -304,6 +304,10 @@ func unequip_rod_visual() -> void:
 		active_lure.queue_free()
 	if is_instance_valid(rod_sprite):
 		rod_sprite.hide()
+	
+	# Unregister active lure on server
+	if has_node("InputSynchronizer") and %InputSynchronizer.is_multiplayer_authority():
+		MultiplayerManager.rpc("unregister_active_lure")
 	_update_cast_button()
 
 # Detection callbacks
@@ -320,7 +324,7 @@ func _update_cast_button() -> void:
 		return
 
 	# Only show CAST for the local player's character
-	var is_local = is_multiplayer_authority() if has_node("InputSynchronizer") else true
+	var is_local = %InputSynchronizer.is_multiplayer_authority() if has_node("InputSynchronizer") else true
 	
 	if is_local and is_rod_equipped and is_at_pond:
 		cast_lure_button.show()
@@ -338,7 +342,10 @@ func _on_cast_pressed() -> void:
 		target_land_pos = global_position.lerp(pond_center.global_position, 0.55)
 	else:
 		target_land_pos = global_position + Vector2(0, 150)
-
+	
+	# Register lure on server dictionary for future joiners
+	MultiplayerManager.rpc("register_active_lure", global_position, target_land_pos, equipped_rod_color)
+	
 	# Send RPC to broadcast the lure cast across all clients in the lobby
 	rpc("broadcast_lure_cast", global_position, target_land_pos, equipped_rod_color)
 
@@ -383,3 +390,19 @@ func perform_lure_cast_visual(start_pos: Vector2, end_pos: Vector2, color: Color
 		if is_instance_valid(lure_instance) and lure_instance.has_method("on_land_in_water"):
 			lure_instance.on_land_in_water()
 	)
+
+# Spawns lure directly floating in water for late joiners (skips flight arc)
+func spawn_static_lure_for_joiner(end_pos: Vector2, color: Color) -> void:
+	if is_instance_valid(active_lure):
+		active_lure.queue_free()
+		
+	var lure_instance = lure_scene.instantiate()
+	get_parent().add_child(lure_instance)
+	lure_instance.global_position = end_pos
+	active_lure = lure_instance
+	
+	if lure_instance.has_method("setup_lure"):
+		lure_instance.setup_lure(color)
+		
+	if lure_instance.has_method("on_land_in_water"):
+		lure_instance.on_land_in_water()

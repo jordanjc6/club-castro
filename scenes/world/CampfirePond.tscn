@@ -228,6 +228,7 @@ position = Vector2(-1408, 226.5)
 shape = SubResource("RectangleShape2D_00mmp")
 
 [node name="Prompt" type="PanelContainer" parent="Fishing" unique_id=955626076]
+z_index = 10
 anchors_preset = -1
 anchor_left = 0.07300001
 anchor_top = 0.16100001
@@ -301,6 +302,7 @@ autowrap_mode = 2
 
 [node name="RodSelection" type="PanelContainer" parent="Fishing" unique_id=1390511809]
 visible = false
+z_index = 10
 anchors_preset = -1
 anchor_left = 0.07300001
 anchor_top = 0.16100001

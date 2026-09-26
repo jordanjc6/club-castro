@@ -123,6 +123,9 @@ const ROD_COLORS: Dictionary = {
 # Map of peer_id -> FishingRod (enum)
 var player_rods: Dictionary = {}
 
+# Stores peer_id -> Dictionary { "start_pos": Vector2, "end_pos": Vector2, "color": Color }
+var active_lures: Dictionary = {}
+
 #################################
 
 func _ready():
@@ -671,10 +674,14 @@ func _add_player_to_game(id: int, position: Vector2 = Vector2.INF, offset: Vecto
 	if multiplayer.is_server():
 		assign_unique_name_for_peer(id)
 		
-		# Sync all existing players' chosen rods to the newly connected joiner
+		# Sync all existing players' chosen rods and active lures to the newly connected joiner
 		print("sync rods to new player")
 		for peer_id in player_rods:
 			rpc_id(id, "sync_player_rod", peer_id, player_rods[peer_id])
+		
+		for peer_id in active_lures:
+			var lure_data = active_lures[peer_id]
+			rpc_id(id, "sync_existing_lure_to_joiner", peer_id, lure_data.start_pos, lure_data.end_pos, lure_data.color)
 	
 	var player_to_add = multiplayer_scene.instantiate()
 	player_to_add.player_id = id
@@ -716,6 +723,7 @@ func _delete_player(id: int):
 		unregister_tag_player(id)
 	
 	player_rods.erase(id)
+	active_lures.erase(id)
 	
 	# Free up the player's assigned name
 	if multiplayer.is_server():
@@ -762,6 +770,9 @@ func _remove_single_player():
 	var player_to_remove = world_scene.get_node_or_null("SinglePlayer")
 	
 	if player_to_remove:
+		if player_to_remove.has_method("cleanup_singleplayer_fishing_state"):
+			player_to_remove.cleanup_singleplayer_fishing_state()
+		
 		var player_position = player_to_remove.global_position
 		var x = player_position.x
 		var y = player_position.y
@@ -1449,3 +1460,42 @@ func sync_player_unequip_rod(peer_id: int) -> void:
 		var player_node = players_node.get_node_or_null(str(peer_id))
 		if is_instance_valid(player_node) and player_node.has_method("unequip_rod_visual"):
 			player_node.unequip_rod_visual()
+
+# Triggered by player when casting
+@rpc("any_peer", "call_local", "reliable")
+func register_active_lure(start_pos: Vector2, end_pos: Vector2, color: Color) -> void:
+	var sender_id = multiplayer.get_remote_sender_id()
+	if sender_id == 0:
+		sender_id = multiplayer.get_unique_id()
+		
+	if multiplayer.is_server():
+		active_lures[sender_id] = {
+			"start_pos": start_pos,
+			"end_pos": end_pos,
+			"color": color
+		}
+
+# Triggered when unequipped or re-cast
+@rpc("any_peer", "call_local", "reliable")
+func unregister_active_lure(peer_id: int = 0) -> void:
+	var sender_id = multiplayer.get_remote_sender_id()
+	if sender_id == 0:
+		sender_id = multiplayer.get_unique_id()
+	var target_id = peer_id if peer_id != 0 else sender_id
+	
+	if multiplayer.is_server():
+		active_lures.erase(target_id)
+
+# Target RPC sent strictly to new joiner
+@rpc("authority", "call_local", "reliable")
+func sync_existing_lure_to_joiner(peer_id: int, start_pos: Vector2, end_pos: Vector2, color: Color) -> void:
+	var world_scene = get_tree().get_current_scene()
+	if not world_scene:
+		return
+		
+	var players_node = world_scene.get_node_or_null("Players")
+	if is_instance_valid(players_node):
+		var player_node = players_node.get_node_or_null(str(peer_id))
+		# Tell the joiner's local instance of that monkey to draw the lure floating directly in the water
+		if is_instance_valid(player_node) and player_node.has_method("spawn_static_lure_for_joiner"):
+			player_node.spawn_static_lure_for_joiner(end_pos, color)

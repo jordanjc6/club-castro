@@ -213,7 +213,7 @@ func _update_cast_button() -> void:
 		return
 
 	# Only show CAST for the local player's character
-	var is_local = is_multiplayer_authority() if has_node("InputSynchronizer") else true
+	var is_local = %InputSynchronizer.is_multiplayer_authority() if has_node("InputSynchronizer") else true
 	
 	if is_local and is_rod_equipped and is_at_pond:
 		cast_lure_button.show()
@@ -270,3 +270,18 @@ func perform_lure_cast_visual(start_pos: Vector2, end_pos: Vector2, color: Color
 		if is_instance_valid(lure_instance) and lure_instance.has_method("on_land_in_water"):
 			lure_instance.on_land_in_water()
 	)
+
+func cleanup_singleplayer_fishing_state() -> void:
+	# 1. Remove active lure floating in water
+	if is_instance_valid(active_lure):
+		active_lure.queue_free()
+		active_lure = null
+		
+	# 2. Unequip rod and hide rod sprite
+	is_rod_equipped = false
+	if is_instance_valid(rod_sprite):
+		rod_sprite.hide()
+		
+	# 3. Hide cast button
+	if is_instance_valid(cast_lure_button):
+		cast_lure_button.hide()
