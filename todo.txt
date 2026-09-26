@@ -1,6 +1,6 @@
 Updates
 
 0 fishing
-- implement fishing waiting, odds, and catching
+- add different fish to catch, display caught fish above player head for all in lobby
 
 0 jina's blue bow

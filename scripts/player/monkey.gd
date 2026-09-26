@@ -27,6 +27,12 @@ var is_at_pond: bool = false
 var lure_scene = preload("res://scenes/minigames/FishingLure.tscn") # Adjust path to your Lure scene
 var equipped_rod_color: Color = Color.WHITE
 var active_lure: Node2D = null
+var cycle_timer: SceneTreeTimer = null
+var miss_timer: SceneTreeTimer = null
+var is_fish_on_line: bool = false
+var bite_time_stamp: float = 0.0
+
+const CYCLE_DURATION: float = 15.0 # Fixed 15-second cycle limit
 
 #############################
 
@@ -60,6 +66,25 @@ func _ready() -> void:
 		## Absorb click so nothing else sees it
 		#get_viewport().set_input_as_handled()
 
+#func _input(event: InputEvent) -> void:
+	#if not is_instance_valid(active_lure):
+		#return
+#
+	#if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) \
+	#or (event is InputEventScreenTouch and event.pressed):
+		#
+		## 1. Store reference to the lure being reeled in and clear active_lure 
+		## so subsequent clicks immediately pass through naturally
+		#var lure_to_reel = active_lure
+		#active_lure = null
+		#_update_cast_button()
+		#
+		## 2. Consume the input click immediately
+		#get_viewport().set_input_as_handled()
+		#
+		## 3. Animate the lure returning to the monkey
+		#animate_reel_in(lure_to_reel)
+
 func _input(event: InputEvent) -> void:
 	if not is_instance_valid(active_lure):
 		return
@@ -67,18 +92,24 @@ func _input(event: InputEvent) -> void:
 	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) \
 	or (event is InputEventScreenTouch and event.pressed):
 		
-		# 1. Store reference to the lure being reeled in and clear active_lure 
-		# so subsequent clicks immediately pass through naturally
+		var current_time = Time.get_ticks_msec() / 1000.0
+		var reaction_time = current_time - bite_time_stamp
+		
+		# Reaction must be within 1.0 second of fish appearing
+		var world_scene = get_tree().get_current_scene()
+		var game_manager = world_scene.get_node_or_null("GameManager")
+		if is_fish_on_line and reaction_time <= 1.0:
+			game_manager.show_temp_notif("You caught a fish!!")
+		#else:
+			#game_manager.show_temp_notif("Escaped / Missed!")
+
+		is_fish_on_line = false
 		var lure_to_reel = active_lure
 		active_lure = null
 		_update_cast_button()
 		
-		# 2. Consume the input click immediately
 		get_viewport().set_input_as_handled()
-		
-		# 3. Animate the lure returning to the monkey
 		animate_reel_in(lure_to_reel)
-
 
 func animate_reel_in(lure_node: Node2D) -> void:
 	if not is_instance_valid(lure_node):
@@ -331,6 +362,7 @@ func perform_lure_cast_visual(start_pos: Vector2, end_pos: Vector2, color: Color
 	y_tween.tween_callback(func():
 		if is_instance_valid(lure_instance) and lure_instance.has_method("on_land_in_water"):
 			lure_instance.on_land_in_water()
+			start_fishing_loop()
 	)
 
 func cleanup_singleplayer_fishing_state() -> void:
@@ -347,3 +379,60 @@ func cleanup_singleplayer_fishing_state() -> void:
 	# 3. Hide cast button
 	if is_instance_valid(cast_lure_button):
 		cast_lure_button.hide()
+
+# Call start_fishing_loop() inside perform_lure_cast_visual after on_land_in_water()
+func start_fishing_loop() -> void:
+	if not is_instance_valid(active_lure):
+		return
+
+	is_fish_on_line = false
+	var has_bite = randf() <= 0.75 # Exactly one 75% roll per 15s period
+
+	if has_bite:
+		# Choose a single bite timestamp between 2.0s and 15.0s
+		var bite_delay = randf_range(2.0, CYCLE_DURATION)
+		
+		cycle_timer = get_tree().create_timer(bite_delay)
+		cycle_timer.timeout.connect(func():
+			if is_instance_valid(active_lure):
+				trigger_fish_hooked(bite_delay)
+		)
+	else:
+		# 25% chance no bite occurs: wait out the full 15s period then start next cycle
+		cycle_timer = get_tree().create_timer(CYCLE_DURATION)
+		cycle_timer.timeout.connect(func():
+			if is_instance_valid(active_lure):
+				start_fishing_loop()
+		)
+
+func trigger_fish_hooked(bite_delay: float) -> void:
+	is_fish_on_line = true
+	bite_time_stamp = Time.get_ticks_msec() / 1000.0
+	spawn_exclamation_popup()
+
+	# 1-second reaction window
+	miss_timer = get_tree().create_timer(1.0)
+	miss_timer.timeout.connect(func():
+		if is_instance_valid(active_lure) and is_fish_on_line:
+			is_fish_on_line = false
+			
+			# Lock out remaining seconds of this 15s period before allowing next cycle
+			var remaining_time = max(0.1, CYCLE_DURATION - bite_delay)
+			get_tree().create_timer(remaining_time).timeout.connect(func():
+				if is_instance_valid(active_lure):
+					start_fishing_loop()
+			)
+	)
+
+func spawn_exclamation_popup() -> void:
+	var popup = Label.new()
+	popup.text = "!!"
+	popup.add_theme_font_size_override("font_size", 28)
+	popup.add_theme_color_override("font_color", Color.YELLOW)
+	popup.position = Vector2(-10, -50)
+	add_child(popup)
+	
+	var tween = create_tween().set_parallel(true)
+	tween.tween_property(popup, "position:y", -80.0, 0.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(popup, "modulate:a", 0.0, 1.2).set_delay(0.4)
+	tween.finished.connect(func(): popup.queue_free())

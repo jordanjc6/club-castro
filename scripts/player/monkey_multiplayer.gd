@@ -41,6 +41,12 @@ var is_at_pond: bool = false
 var lure_scene = preload("res://scenes/minigames/FishingLure.tscn") # Adjust path if needed
 var equipped_rod_color: Color = Color.WHITE
 var active_lure: Node2D = null
+var cycle_timer: SceneTreeTimer = null
+var miss_timer: SceneTreeTimer = null
+var is_fish_on_line: bool = false
+var bite_time_stamp: float = 0.0
+
+const CYCLE_DURATION: float = 15.0
 
 #############################
 
@@ -81,6 +87,12 @@ func _ready() -> void:
 	else:
 		camera.enabled = false
 
+func _exit_tree() -> void:
+	# Ensures floating lure visuals are freed when this player disconnects/despawns
+	if is_instance_valid(active_lure):
+		active_lure.queue_free()
+		active_lure = null
+
 #func _input(event: InputEvent) -> void:
 	## Only intercept for the local player character instance if a lure is active
 	#var input_sync = get_node_or_null("InputSynchronizer")
@@ -99,6 +111,25 @@ func _ready() -> void:
 		## Absorb click everywhere on screen
 		#get_viewport().set_input_as_handled()
 
+#func _input(event: InputEvent) -> void:
+	#var input_sync = get_node_or_null("InputSynchronizer")
+	#var is_local = input_sync.is_multiplayer_authority() if is_instance_valid(input_sync) else is_multiplayer_authority()
+	#
+	#if not is_local or not is_instance_valid(active_lure):
+		#return
+#
+	#if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) \
+	#or (event is InputEventScreenTouch and event.pressed):
+		#
+		## 1. Unregister active lure from server immediately
+		#MultiplayerManager.rpc("unregister_active_lure")
+		#
+		## 2. Broadcast reel-in animation to all players in the lobby
+		#rpc("broadcast_remove_lure")
+		#
+		## 3. Absorb click so UI/movement isn't triggered
+		#get_viewport().set_input_as_handled()
+
 func _input(event: InputEvent) -> void:
 	var input_sync = get_node_or_null("InputSynchronizer")
 	var is_local = input_sync.is_multiplayer_authority() if is_instance_valid(input_sync) else is_multiplayer_authority()
@@ -109,13 +140,20 @@ func _input(event: InputEvent) -> void:
 	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) \
 	or (event is InputEventScreenTouch and event.pressed):
 		
-		# 1. Unregister active lure from server immediately
-		MultiplayerManager.rpc("unregister_active_lure")
+		var current_time = Time.get_ticks_msec() / 1000.0
+		var reaction_time = current_time - bite_time_stamp
 		
-		# 2. Broadcast reel-in animation to all players in the lobby
+		var world_scene = get_tree().get_current_scene()
+		var game_manager = world_scene.get_node_or_null("GameManager")
+		if is_fish_on_line and reaction_time <= 1.0:
+			game_manager.show_temp_notif("You caught a fish!!")
+		#else:
+			#show_temp_notification("Escaped / Missed!")
+
+		is_fish_on_line = false
+		MultiplayerManager.rpc("unregister_active_lure")
 		rpc("broadcast_remove_lure")
 		
-		# 3. Absorb click so UI/movement isn't triggered
 		get_viewport().set_input_as_handled()
 
 func _on_player_names_updated(_names: Dictionary) -> void:
@@ -428,6 +466,9 @@ func perform_lure_cast_visual(start_pos: Vector2, end_pos: Vector2, color: Color
 	y_tween.tween_callback(func():
 		if is_instance_valid(lure_instance) and lure_instance.has_method("on_land_in_water"):
 			lure_instance.on_land_in_water()
+			var input_sync = get_node_or_null("InputSynchronizer")
+			var is_local = input_sync.is_multiplayer_authority() if is_instance_valid(input_sync) else is_multiplayer_authority()
+			if is_local: start_fishing_loop()
 	)
 
 # Spawns lure directly floating in water for late joiners (skips flight arc)
@@ -481,3 +522,59 @@ func broadcast_remove_lure() -> void:
 		if is_instance_valid(lure_to_reel):
 			lure_to_reel.queue_free()
 	)
+
+func start_fishing_loop() -> void:
+	if not is_instance_valid(active_lure):
+		return
+
+	is_fish_on_line = false
+	var has_bite = randf() <= 0.75
+
+	if has_bite:
+		var bite_delay = randf_range(2.0, CYCLE_DURATION)
+		cycle_timer = get_tree().create_timer(bite_delay)
+		cycle_timer.timeout.connect(func():
+			if is_instance_valid(active_lure):
+				# Broadcast bite event to all peers in lobby
+				rpc("broadcast_fish_hooked", bite_delay)
+		)
+	else:
+		cycle_timer = get_tree().create_timer(CYCLE_DURATION)
+		cycle_timer.timeout.connect(func():
+			if is_instance_valid(active_lure):
+				start_fishing_loop()
+		)
+
+@rpc("any_peer", "call_local", "reliable")
+func broadcast_fish_hooked(bite_delay: float) -> void:
+	is_fish_on_line = true
+	bite_time_stamp = Time.get_ticks_msec() / 1000.0
+	spawn_exclamation_popup()
+
+	var input_sync = get_node_or_null("InputSynchronizer")
+	var is_local = input_sync.is_multiplayer_authority() if is_instance_valid(input_sync) else is_multiplayer_authority()
+	
+	if is_local:
+		miss_timer = get_tree().create_timer(1.0)
+		miss_timer.timeout.connect(func():
+			if is_instance_valid(active_lure) and is_fish_on_line:
+				is_fish_on_line = false
+				var remaining_time = max(0.1, CYCLE_DURATION - bite_delay)
+				get_tree().create_timer(remaining_time).timeout.connect(func():
+					if is_instance_valid(active_lure):
+						start_fishing_loop()
+				)
+		)
+
+func spawn_exclamation_popup() -> void:
+	var popup = Label.new()
+	popup.text = "!!"
+	popup.add_theme_font_size_override("font_size", 28)
+	popup.add_theme_color_override("font_color", Color.YELLOW)
+	popup.position = Vector2(-10, -50)
+	add_child(popup)
+	
+	var tween = create_tween().set_parallel(true)
+	tween.tween_property(popup, "position:y", -80.0, 0.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(popup, "modulate:a", 0.0, 1.2).set_delay(0.4)
+	tween.finished.connect(func(): popup.queue_free())
