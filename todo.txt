@@ -1,6 +1,7 @@
 Updates
 
 0 fishing
-- add different fish to catch, display caught fish above player head for all in lobby
+- hide cast btn until caught fish done being shown for singleplayer
+- add different fish to catch
 
 0 jina's blue bow

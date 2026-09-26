@@ -120,6 +120,15 @@ const ROD_COLORS: Dictionary = {
 	FishingRod.VIOLET: Color("9f00ff")
 }
 
+const FISH_SIZES = {
+	"S": { "weight": 50, "folder": "small" },
+	"M": { "weight": 35, "folder": "medium" },
+	"B": { "weight": 15, "folder": "big" } # Change "big" to "large" if your folder is named large
+}
+const FISH_DATABASE = {
+	"Bluefish": { "weight": 100 }
+}
+
 # Map of peer_id -> FishingRod (enum)
 var player_rods: Dictionary = {}
 
@@ -1499,3 +1508,19 @@ func sync_existing_lure_to_joiner(peer_id: int, start_pos: Vector2, end_pos: Vec
 		# Tell the joiner's local instance of that monkey to draw the lure floating directly in the water
 		if is_instance_valid(player_node) and player_node.has_method("spawn_static_lure_for_joiner"):
 			player_node.spawn_static_lure_for_joiner(end_pos, color)
+
+# Weighted selection logic
+static func get_random_weighted_item(weights_dict: Dictionary) -> String:
+	var total_weight: float = 0.0
+	for key in weights_dict:
+		total_weight += weights_dict[key]["weight"]
+
+	var random_roll = randf() * total_weight
+	var current_sum: float = 0.0
+
+	for key in weights_dict:
+		current_sum += weights_dict[key]["weight"]
+		if random_roll <= current_sum:
+			return key
+
+	return weights_dict.keys()[0]

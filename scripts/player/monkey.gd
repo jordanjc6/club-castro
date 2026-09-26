@@ -99,7 +99,14 @@ func _input(event: InputEvent) -> void:
 		var world_scene = get_tree().get_current_scene()
 		var game_manager = world_scene.get_node_or_null("GameManager")
 		if is_fish_on_line and reaction_time <= 1.0:
-			game_manager.show_temp_notif("You caught a fish!!")
+			var caught_fish = MultiplayerManager.get_random_weighted_item(MultiplayerManager.FISH_DATABASE)
+			var caught_size = MultiplayerManager.get_random_weighted_item(MultiplayerManager.FISH_SIZES)
+			
+			var size_word = MultiplayerManager.FISH_SIZES[caught_size]["folder"]
+			var notif_message = "You caught a %s %s!" % [size_word, caught_fish]
+			
+			game_manager.show_temp_notif(notif_message, 3.5)
+			show_caught_fish_display(caught_fish, caught_size)
 		#else:
 			#game_manager.show_temp_notif("Escaped / Missed!")
 
@@ -427,12 +434,39 @@ func trigger_fish_hooked(bite_delay: float) -> void:
 func spawn_exclamation_popup() -> void:
 	var popup = Label.new()
 	popup.text = "!!"
-	popup.add_theme_font_size_override("font_size", 28)
+	popup.add_theme_font_size_override("font_size", 32)
 	popup.add_theme_color_override("font_color", Color.YELLOW)
 	popup.position = Vector2(-10, -50)
 	add_child(popup)
 	
 	var tween = create_tween().set_parallel(true)
-	tween.tween_property(popup, "position:y", -80.0, 0.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tween.tween_property(popup, "modulate:a", 0.0, 1.2).set_delay(0.4)
+	tween.tween_property(popup, "position:y", -80.0, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(popup, "modulate:a", 0.0, 0.9).set_delay(0.3)
 	tween.finished.connect(func(): popup.queue_free())
+
+func show_caught_fish_display(fish_code: String, size_code: String) -> void:
+	# Get folder name from FISH_SIZES dictionary
+	var folder_name = MultiplayerManager.FISH_SIZES[size_code]["folder"]
+	
+	# Dynamically resolves to: res://assets/icons/fishes/small/blueS.png
+	var texture_path = "res://assets/icons/fishes/%s/%s%s.png" % [folder_name, fish_code, size_code]
+	
+	if not ResourceLoader.exists(texture_path):
+		print("Error: Missing fish texture at path: ", texture_path)
+		return
+
+	var fish_sprite = Sprite2D.new()
+	fish_sprite.texture = load(texture_path)
+	fish_sprite.position = Vector2(0, -60)
+	add_child(fish_sprite)
+
+	var tween = create_tween().set_parallel(true)
+	tween.tween_property(fish_sprite, "position:y", -100.0, 0.5)\
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		
+	tween.tween_property(fish_sprite, "modulate:a", 0.0, 0.5).set_delay(3)
+
+	tween.finished.connect(func():
+		if is_instance_valid(fish_sprite):
+			fish_sprite.queue_free()
+	)
