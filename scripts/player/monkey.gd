@@ -82,9 +82,9 @@ func _input(event: InputEvent) -> void:
 func animate_reel_in(lure_node: Node2D) -> void:
 	if not is_instance_valid(lure_node):
 		return
-		
-	# Kill existing bobbing tweens if active on the lure
-	var existing_tween = lure_node.get_tree().create_tween()
+	
+	if lure_node.has_method("kill_tweens"):
+		lure_node.kill_tweens()
 	
 	# Tween lure position back to player global position over 0.3 seconds
 	var reel_tween = create_tween().set_parallel(true)
@@ -95,7 +95,12 @@ func animate_reel_in(lure_node: Node2D) -> void:
 	reel_tween.tween_property(lure_node, "scale", Vector2(0.3, 0.3), 0.35)
 	
 	# Free lure when reel animation completes
-	reel_tween.chain().tween_callback(func():
+	#reel_tween.chain().tween_callback(func():
+		#if is_instance_valid(lure_node):
+			#lure_node.queue_free()
+	#)
+	# Clean up lure safely when tween finishes
+	reel_tween.finished.connect(func():
 		if is_instance_valid(lure_node):
 			lure_node.queue_free()
 	)

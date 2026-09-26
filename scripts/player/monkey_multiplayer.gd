@@ -458,13 +458,21 @@ func broadcast_remove_lure() -> void:
 	var lure_to_reel = active_lure
 	active_lure = null
 	
+	if lure_to_reel.has_method("kill_tweens"):
+		lure_to_reel.kill_tweens()
+	
 	# Animate lure travelling back to this player node on every client's screen
 	var reel_tween = create_tween().set_parallel(true)
 	reel_tween.tween_property(lure_to_reel, "global_position", global_position, 0.35)\
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	reel_tween.tween_property(lure_to_reel, "scale", Vector2(0.3, 0.3), 0.35)
 	
-	reel_tween.chain().tween_callback(func():
+	#reel_tween.chain().tween_callback(func():
+		#if is_instance_valid(lure_to_reel):
+			#lure_to_reel.queue_free()
+	#)
+	# Clean up lure safely when tween finishes
+	reel_tween.finished.connect(func():
 		if is_instance_valid(lure_to_reel):
 			lure_to_reel.queue_free()
 	)
