@@ -1,7 +1,7 @@
 Updates
 
 0 fishing
-- delete local player's lure on click anywhere on screen (should absorb this one click)
+- on click anywhere after cast lure, reel in lure animation
 - implement fishing waiting, odds, and catching
 
 0 jina's blue bow

@@ -44,6 +44,21 @@ func _ready() -> void:
 	camera.top_level = true
 	target_position = global_position
 
+func _input(event: InputEvent) -> void:
+	# Check if an active lure exists
+	if not is_instance_valid(active_lure):
+		return
+
+	# Intercept Left Mouse Click or Touch anywhere on screen
+	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) \
+	or (event is InputEventScreenTouch and event.pressed):
+
+		# Clean up singleplayer lure
+		active_lure.queue_free()
+		active_lure = null
+		
+		# Absorb click so nothing else sees it
+		get_viewport().set_input_as_handled()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if is_movement_disabled:

@@ -81,6 +81,23 @@ func _ready() -> void:
 	else:
 		camera.enabled = false
 
+func _input(event: InputEvent) -> void:
+	# Only intercept for the local player character instance if a lure is active
+	var input_sync = get_node_or_null("InputSynchronizer")
+	var is_local = input_sync.is_multiplayer_authority() if is_instance_valid(input_sync) else is_multiplayer_authority()
+	
+	if not is_local or not is_instance_valid(active_lure):
+		return
+
+	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) \
+	or (event is InputEventScreenTouch and event.pressed):
+
+		# Sync removal across lobby
+		rpc("broadcast_remove_lure")
+		MultiplayerManager.rpc("unregister_active_lure")
+		
+		# Absorb click everywhere on screen
+		get_viewport().set_input_as_handled()
 
 func _on_player_names_updated(_names: Dictionary) -> void:
 	_update_name_label()
@@ -406,3 +423,9 @@ func spawn_static_lure_for_joiner(end_pos: Vector2, color: Color) -> void:
 		
 	if lure_instance.has_method("on_land_in_water"):
 		lure_instance.on_land_in_water()
+
+@rpc("any_peer", "call_local", "reliable")
+func broadcast_remove_lure() -> void:
+	if is_instance_valid(active_lure):
+		active_lure.queue_free()
+		active_lure = null
