@@ -1,7 +1,6 @@
 Updates
 
 0 fishing
-- hide cast lure on click, re-display after reel in
 - implement fishing waiting, odds, and catching
 
 0 jina's blue bow

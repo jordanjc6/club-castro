@@ -362,7 +362,7 @@ func _update_cast_button() -> void:
 	# Only show CAST for the local player's character
 	var is_local = %InputSynchronizer.is_multiplayer_authority() if has_node("InputSynchronizer") else true
 	
-	if is_local and is_rod_equipped and is_at_pond:
+	if is_local and is_rod_equipped and is_at_pond and active_lure == null:
 		cast_lure_button.show()
 	else:
 		cast_lure_button.hide()
@@ -384,6 +384,8 @@ func _on_cast_pressed() -> void:
 	
 	# Send RPC to broadcast the lure cast across all clients in the lobby
 	rpc("broadcast_lure_cast", global_position, target_land_pos, equipped_rod_color)
+	
+	_update_cast_button()
 
 @rpc("any_peer", "call_local", "reliable")
 func broadcast_lure_cast(start_pos: Vector2, end_pos: Vector2, color: Color) -> void:
@@ -398,6 +400,7 @@ func perform_lure_cast_visual(start_pos: Vector2, end_pos: Vector2, color: Color
 	get_parent().add_child(lure_instance)
 	lure_instance.global_position = start_pos
 	active_lure = lure_instance # Track active lure reference locally on every client
+	_update_cast_button()
 	
 	if lure_instance.has_method("setup_lure"):
 		lure_instance.setup_lure(color)
@@ -436,6 +439,7 @@ func spawn_static_lure_for_joiner(end_pos: Vector2, color: Color) -> void:
 	get_parent().add_child(lure_instance)
 	lure_instance.global_position = end_pos
 	active_lure = lure_instance
+	_update_cast_button()
 	
 	if lure_instance.has_method("setup_lure"):
 		lure_instance.setup_lure(color)
@@ -457,6 +461,7 @@ func broadcast_remove_lure() -> void:
 	# Store reference locally and clear active_lure reference
 	var lure_to_reel = active_lure
 	active_lure = null
+	_update_cast_button()
 	
 	if lure_to_reel.has_method("kill_tweens"):
 		lure_to_reel.kill_tweens()
