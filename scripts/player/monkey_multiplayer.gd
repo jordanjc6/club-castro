@@ -81,8 +81,25 @@ func _ready() -> void:
 	else:
 		camera.enabled = false
 
+#func _input(event: InputEvent) -> void:
+	## Only intercept for the local player character instance if a lure is active
+	#var input_sync = get_node_or_null("InputSynchronizer")
+	#var is_local = input_sync.is_multiplayer_authority() if is_instance_valid(input_sync) else is_multiplayer_authority()
+	#
+	#if not is_local or not is_instance_valid(active_lure):
+		#return
+#
+	#if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) \
+	#or (event is InputEventScreenTouch and event.pressed):
+#
+		## Sync removal across lobby
+		#rpc("broadcast_remove_lure")
+		#MultiplayerManager.rpc("unregister_active_lure")
+		#
+		## Absorb click everywhere on screen
+		#get_viewport().set_input_as_handled()
+
 func _input(event: InputEvent) -> void:
-	# Only intercept for the local player character instance if a lure is active
 	var input_sync = get_node_or_null("InputSynchronizer")
 	var is_local = input_sync.is_multiplayer_authority() if is_instance_valid(input_sync) else is_multiplayer_authority()
 	
@@ -91,12 +108,14 @@ func _input(event: InputEvent) -> void:
 
 	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) \
 	or (event is InputEventScreenTouch and event.pressed):
-
-		# Sync removal across lobby
-		rpc("broadcast_remove_lure")
+		
+		# 1. Unregister active lure from server immediately
 		MultiplayerManager.rpc("unregister_active_lure")
 		
-		# Absorb click everywhere on screen
+		# 2. Broadcast reel-in animation to all players in the lobby
+		rpc("broadcast_remove_lure")
+		
+		# 3. Absorb click so UI/movement isn't triggered
 		get_viewport().set_input_as_handled()
 
 func _on_player_names_updated(_names: Dictionary) -> void:
@@ -424,8 +443,28 @@ func spawn_static_lure_for_joiner(end_pos: Vector2, color: Color) -> void:
 	if lure_instance.has_method("on_land_in_water"):
 		lure_instance.on_land_in_water()
 
+#@rpc("any_peer", "call_local", "reliable")
+#func broadcast_remove_lure() -> void:
+	#if is_instance_valid(active_lure):
+		#active_lure.queue_free()
+		#active_lure = null
+
 @rpc("any_peer", "call_local", "reliable")
 func broadcast_remove_lure() -> void:
-	if is_instance_valid(active_lure):
-		active_lure.queue_free()
-		active_lure = null
+	if not is_instance_valid(active_lure):
+		return
+		
+	# Store reference locally and clear active_lure reference
+	var lure_to_reel = active_lure
+	active_lure = null
+	
+	# Animate lure travelling back to this player node on every client's screen
+	var reel_tween = create_tween().set_parallel(true)
+	reel_tween.tween_property(lure_to_reel, "global_position", global_position, 0.35)\
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	reel_tween.tween_property(lure_to_reel, "scale", Vector2(0.3, 0.3), 0.35)
+	
+	reel_tween.chain().tween_callback(func():
+		if is_instance_valid(lure_to_reel):
+			lure_to_reel.queue_free()
+	)

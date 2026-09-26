@@ -44,21 +44,61 @@ func _ready() -> void:
 	camera.top_level = true
 	target_position = global_position
 
+#func _input(event: InputEvent) -> void:
+	## Check if an active lure exists
+	#if not is_instance_valid(active_lure):
+		#return
+#
+	## Intercept Left Mouse Click or Touch anywhere on screen
+	#if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) \
+	#or (event is InputEventScreenTouch and event.pressed):
+#
+		## Clean up singleplayer lure
+		#active_lure.queue_free()
+		#active_lure = null
+		#
+		## Absorb click so nothing else sees it
+		#get_viewport().set_input_as_handled()
+
 func _input(event: InputEvent) -> void:
-	# Check if an active lure exists
 	if not is_instance_valid(active_lure):
 		return
 
-	# Intercept Left Mouse Click or Touch anywhere on screen
 	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) \
 	or (event is InputEventScreenTouch and event.pressed):
-
-		# Clean up singleplayer lure
-		active_lure.queue_free()
+		
+		# 1. Store reference to the lure being reeled in and clear active_lure 
+		# so subsequent clicks immediately pass through naturally
+		var lure_to_reel = active_lure
 		active_lure = null
 		
-		# Absorb click so nothing else sees it
+		# 2. Consume the input click immediately
 		get_viewport().set_input_as_handled()
+		
+		# 3. Animate the lure returning to the monkey
+		animate_reel_in(lure_to_reel)
+
+
+func animate_reel_in(lure_node: Node2D) -> void:
+	if not is_instance_valid(lure_node):
+		return
+		
+	# Kill existing bobbing tweens if active on the lure
+	var existing_tween = lure_node.get_tree().create_tween()
+	
+	# Tween lure position back to player global position over 0.3 seconds
+	var reel_tween = create_tween().set_parallel(true)
+	reel_tween.tween_property(lure_node, "global_position", global_position, 0.35)\
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	
+	# Optional: scale down slightly as it approaches player
+	reel_tween.tween_property(lure_node, "scale", Vector2(0.3, 0.3), 0.35)
+	
+	# Free lure when reel animation completes
+	reel_tween.chain().tween_callback(func():
+		if is_instance_valid(lure_node):
+			lure_node.queue_free()
+	)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if is_movement_disabled:
