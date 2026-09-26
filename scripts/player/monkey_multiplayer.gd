@@ -505,33 +505,60 @@ func spawn_static_lure_for_joiner(end_pos: Vector2, color: Color) -> void:
 		#active_lure.queue_free()
 		#active_lure = null
 
+#@rpc("any_peer", "call_local", "reliable")
+#func broadcast_remove_lure() -> void:
+	#if not is_instance_valid(active_lure):
+		#return
+		#
+	## Store reference locally and clear active_lure reference
+	#var lure_to_reel = active_lure
+	#active_lure = null
+	##_update_cast_button()
+	#
+	#if lure_to_reel.has_method("kill_tweens"):
+		#lure_to_reel.kill_tweens()
+	#
+	## Animate lure travelling back to this player node on every client's screen
+	#var reel_tween = create_tween().set_parallel(true)
+	#reel_tween.tween_property(lure_to_reel, "global_position", global_position, 0.35)\
+		#.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	#reel_tween.tween_property(lure_to_reel, "scale", Vector2(0.3, 0.3), 0.35)
+	#
+	##reel_tween.chain().tween_callback(func():
+		##if is_instance_valid(lure_to_reel):
+			##lure_to_reel.queue_free()
+	##)
+	## Clean up lure safely when tween finishes
+	#reel_tween.finished.connect(func():
+		#if is_instance_valid(lure_to_reel):
+			#lure_to_reel.queue_free()
+	#)
+
 @rpc("any_peer", "call_local", "reliable")
 func broadcast_remove_lure() -> void:
 	if not is_instance_valid(active_lure):
 		return
 		
-	# Store reference locally and clear active_lure reference
 	var lure_to_reel = active_lure
 	active_lure = null
-	#_update_cast_button()
-	
+
 	if lure_to_reel.has_method("kill_tweens"):
 		lure_to_reel.kill_tweens()
-	
-	# Animate lure travelling back to this player node on every client's screen
+
 	var reel_tween = create_tween().set_parallel(true)
 	reel_tween.tween_property(lure_to_reel, "global_position", global_position, 0.35)\
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	reel_tween.tween_property(lure_to_reel, "scale", Vector2(0.3, 0.3), 0.35)
-	
-	#reel_tween.chain().tween_callback(func():
-		#if is_instance_valid(lure_to_reel):
-			#lure_to_reel.queue_free()
-	#)
-	# Clean up lure safely when tween finishes
+
 	reel_tween.finished.connect(func():
 		if is_instance_valid(lure_to_reel):
 			lure_to_reel.queue_free()
+
+			# Ensures cast button updates on reel-in, whether caught or missed
+			var input_sync = get_node_or_null("InputSynchronizer")
+			var is_local = input_sync.is_multiplayer_authority() if is_instance_valid(input_sync) else is_multiplayer_authority()
+			if is_local:
+				_update_cast_button()
 	)
 
 func start_fishing_loop() -> void:
@@ -603,6 +630,7 @@ func show_caught_fish_display(fish_code: String, size_code: String) -> void:
 	
 	if not ResourceLoader.exists(texture_path):
 		print("Error: Missing fish texture at path: ", texture_path)
+		_update_cast_button()
 		return
 
 	var fish_sprite = Sprite2D.new()
