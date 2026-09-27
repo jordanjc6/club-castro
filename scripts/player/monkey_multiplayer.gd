@@ -130,6 +130,42 @@ func _exit_tree() -> void:
 		## 3. Absorb click so UI/movement isn't triggered
 		#get_viewport().set_input_as_handled()
 
+#func _input(event: InputEvent) -> void:
+	#var input_sync = get_node_or_null("InputSynchronizer")
+	#var is_local = input_sync.is_multiplayer_authority() if is_instance_valid(input_sync) else is_multiplayer_authority()
+	#
+	#if not is_local or not is_instance_valid(active_lure):
+		#return
+#
+	#if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) \
+	#or (event is InputEventScreenTouch and event.pressed):
+		#var current_time = Time.get_ticks_msec() / 1000.0
+		#var reaction_time = current_time - bite_time_stamp
+		#
+		#var world_scene = get_tree().get_current_scene()
+		#var game_manager = world_scene.get_node_or_null("GameManager")
+		#
+		#var caught_fish: String = ""
+		#var caught_size: String = ""
+		#
+		#if is_fish_on_line and reaction_time <= 1.0:
+			#caught_fish = MultiplayerManager.get_random_weighted_item(MultiplayerManager.FISH_DATABASE)
+			#caught_size = MultiplayerManager.get_random_weighted_item(MultiplayerManager.FISH_SIZES)
+			#
+			#var size_word = MultiplayerManager.FISH_SIZES[caught_size]["folder"]
+			#var notif_message = "You caught a %s %s!" % [size_word, caught_fish]
+			#
+			#if is_instance_valid(game_manager):
+				#game_manager.show_temp_notif(notif_message, 3.5)
+#
+		#is_fish_on_line = false
+		#MultiplayerManager.rpc("unregister_active_lure")
+		#
+		## Pass catch details through RPC to reel-in handler
+		#rpc("broadcast_remove_lure", caught_fish, caught_size)
+		#
+		#get_viewport().set_input_as_handled()
+
 func _input(event: InputEvent) -> void:
 	var input_sync = get_node_or_null("InputSynchronizer")
 	var is_local = input_sync.is_multiplayer_authority() if is_instance_valid(input_sync) else is_multiplayer_authority()
@@ -150,8 +186,12 @@ func _input(event: InputEvent) -> void:
 		
 		if is_fish_on_line and reaction_time <= 1.0:
 			caught_fish = MultiplayerManager.get_random_weighted_item(MultiplayerManager.FISH_DATABASE)
-			caught_size = MultiplayerManager.get_random_weighted_item(MultiplayerManager.FISH_SIZES)
+			var rolled_size = MultiplayerManager.get_random_weighted_item(MultiplayerManager.FISH_SIZES)
 			
+			# Fallback to an existing texture size if the rolled variant is missing
+			caught_size = MultiplayerManager.get_valid_fish_size(caught_fish, rolled_size)
+			
+			# Display notification matching the resolved size
 			var size_word = MultiplayerManager.FISH_SIZES[caught_size]["folder"]
 			var notif_message = "You caught a %s %s!" % [size_word, caught_fish]
 			
@@ -161,7 +201,7 @@ func _input(event: InputEvent) -> void:
 		is_fish_on_line = false
 		MultiplayerManager.rpc("unregister_active_lure")
 		
-		# Pass catch details through RPC to reel-in handler
+		# Pass catch details with resolved size through RPC to reel-in handler
 		rpc("broadcast_remove_lure", caught_fish, caught_size)
 		
 		get_viewport().set_input_as_handled()
@@ -659,8 +699,6 @@ func show_caught_fish_display(fish_code: String, size_code: String) -> void:
 		
 		var input_sync = get_node_or_null("InputSynchronizer")
 		var is_local = input_sync.is_multiplayer_authority() if is_instance_valid(input_sync) else is_multiplayer_authority()
-		
-		# Step 3: Show cast button AFTER fish display disappears
 		if is_local:
 			_update_cast_button()
 	)

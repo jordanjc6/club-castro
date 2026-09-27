@@ -102,8 +102,12 @@ func _input(event: InputEvent) -> void:
 		
 		if is_fish_on_line and reaction_time <= 1.0:
 			caught_fish = MultiplayerManager.get_random_weighted_item(MultiplayerManager.FISH_DATABASE)
-			caught_size = MultiplayerManager.get_random_weighted_item(MultiplayerManager.FISH_SIZES)
+			var rolled_size = MultiplayerManager.get_random_weighted_item(MultiplayerManager.FISH_SIZES)
 			
+			# Fallback to an existing texture size if the rolled variant is missing
+			caught_size = MultiplayerManager.get_valid_fish_size(caught_fish, rolled_size)
+			
+			# Display notification matching the resolved size
 			var size_word = MultiplayerManager.FISH_SIZES[caught_size]["folder"]
 			var notif_message = "You caught a %s %s!" % [size_word, caught_fish]
 			
@@ -116,7 +120,7 @@ func _input(event: InputEvent) -> void:
 		
 		get_viewport().set_input_as_handled()
 		
-		# Pass caught info to reel-in animation sequence
+		# Pass resolved catch info to reel-in animation sequence
 		animate_reel_in(lure_to_reel, caught_fish, caught_size)
 
 func animate_reel_in(lure_node: Node2D, caught_fish: String = "", caught_size: String = "") -> void:
@@ -469,6 +473,5 @@ func show_caught_fish_display(fish_code: String, size_code: String) -> void:
 	tween.finished.connect(func():
 		if is_instance_valid(fish_sprite):
 			fish_sprite.queue_free()
-		# Step 3: Show cast button AFTER fish display disappears
 		_update_cast_button()
 	)

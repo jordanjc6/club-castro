@@ -121,12 +121,33 @@ const ROD_COLORS: Dictionary = {
 }
 
 const FISH_SIZES = {
-	"S": { "weight": 50, "folder": "small" },
-	"M": { "weight": 35, "folder": "medium" },
+	"S": { "weight": 35, "folder": "small" },
+	"M": { "weight": 50, "folder": "medium" },
 	"B": { "weight": 15, "folder": "big" }
 }
-const FISH_DATABASE = {
-	"Bluefish": { "weight": 100 }
+const FISH_DATABASE = {  # 22 entries
+	"Anglerfish": { "weight": 4 },
+	"Bluefish": { "weight": 8 },
+	"Bluestripe": { "weight": 8 },
+	"Bitfish": { "weight": 5 },
+	"Clownfish": { "weight": 5 },
+	"Cod": { "weight": 4 },
+	"Dolphin": { "weight": 3 },
+	"Hammerhead": { "weight": 4 },
+	"Idlefish": { "weight": 4 },
+	"Jellyfish": { "weight": 4 },
+	"Koi": { "weight": 5 },
+	"Pike": { "weight": 5 },
+	"Rayfish": { "weight": 4 },
+	"Salmon": { "weight": 5 },
+	"Shadowfish": { "weight": 4 },
+	"Shark": { "weight": 4 },
+	"Shrimp": { "weight": 8 },
+	"Spikyfish": { "weight": 6 },
+	"Starfish": { "weight": 4 },
+	"Swordfish": { "weight": 4 },
+	"Whale": { "weight": 1 },
+	"Yellowfish": { "weight": 8 },
 }
 
 # Map of peer_id -> FishingRod (enum)
@@ -1524,3 +1545,21 @@ static func get_random_weighted_item(weights_dict: Dictionary) -> String:
 			return key
 
 	return weights_dict.keys()[0]
+
+# Returns a valid size_code ("S", "M", "L") that has an existing sprite file
+static func get_valid_fish_size(fish_code: String, preferred_size: String) -> String:
+	# Priority fallbacks based on preferred size
+	var check_order: Array = []
+	match preferred_size:
+		"B": check_order = ["B", "M", "S"]
+		"M": check_order = ["M", "S", "B"]
+		_:   check_order = ["S", "M", "B"]
+
+	for size_code in check_order:
+		var folder_name = FISH_SIZES[size_code]["folder"]
+		var path = "res://assets/icons/fishes/%s/%s%s.png" % [folder_name, fish_code, size_code]
+		if ResourceLoader.exists(path):
+			return size_code # Found a valid size!
+
+	# If no file exists at all for this fish, return the original rolled size as safety
+	return preferred_size
