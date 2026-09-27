@@ -91,57 +91,59 @@ func _input(event: InputEvent) -> void:
 
 	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) \
 	or (event is InputEventScreenTouch and event.pressed):
-		
 		var current_time = Time.get_ticks_msec() / 1000.0
 		var reaction_time = current_time - bite_time_stamp
 		
-		# Reaction must be within 1.0 second of fish appearing
 		var world_scene = get_tree().get_current_scene()
 		var game_manager = world_scene.get_node_or_null("GameManager")
+		
+		var caught_fish: String = ""
+		var caught_size: String = ""
+		
 		if is_fish_on_line and reaction_time <= 1.0:
-			var caught_fish = MultiplayerManager.get_random_weighted_item(MultiplayerManager.FISH_DATABASE)
-			var caught_size = MultiplayerManager.get_random_weighted_item(MultiplayerManager.FISH_SIZES)
+			caught_fish = MultiplayerManager.get_random_weighted_item(MultiplayerManager.FISH_DATABASE)
+			caught_size = MultiplayerManager.get_random_weighted_item(MultiplayerManager.FISH_SIZES)
 			
 			var size_word = MultiplayerManager.FISH_SIZES[caught_size]["folder"]
 			var notif_message = "You caught a %s %s!" % [size_word, caught_fish]
 			
-			game_manager.show_temp_notif(notif_message, 3.5)
-			show_caught_fish_display(caught_fish, caught_size)
-		#else:
-			#game_manager.show_temp_notif("Escaped / Missed!")
+			if is_instance_valid(game_manager):
+				game_manager.show_temp_notif(notif_message, 3.5)
 
 		is_fish_on_line = false
 		var lure_to_reel = active_lure
 		active_lure = null
-		_update_cast_button()
 		
 		get_viewport().set_input_as_handled()
-		animate_reel_in(lure_to_reel)
+		
+		# Pass caught info to reel-in animation sequence
+		animate_reel_in(lure_to_reel, caught_fish, caught_size)
 
-func animate_reel_in(lure_node: Node2D) -> void:
+func animate_reel_in(lure_node: Node2D, caught_fish: String = "", caught_size: String = "") -> void:
 	if not is_instance_valid(lure_node):
+		if caught_fish != "" and caught_size != "":
+			show_caught_fish_display(caught_fish, caught_size)
+		else:
+			_update_cast_button()
 		return
 	
 	if lure_node.has_method("kill_tweens"):
 		lure_node.kill_tweens()
 	
-	# Tween lure position back to player global position over 0.3 seconds
 	var reel_tween = create_tween().set_parallel(true)
 	reel_tween.tween_property(lure_node, "global_position", global_position, 0.35)\
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	
-	# Optional: scale down slightly as it approaches player
 	reel_tween.tween_property(lure_node, "scale", Vector2(0.3, 0.3), 0.35)
 	
-	# Free lure when reel animation completes
-	#reel_tween.chain().tween_callback(func():
-		#if is_instance_valid(lure_node):
-			#lure_node.queue_free()
-	#)
-	# Clean up lure safely when tween finishes
 	reel_tween.finished.connect(func():
 		if is_instance_valid(lure_node):
 			lure_node.queue_free()
+		
+		# Step 2: Display fish sprite AFTER reel-in completes (or show button if missed)
+		if caught_fish != "" and caught_size != "":
+			show_caught_fish_display(caught_fish, caught_size)
+		else:
+			_update_cast_button()
 	)
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -434,7 +436,7 @@ func trigger_fish_hooked(bite_delay: float) -> void:
 func spawn_exclamation_popup() -> void:
 	var popup = Label.new()
 	popup.text = "!!"
-	popup.add_theme_font_size_override("font_size", 32)
+	popup.add_theme_font_size_override("font_size", 45)
 	popup.add_theme_color_override("font_color", Color.YELLOW)
 	popup.position = Vector2(-10, -50)
 	add_child(popup)
@@ -445,14 +447,12 @@ func spawn_exclamation_popup() -> void:
 	tween.finished.connect(func(): popup.queue_free())
 
 func show_caught_fish_display(fish_code: String, size_code: String) -> void:
-	# Get folder name from FISH_SIZES dictionary
 	var folder_name = MultiplayerManager.FISH_SIZES[size_code]["folder"]
-	
-	# Dynamically resolves to: res://assets/icons/fishes/small/blueS.png
 	var texture_path = "res://assets/icons/fishes/%s/%s%s.png" % [folder_name, fish_code, size_code]
 	
 	if not ResourceLoader.exists(texture_path):
 		print("Error: Missing fish texture at path: ", texture_path)
+		_update_cast_button()
 		return
 
 	var fish_sprite = Sprite2D.new()
@@ -464,9 +464,11 @@ func show_caught_fish_display(fish_code: String, size_code: String) -> void:
 	tween.tween_property(fish_sprite, "position:y", -100.0, 0.5)\
 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		
-	tween.tween_property(fish_sprite, "modulate:a", 0.0, 0.5).set_delay(3)
+	tween.tween_property(fish_sprite, "modulate:a", 0.0, 0.5).set_delay(3.0)
 
 	tween.finished.connect(func():
 		if is_instance_valid(fish_sprite):
 			fish_sprite.queue_free()
+		# Step 3: Show cast button AFTER fish display disappears
+		_update_cast_button()
 	)

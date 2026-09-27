@@ -123,7 +123,7 @@ const ROD_COLORS: Dictionary = {
 const FISH_SIZES = {
 	"S": { "weight": 50, "folder": "small" },
 	"M": { "weight": 35, "folder": "medium" },
-	"B": { "weight": 15, "folder": "big" } # Change "big" to "large" if your folder is named large
+	"B": { "weight": 15, "folder": "big" }
 }
 const FISH_DATABASE = {
 	"Bluefish": { "weight": 100 }

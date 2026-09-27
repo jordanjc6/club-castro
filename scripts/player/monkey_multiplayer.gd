@@ -139,27 +139,30 @@ func _input(event: InputEvent) -> void:
 
 	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) \
 	or (event is InputEventScreenTouch and event.pressed):
-		
 		var current_time = Time.get_ticks_msec() / 1000.0
 		var reaction_time = current_time - bite_time_stamp
 		
 		var world_scene = get_tree().get_current_scene()
 		var game_manager = world_scene.get_node_or_null("GameManager")
+		
+		var caught_fish: String = ""
+		var caught_size: String = ""
+		
 		if is_fish_on_line and reaction_time <= 1.0:
-			var caught_fish = MultiplayerManager.get_random_weighted_item(MultiplayerManager.FISH_DATABASE)
-			var caught_size = MultiplayerManager.get_random_weighted_item(MultiplayerManager.FISH_SIZES)
+			caught_fish = MultiplayerManager.get_random_weighted_item(MultiplayerManager.FISH_DATABASE)
+			caught_size = MultiplayerManager.get_random_weighted_item(MultiplayerManager.FISH_SIZES)
 			
 			var size_word = MultiplayerManager.FISH_SIZES[caught_size]["folder"]
 			var notif_message = "You caught a %s %s!" % [size_word, caught_fish]
 			
-			game_manager.show_temp_notif(notif_message, 3.5)
-			rpc("broadcast_caught_fish", caught_fish, caught_size)
-		#else:
-			#show_temp_notification("Escaped / Missed!")
+			if is_instance_valid(game_manager):
+				game_manager.show_temp_notif(notif_message, 3.5)
 
 		is_fish_on_line = false
 		MultiplayerManager.rpc("unregister_active_lure")
-		rpc("broadcast_remove_lure")
+		
+		# Pass catch details through RPC to reel-in handler
+		rpc("broadcast_remove_lure", caught_fish, caught_size)
 		
 		get_viewport().set_input_as_handled()
 
@@ -535,30 +538,39 @@ func spawn_static_lure_for_joiner(end_pos: Vector2, color: Color) -> void:
 	#)
 
 @rpc("any_peer", "call_local", "reliable")
-func broadcast_remove_lure() -> void:
+func broadcast_remove_lure(caught_fish: String = "", caught_size: String = "") -> void:
 	if not is_instance_valid(active_lure):
+		if caught_fish != "" and caught_size != "":
+			show_caught_fish_display(caught_fish, caught_size)
+		else:
+			var input_sync = get_node_or_null("InputSynchronizer")
+			var is_local = input_sync.is_multiplayer_authority() if is_instance_valid(input_sync) else is_multiplayer_authority()
+			if is_local: _update_cast_button()
 		return
 		
 	var lure_to_reel = active_lure
 	active_lure = null
-
+	
 	if lure_to_reel.has_method("kill_tweens"):
 		lure_to_reel.kill_tweens()
-
+	
 	var reel_tween = create_tween().set_parallel(true)
 	reel_tween.tween_property(lure_to_reel, "global_position", global_position, 0.35)\
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	reel_tween.tween_property(lure_to_reel, "scale", Vector2(0.3, 0.3), 0.35)
-
+	
 	reel_tween.finished.connect(func():
 		if is_instance_valid(lure_to_reel):
 			lure_to_reel.queue_free()
-
-			# Ensures cast button updates on reel-in, whether caught or missed
-			var input_sync = get_node_or_null("InputSynchronizer")
-			var is_local = input_sync.is_multiplayer_authority() if is_instance_valid(input_sync) else is_multiplayer_authority()
-			if is_local:
-				_update_cast_button()
+			
+		var input_sync = get_node_or_null("InputSynchronizer")
+		var is_local = input_sync.is_multiplayer_authority() if is_instance_valid(input_sync) else is_multiplayer_authority()
+		
+		# Step 2: Show fish sprite AFTER reel-in completes across all lobby peers
+		if caught_fish != "" and caught_size != "":
+			show_caught_fish_display(caught_fish, caught_size)
+		elif is_local:
+			_update_cast_button()
 	)
 
 func start_fishing_loop() -> void:
@@ -607,7 +619,7 @@ func broadcast_fish_hooked(bite_delay: float) -> void:
 func spawn_exclamation_popup() -> void:
 	var popup = Label.new()
 	popup.text = "!!"
-	popup.add_theme_font_size_override("font_size", 32)
+	popup.add_theme_font_size_override("font_size", 45)
 	popup.add_theme_color_override("font_color", Color.YELLOW)
 	popup.position = Vector2(-10, -50)
 	add_child(popup)
@@ -622,10 +634,7 @@ func broadcast_caught_fish(fish_code: String, size_code: String) -> void:
 	show_caught_fish_display(fish_code, size_code)
 
 func show_caught_fish_display(fish_code: String, size_code: String) -> void:
-	# Get folder name from FISH_SIZES dictionary
 	var folder_name = MultiplayerManager.FISH_SIZES[size_code]["folder"]
-	
-	# Dynamically resolves to: res://assets/icons/fishes/small/blueS.png
 	var texture_path = "res://assets/icons/fishes/%s/%s%s.png" % [folder_name, fish_code, size_code]
 	
 	if not ResourceLoader.exists(texture_path):
@@ -642,10 +651,16 @@ func show_caught_fish_display(fish_code: String, size_code: String) -> void:
 	tween.tween_property(fish_sprite, "position:y", -100.0, 0.5)\
 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		
-	tween.tween_property(fish_sprite, "modulate:a", 0.0, 0.5).set_delay(3)
+	tween.tween_property(fish_sprite, "modulate:a", 0.0, 0.5).set_delay(3.0)
 
 	tween.finished.connect(func():
 		if is_instance_valid(fish_sprite):
 			fish_sprite.queue_free()
+		
+		var input_sync = get_node_or_null("InputSynchronizer")
+		var is_local = input_sync.is_multiplayer_authority() if is_instance_valid(input_sync) else is_multiplayer_authority()
+		
+		# Step 3: Show cast button AFTER fish display disappears
+		if is_local:
 			_update_cast_button()
 	)

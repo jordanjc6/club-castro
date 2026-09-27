@@ -1,7 +1,6 @@
 Updates
 
 0 fishing
-- hide cast btn until caught fish done being shown for singleplayer
 - add different fish to catch
 
 0 jina's blue bow
