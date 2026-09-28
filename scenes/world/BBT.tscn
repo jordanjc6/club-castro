@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://cjnc5jcd6qw46" path="res://scenes/minigames/TicTacToeMinigame.tscn" id="3_ke0q3"]
 [ext_resource type="PackedScene" uid="uid://blgq5u7jc5i8u" path="res://scenes/minigames/BaristaMinigame.tscn" id="4_nibfx"]
 [ext_resource type="PackedScene" uid="uid://eghfg8h23uwq" path="res://scenes/world/area_barrier.tscn" id="5_r027k"]
+[ext_resource type="Script" uid="uid://dytne3wgisch" path="res://scripts/world/hidden_item.gd" id="7_bdud1"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_083f8"]
 size = Vector2(181, 34.25)
@@ -18,6 +19,29 @@ blend_mode = 1
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_00mmp"]
 blend_mode = 1
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_00mmp"]
+radius = 45.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ke0q3"]
+bg_color = Color(0.7764706, 0.8745098, 0.9647059, 1)
+border_width_left = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_bottom_right = 40
+corner_radius_bottom_left = 40
+
+[sub_resource type="LabelSettings" id="LabelSettings_nibfx"]
+font_size = 48
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yokly"]
+bg_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 35
+corner_radius_top_right = 35
+corner_radius_bottom_right = 35
+corner_radius_bottom_left = 35
 
 [node name="BBT" type="Node2D" unique_id=323713113 node_paths=PackedStringArray("bbt_exit_polygon", "exit_button")]
 script = ExtResource("1_f2y7u")
@@ -239,6 +263,78 @@ position = Vector2(2445, 339)
 
 [node name="AreaBarrier2" parent="TemporaryBarriers" unique_id=17872663 instance=ExtResource("5_r027k")]
 position = Vector2(2530, 96)
+
+[node name="HiddenItem" type="Node2D" parent="." unique_id=852749606]
+script = ExtResource("7_bdud1")
+
+[node name="InteractionArea" type="Area2D" parent="HiddenItem" unique_id=1987190492]
+collision_layer = 4
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HiddenItem/InteractionArea" unique_id=309490165]
+position = Vector2(2649, 523)
+shape = SubResource("CircleShape2D_00mmp")
+
+[node name="Popup" type="CanvasLayer" parent="HiddenItem" unique_id=103610535]
+
+[node name="PanelContainer" type="PanelContainer" parent="HiddenItem/Popup" unique_id=1169773851]
+anchors_preset = -1
+anchor_left = 0.07300001
+anchor_top = 0.16100001
+anchor_right = 0.07300001
+anchor_bottom = 0.16100001
+offset_left = 1725.5599
+offset_top = -117.92001
+offset_right = 2375.56
+offset_bottom = 82.07999
+theme_override_styles/panel = SubResource("StyleBoxFlat_ke0q3")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HiddenItem/Popup/PanelContainer" unique_id=2038085232]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HiddenItem/Popup/PanelContainer/VBoxContainer" unique_id=1217298956]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "You found Jina's Bow!"
+label_settings = SubResource("LabelSettings_nibfx")
+horizontal_alignment = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="HiddenItem/Popup/PanelContainer/VBoxContainer" unique_id=217763917]
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HiddenItem/Popup/PanelContainer/VBoxContainer" unique_id=1084430040]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_constants/separation = 75
+alignment = 1
+
+[node name="Equip" type="Button" parent="HiddenItem/Popup/PanelContainer/VBoxContainer/HBoxContainer" unique_id=360295353]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 42
+theme_override_styles/normal = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/hover = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/focus = SubResource("StyleBoxFlat_yokly")
+text = "Equip"
+
+[node name="LeaveIt" type="Button" parent="HiddenItem/Popup/PanelContainer/VBoxContainer/HBoxContainer" unique_id=1543358381]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 42
+theme_override_styles/normal = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/hover = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_yokly")
+theme_override_styles/focus = SubResource("StyleBoxFlat_yokly")
+text = "Leave it"
 
 [connection signal="body_entered" from="BBTCollisions/bbt-to-jungle-plaza" to="BBTCollisions/bbt-to-jungle-plaza" method="_on_body_entered"]
 
