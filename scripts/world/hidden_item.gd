@@ -1,7 +1,7 @@
 extends Node2D
 
 @onready var interaction_area: Area2D = $InteractionArea
-@onready var popup: PanelContainer = $Popup
+@onready var popup: CanvasLayer = $Popup
 @onready var equip_button: Button = $Popup/PanelContainer/VBoxContainer/HBoxContainer/Equip
 @onready var leave_it_button: Button = $Popup/PanelContainer/VBoxContainer/HBoxContainer/LeaveIt
 
@@ -13,67 +13,46 @@ func _ready() -> void:
 	equip_button.pressed.connect(_on_equip_button_pressed)
 	leave_it_button.pressed.connect(_on_leave_it_button_pressed)
 
-# show local game prompt upon entering game area
-#
 func _interaction_area_entered(body: Node) -> void:
-	pass
-	# show popup
-	
-	#var input_sync = body.get_node_or_null("InputSynchronizer")
-		#
-	## only show popup for the player that entered
-	#if ( (input_sync and input_sync.is_multiplayer_authority()) or body.name == "SinglePlayer"):
-		#print("game area entered by %s" % body)
-		#game_prompt_panel.visible = true
-		#game_result_panel.visible = false
-	#
-	#if (input_sync and input_sync.is_multiplayer_authority()):
-		## Guard: Skip showing prompt if the local player is currently in a Tag match
-		#if MultiplayerManager.is_player_in_tag_game(body.player_id):
-			#return
-		#hud.get_node("LobbyNav").visible = false
-		#hud.get_node("LobbyPopup").visible = false
-		#hud.get_node("MinigamesPopup").visible = false
-		#hud.get_node("LobbyNav/MultiplayerHUD/VBoxContainer/MinigamesButton").disabled = false
-		#hud.get_node("LobbyNav/MultiplayerHUD/VBoxContainer/ExitButton").disabled = false
-	#elif body.name == "SinglePlayer":
-		#hud.get_node("SideNav").visible = false
-		#hud.get_node("JoinPopup").visible = false
-		#hud.get_node("SideNav/MultiplayerHUD/VBoxContainer/HostButton").disabled = false
+	print("interaction area entered")
+	var input_sync = body.get_node_or_null("InputSynchronizer")
+	var is_local_player = input_sync.is_multiplayer_authority() if is_instance_valid(input_sync) else true
+	if is_local_player:
+		popup.show()
 
 func _interaction_area_exited(body: Node) -> void:
-	pass
-	# hide popup
-	
-	#if not is_instance_valid(body) or not body.is_inside_tree():
-		#return
-	#
-	#var input_sync = body.get_node_or_null("InputSynchronizer")
-	#
-	## Check is_inside_tree on input_sync before accessing multiplayer authority
-	#var is_local_mp = input_sync and input_sync.is_inside_tree() and input_sync.is_multiplayer_authority()
-	#var is_local_sp = body.name == "SinglePlayer"
-	#
-	#if is_local_mp or is_local_sp:
-		#print("game area exited by %s" % body)
-		#game_prompt_panel.visible = false
-		#if game_window.visible:
-			#_on_cancel_button_pressed()
-	#
-	#if is_local_mp:
-		## Guard: Skip showing prompt if the local player is currently in a Tag match
-		#if MultiplayerManager.is_player_in_tag_game(body.player_id):
-			#return
-		#if hud.has_node("LobbyNav"):
-			#hud.get_node("LobbyNav").visible = true
-	#elif is_local_sp:
-		#if hud.has_node("SideNav"):
-			#hud.get_node("SideNav").visible = true
+	print("interaction area exited")
+	if not is_instance_valid(body) or not body.is_inside_tree():
+		return
+	var input_sync = body.get_node_or_null("InputSynchronizer")
+	var is_local_player = input_sync.is_multiplayer_authority() if is_instance_valid(input_sync) else true
+	if is_local_player:
+		popup.hide()
 
 func _on_equip_button_pressed():
-	pass
-	# equip item...
+	print("equip btn pressed")
+	var world_scene = get_tree().get_current_scene()
+	var single_player = world_scene.get_node_or_null("SinglePlayer")
+	
+	# multiplayer
+	if single_player == null and multiplayer.multiplayer_peer and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED:
+		MultiplayerManager.rpc("request_equip_accessory", "jina_bow")
+	# singleplayer
+	else:
+		if is_instance_valid(single_player) and single_player.has_method("equip_jina_bow"):
+			single_player.equip_jina_bow()
+	popup.hide()
 
 func _on_leave_it_button_pressed():
-	pass
-	# hide popup
+	print("leave it btn pressed")
+	var world_scene = get_tree().get_current_scene()
+	var single_player = world_scene.get_node_or_null("SinglePlayer")
+	
+	# multiplayer
+	if single_player == null and multiplayer.multiplayer_peer and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED:
+		MultiplayerManager.rpc("request_equip_accessory", "")
+	# singleplayer
+	else:
+		if is_instance_valid(single_player) and single_player.has_method("equip_jina_bow"):
+			single_player.unequip_jina_bow()
+	popup.hide()

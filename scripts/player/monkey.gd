@@ -16,6 +16,7 @@ var current_grid_offset: Vector2 = Vector2.ZERO
 @onready var monkey = $AnimatedSprite2D
 @onready var camera = $Camera2D
 @onready var animation_player = $ScreenFadeLayer/AnimationPlayer
+@onready var head_accessory: Sprite2D = $HeadAccessory
 
 # fishing ###################
 #############################
@@ -38,6 +39,7 @@ const CYCLE_DURATION: float = 15.0 # Fixed 15-second cycle limit
 
 func _ready() -> void:
 	add_to_group("player")
+	head_accessory.hide()
 	rod_sprite.hide()
 	cast_lure_button.hide()
 	cast_lure_button.pressed.connect(_on_cast_pressed)
@@ -475,3 +477,9 @@ func show_caught_fish_display(fish_code: String, size_code: String) -> void:
 			fish_sprite.queue_free()
 		_update_cast_button()
 	)
+
+func equip_jina_bow() -> void:
+	head_accessory.show()
+
+func unequip_jina_bow() -> void:
+	head_accessory.hide()

@@ -21,6 +21,7 @@
 [ext_resource type="Texture2D" uid="uid://bs381ij3i1gq3" path="res://assets/monkey-sprites/walking/side/walking-side2.png" id="19_nbekv"]
 [ext_resource type="Texture2D" uid="uid://cjohnlinqiga3" path="res://assets/monkey-sprites/walking/side/walking-side3.png" id="20_veeye"]
 [ext_resource type="Texture2D" uid="uid://bsmmdqhw4qyu1" path="res://assets/icons/fishing-rod.png" id="21_veeye"]
+[ext_resource type="Texture2D" uid="uid://81pj3mqq2myj" path="res://assets/accessories/jina_bow/jina_bow_32.png" id="22_xgg1n"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wtx44"]
 animations = [{
@@ -216,7 +217,7 @@ script = ExtResource("1_1uot1")
 position = Vector2(2, 9)
 scale = Vector2(0.7371915, 0.74434924)
 sprite_frames = SubResource("SpriteFrames_wtx44")
-animation = &"standing-front"
+animation = &"walking-front"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=101953220]
 position = Vector2(6, 49)
@@ -258,3 +259,7 @@ offset_right = 77.0
 offset_bottom = -49.0
 theme_override_font_sizes/font_size = 30
 text = "Cast Lure"
+
+[node name="HeadAccessory" type="Sprite2D" parent="." unique_id=1666679124]
+position = Vector2(7, -29)
+texture = ExtResource("22_xgg1n")

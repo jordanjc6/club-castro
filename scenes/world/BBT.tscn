@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://blgq5u7jc5i8u" path="res://scenes/minigames/BaristaMinigame.tscn" id="4_nibfx"]
 [ext_resource type="PackedScene" uid="uid://eghfg8h23uwq" path="res://scenes/world/area_barrier.tscn" id="5_r027k"]
 [ext_resource type="Script" uid="uid://dytne3wgisch" path="res://scripts/world/hidden_item.gd" id="7_bdud1"]
+[ext_resource type="Texture2D" uid="uid://8y6labrqgf3u" path="res://assets/accessories/jina_bow/jina_bow_128.png" id="8_bmsoa"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_083f8"]
 size = Vector2(181, 34.25)
@@ -276,6 +277,7 @@ position = Vector2(2649, 523)
 shape = SubResource("CircleShape2D_00mmp")
 
 [node name="Popup" type="CanvasLayer" parent="HiddenItem" unique_id=103610535]
+follow_viewport_enabled = true
 
 [node name="PanelContainer" type="PanelContainer" parent="HiddenItem/Popup" unique_id=1169773851]
 anchors_preset = -1
@@ -300,6 +302,8 @@ label_settings = SubResource("LabelSettings_nibfx")
 horizontal_alignment = 1
 
 [node name="Sprite2D" type="Sprite2D" parent="HiddenItem/Popup/PanelContainer/VBoxContainer" unique_id=217763917]
+position = Vector2(322, 366)
+texture = ExtResource("8_bmsoa")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="HiddenItem/Popup/PanelContainer/VBoxContainer" unique_id=1084430040]
 custom_minimum_size = Vector2(0, 100)

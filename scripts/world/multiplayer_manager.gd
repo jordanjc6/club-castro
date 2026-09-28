@@ -34,6 +34,9 @@ const MONKEY_NAMES: Array[String] = [ "Chonk",
 # Stores mapping of peer_id -> String name (Server-Authoritative)
 var player_names: Dictionary = {}
 
+# peer_id -> String name (Server-Authoritative)
+var player_accessories: Dictionary = {}
+
 # (x1, y1) = top left theatremap offset
 # (x2, y2) = bottom right theatremap based on texturerect size (1280, 720)
 const THEATRE_X1 = 0
@@ -712,6 +715,11 @@ func _add_player_to_game(id: int, position: Vector2 = Vector2.INF, offset: Vecto
 		for peer_id in active_lures:
 			var lure_data = active_lures[peer_id]
 			rpc_id(id, "sync_existing_lure_to_joiner", peer_id, lure_data.start_pos, lure_data.end_pos, lure_data.color)
+		
+		for peer_id in player_accessories:
+			var item_id = player_accessories[peer_id]
+			if item_id != "":
+				rpc_id(id, "sync_player_accessory", peer_id, item_id)
 	
 	var player_to_add = multiplayer_scene.instantiate()
 	player_to_add.player_id = id
@@ -1563,3 +1571,30 @@ static func get_valid_fish_size(fish_code: String, preferred_size: String) -> St
 
 	# If no file exists at all for this fish, return the original rolled size as safety
 	return preferred_size
+
+@rpc("any_peer", "call_local", "reliable")
+func request_equip_accessory(item_id: String) -> void:
+	var sender_id = multiplayer.get_remote_sender_id()
+	if sender_id == 0:
+		sender_id = multiplayer.get_unique_id()
+		
+	if multiplayer.is_server():
+		player_accessories[sender_id] = item_id
+		rpc("sync_player_accessory", sender_id, item_id)
+
+@rpc("any_peer", "call_local", "reliable")
+func sync_player_accessory(peer_id: int, item_id: String) -> void:
+	player_accessories[peer_id] = item_id
+	
+	var world_scene = get_tree().get_current_scene()
+	if not is_instance_valid(world_scene):
+		return
+		
+	for node in world_scene.get_tree().get_nodes_in_group("player"):
+		var input_sync = node.get_node_or_null("InputSynchronizer")
+		var node_authority = input_sync.get_multiplayer_authority() if is_instance_valid(input_sync) else node.get_multiplayer_authority()
+		
+		if node_authority == peer_id:
+			if node.has_method("set_head_accessory_equipped"):
+				node.set_head_accessory_equipped(item_id != "")
+			break

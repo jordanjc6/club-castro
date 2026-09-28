@@ -19,6 +19,8 @@ var current_grid_offset: Vector2 = Vector2.ZERO
 @onready var camera = $Camera2D
 @onready var animation_player = $ScreenFadeLayer/AnimationPlayer
 @onready var name_label: Label = $Label
+@onready var head_accessory: Sprite2D = $HeadAccessory
+var is_head_accessory_equipped: bool = false
 
 # tag minigame ###########################################
 ##########################################################
@@ -59,6 +61,7 @@ const CYCLE_DURATION: float = 15.0
 func _ready() -> void:
 	add_to_group("player")
 	target_position = global_position
+	head_accessory.hide()
 	tag_indicator.hide()  # ensure indicator for tag minigame hidden
 	tag_indicator_outline.hide()
 	rod_sprite.hide()
@@ -702,3 +705,8 @@ func show_caught_fish_display(fish_code: String, size_code: String) -> void:
 		if is_local:
 			_update_cast_button()
 	)
+
+# RPC-driven toggle called across network peers
+func set_head_accessory_equipped(equipped: bool) -> void:
+	is_head_accessory_equipped = equipped
+	head_accessory.visible = equipped
