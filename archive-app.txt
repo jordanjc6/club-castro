@@ -13,5 +13,14 @@ Xcode
   and connect to multiplayer lobbies and peers."
 - command + shift + K to clean build folder
 - set target build to any ios device
+
 - top bar, product > archive
 - upload to app store connect for review
+
+OR
+
+- instead of archive from local xcode which is outdated,
+  use xcode cloud
+- push new export folder and updated export_presets.cfg to github
+- launch xcode cloud in browser and point to new export folder
+- build and archive directly to app store connect
