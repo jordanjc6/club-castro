@@ -477,6 +477,7 @@ func _on_cast_pressed() -> void:
 	# Register lure on server dictionary for future joiners
 	MultiplayerManager.rpc("register_active_lure", global_position, target_land_pos, equipped_rod_color)
 	
+	rpc("set_movement_disabled", true)
 	# Send RPC to broadcast the lure cast across all clients in the lobby
 	rpc("broadcast_lure_cast", global_position, target_land_pos, equipped_rod_color)
 	
@@ -614,6 +615,7 @@ func broadcast_remove_lure(caught_fish: String = "", caught_size: String = "") -
 			show_caught_fish_display(caught_fish, caught_size)
 		elif is_local:
 			_update_cast_button()
+		rpc("set_movement_disabled", false)
 	)
 
 func start_fishing_loop() -> void:
