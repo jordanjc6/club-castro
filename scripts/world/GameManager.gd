@@ -1,6 +1,6 @@
 extends Node
 
-signal minigames_button_pressed
+signal minigames_button_pressed(player_id: int)
 
 # single player sidenav
 @onready var side_nav: HBoxContainer = $"../HUD/SideNav"
@@ -278,20 +278,20 @@ func _lobby_button_pressed():
 
 func _minigames_button_pressed():
 	print("minigames btn")
+	var my_id = multiplayer.get_unique_id()
 	if !minigames_popup.visible:
 		lobby_button.disabled = true
 		exit_button.disabled = true
 		minigames_mainmenu.show()
 		minigames_tagmenu.hide()
-		minigames_button_pressed.emit()
+		minigames_button_pressed.emit(my_id)
 	else: 
 		lobby_button.disabled = false
 		exit_button.disabled = false
 		minigames_mainmenu.hide()
 		minigames_tagmenu.hide()
-		minigames_button_pressed.emit()
+		minigames_button_pressed.emit(my_id)
 		# Unregister local player from Tag lobby if currently joined
-		var my_id = multiplayer.get_unique_id()
 		if MultiplayerManager.joined_tag_peers.has(my_id):
 			MultiplayerManager.rpc("unregister_tag_player", my_id)
 	minigames_popup.visible = !minigames_popup.visible
