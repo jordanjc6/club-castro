@@ -734,24 +734,25 @@ func client_end_game(result_text: String) -> void:
 func get_local_player() -> CharacterBody2D:
 	# 1. Singleplayer Check
 	var singleplayer = get_tree().root.find_child("SinglePlayer", true, false)
+	print("singlePlayer: %s" % singleplayer)
 	if is_instance_valid(singleplayer):
 		return singleplayer
 		
 	# 2. Multiplayer Check: Match node name to unique multiplayer peer ID
 	var local_id_str = str(multiplayer.get_unique_id())
-	var players_container = get_tree().root.find_child("Players", true, false)
-	
-	if is_instance_valid(players_container):
-		# Look for node named after this local machine's peer ID (e.g. "1" or "112267552")
-		var local_node = players_container.get_node_or_null(local_id_str)
-		if is_instance_valid(local_node):
-			return local_node
+	for player in get_tree().get_nodes_in_group("player"):
+		# Match player node named "1", "10293847", etc.
+		if player.name == local_id_str:
+			return player
 			
-		# Fallback: Find child with multiplayer authority
-		for child in players_container.get_children():
-			if child is MultiPlayer and child.is_multiplayer_authority():
-				return child
-				
+		# Fallback: check authority via InputSynchronizer or node authority
+		var input_sync = player.get_node_or_null("InputSynchronizer")
+		if is_instance_valid(input_sync) and input_sync.is_multiplayer_authority():
+			return player
+		elif player.is_multiplayer_authority():
+			return player
+	
+	print("local player not found")
 	return null
 
 func set_local_player_movement_disabled(disabled: bool) -> void:
