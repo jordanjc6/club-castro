@@ -150,6 +150,7 @@ func animate_reel_in(lure_node: Node2D, caught_fish: String = "", caught_size: S
 			show_caught_fish_display(caught_fish, caught_size)
 		else:
 			_update_cast_button()
+		set_movement_disabled(false)
 	)
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -339,6 +340,7 @@ func _on_cast_pressed() -> void:
 	else:
 		target_land_pos = global_position + Vector2(0, 150)
 	
+	set_movement_disabled(true)
 	perform_lure_cast_visual(global_position, target_land_pos, equipped_rod_color)
 
 func perform_lure_cast_visual(start_pos: Vector2, end_pos: Vector2, color: Color) -> void:
