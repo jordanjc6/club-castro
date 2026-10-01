@@ -84,8 +84,9 @@ var _is_reconnecting: bool = false
 var joined_tag_peers: Array[int] = []
 var tag_it_peer_id: int = -1  # store who is "it" for tag
 
-# Tracks active Tag minigame session state across network
+# Tracks active minigames session state across network
 var is_tag_minigame_started: bool = false
+var is_minigolf_minigame_started: bool = false
 
 # Spawn locations (Adjust Vector2 values to match your game arena layout)
 const IT_SPAWN_POS = Vector2(647, 527 + 75)

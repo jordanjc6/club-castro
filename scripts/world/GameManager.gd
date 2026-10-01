@@ -1,5 +1,7 @@
 extends Node
 
+signal minigames_button_pressed
+
 # single player sidenav
 @onready var side_nav: HBoxContainer = $"../HUD/SideNav"
 @onready var host_button: Button = $"../HUD/SideNav/MultiplayerHUD/VBoxContainer/HostButton"
@@ -23,6 +25,8 @@ extends Node
 @onready var minigames_popup: Node2D = $"../HUD/MinigamesPopup"
 @onready var minigames_mainmenu: PanelContainer = $"../HUD/MinigamesPopup/MainMenu"
 @onready var tag_button: Button = $"../HUD/MinigamesPopup/MainMenu/MarginContainer/VBoxContainer/HBoxContainer/TagButton"
+
+# tag menu
 @onready var minigames_tagmenu: PanelContainer = $"../HUD/MinigamesPopup/TagMenu"
 @onready var tag_invite_button: Button = $"../HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Header/HBoxContainer/InviteButton"
 @onready var tag_menu_close_button: Button = $"../HUD/MinigamesPopup/TagMenu/MarginContainer/VBoxContainer/Header/HBoxContainer/CloseTagMenuButton"
@@ -279,11 +283,13 @@ func _minigames_button_pressed():
 		exit_button.disabled = true
 		minigames_mainmenu.show()
 		minigames_tagmenu.hide()
+		minigames_button_pressed.emit()
 	else: 
 		lobby_button.disabled = false
 		exit_button.disabled = false
 		minigames_mainmenu.hide()
 		minigames_tagmenu.hide()
+		minigames_button_pressed.emit()
 		# Unregister local player from Tag lobby if currently joined
 		var my_id = multiplayer.get_unique_id()
 		if MultiplayerManager.joined_tag_peers.has(my_id):
