@@ -2,24 +2,12 @@ extends PanelContainer
 
 @onready var game_manager: Node = $"../../../GameManager"
 
-# single player sidenav
-@onready var side_nav: HBoxContainer = $"../../SideNav"
-@onready var host_button: Button = $"../../SideNav/MultiplayerHUD/VBoxContainer/HostButton"
-@onready var join_button: Button = $"../../SideNav/MultiplayerHUD/VBoxContainer/JoinButton"
-@onready var join_popup: PanelContainer = $"../../JoinPopup"
-@onready var find_button: Button = $"../../JoinPopup/VBoxContainer/FindButton"
-
 # multiplayer lobby nav
 @onready var lobby_nav: HBoxContainer = $"../../LobbyNav"
 @onready var lobby_button: Button = $"../../LobbyNav/MultiplayerHUD/VBoxContainer/LobbyButton"
 @onready var minigames_button: Button = $"../../LobbyNav/MultiplayerHUD/VBoxContainer/MinigamesButton"
 @onready var exit_button: Button = $"../../LobbyNav/MultiplayerHUD/VBoxContainer/ExitButton"
 @onready var lobby_popup: PanelContainer = $"../../LobbyPopup"
-@onready var copy_button: Button = $"../../LobbyPopup/VBoxContainer/CopyButton"
-
-# tag minigame nav
-@onready var tag_nav: HBoxContainer = $"../../TagNav"
-@onready var leave_tag_button: Button = $"../../TagNav/MultiplayerHUD/VBoxContainer/LeaveGameButton"
 
 # minigames popup
 @onready var minigames_popup: Node2D = get_parent()
@@ -29,10 +17,6 @@ extends PanelContainer
 
 # tag menu
 @onready var minigames_tagmenu: PanelContainer = $"../TagMenu"
-@onready var tag_invite_button: Button = $"../TagMenu/MarginContainer/VBoxContainer/Header/HBoxContainer/InviteButton"
-@onready var tag_menu_close_button: Button = $"../TagMenu/MarginContainer/VBoxContainer/Header/HBoxContainer/CloseTagMenuButton"
-@onready var tag_start_button: Button = $"../TagMenu/MarginContainer/VBoxContainer/Footer/StartGameButton"
-@onready var tag_players_grid: GridContainer = $"../TagMenu/MarginContainer/VBoxContainer/Players"
 
 # minigolf menu
 @onready var minigolf_menu: PanelContainer = self
@@ -45,44 +29,29 @@ extends PanelContainer
 @onready var game_notif: PanelContainer = $"../../GameNotification"
 var _notif_tween: Tween = null
 @onready var join_tag_button: Button = $"../../GameNotification/MarginContainer/VBoxContainer/JoinTagButton"
+@onready var join_minigolf_button: Button = $"../../GameNotification/MarginContainer/VBoxContainer/JoinMinigolfButton"
 @onready var loading_spinner: TextureProgressBar = $"../../LoadingSpinner"
 
-# tag minigame ##############################################################
-#############################################################################
-# Color Constants for Name Tag States
-const COLOR_BROWN = Color("3d251e")        # Joined player background
+# style constants
+const COLOR_BROWN = Color("3d251e")
 const COLOR_GOLD = Color("ffd700")  
 const DEFAULT_NAMETAG_COLOR = Color("0000003c")
-const ROULETTE_BORDER_WIDTH = 8       # Roulette hop border highlight
+const ROULETTE_BORDER_WIDTH = 8
 
-# Label Node for visible countdown on screen HUD (e.g., HUD/CountdownLabel)
-@onready var countdown_label: Label = $"../../CountdownLabel"
-@onready var match_timer_label: Label = $"../../MatchTimerLabel"
-const TAG_MINIGAME_TIME_LIMIT: int = 120  # seconds
-var _current_tag_match_id: int = 0
-
-##############################################################################
-
-# minigolf minigame #########
-#############################
+# minigolf minigame 
 var minigolf_players: Array[int] = []
 const PLAYER_TAG_BG_COLOR: Color = COLOR_BROWN
 
-#############################
-
 func _ready() -> void:
 	game_manager.minigames_button_pressed.connect(on_minigames_button_pressed)
+	MultiplayerManager.player_left_multiplayer_lobby.connect(remove_minigolf_player)
+	MultiplayerManager.player_disconnected_notif.connect(reset_state_for_single_player_return)
 	minigolf_menu.hide()
 	minigolf_button.pressed.connect(minigolf_button_pressed)
-	#minigolf_invite_button.pressed.connect(_minigolf_invite_pressed)
 	minigolf_menu_close_button.pressed.connect(minigolf_close_pressed)
+	minigolf_invite_button.pressed.connect(minigolf_invite_pressed)
+	join_minigolf_button.pressed.connect(accept_minigolf_invite)
 	#minigolf_start_button.pressed.connect(_minigolf_start_pressed)
-	
-	# Listen for network status signals (also will need to remove player in delete in multiplayer manager if game closed)
-	#MultiplayerManager.player_disconnected_notif.connect(on_player_disconnected)
-	#MultiplayerManager.player_reconnecting_notif.connect(on_player_reconnecting)
-	#MultiplayerManager.player_reconnected_notif.connect(on_player_reconnected)
-	#MultiplayerManager.tag_lobby_updated.connect(_update_tag_player_grid)
 
 func on_minigames_button_pressed(by_player_id: int):
 	close_minigolf_menu()
@@ -92,11 +61,35 @@ func on_minigames_button_pressed(by_player_id: int):
 func close_minigolf_menu():
 	minigolf_menu.hide()
 
+func enable_lobby_nav_buttons():
+	lobby_button.disabled = false
+	minigames_button.disabled = false
+	exit_button.disabled = false
+
+func hide_minigames_popups():
+	minigames_popup.hide()
+	minigames_mainmenu.hide()
+
 @rpc("any_peer", "call_local", "reliable")
 func remove_minigolf_player(id: int) -> void:
 	if multiplayer.is_server():
 		minigolf_players.erase(id)
 		rpc("sync_minigolf_lobby_ui", minigolf_players)
+		check_remaining_players()
+
+func check_remaining_players():
+	if minigolf_players.is_empty():
+		reset_minigolf_state()
+
+func reset_minigolf_state():
+	if multiplayer.is_server():
+		minigolf_players.clear()
+		MultiplayerManager.is_minigolf_minigame_started = false
+		rpc("sync_minigolf_lobby_ui", minigolf_players)
+
+func reset_state_for_single_player_return():
+	minigolf_menu.hide()
+	reset_minigolf_state()
 
 func minigolf_button_pressed():
 	print("minigolf btn")
@@ -156,4 +149,79 @@ func create_stylebox(bg_color: Color, border_color: Color = Color.TRANSPARENT, b
 func minigolf_close_pressed():
 	print("minigolf close btn")
 	close_minigolf_menu()
+	enable_lobby_nav_buttons()
+	hide_minigames_popups()
 	rpc("remove_minigolf_player", multiplayer.get_unique_id())
+
+func minigolf_invite_pressed():
+	print("invite to play")
+	if not all_players_in_minigolf():
+		rpc("send_minigolf_invite")
+		game_manager.show_temp_notif("Sent invites to unjoined players!", 2)
+	else:
+		game_manager.show_temp_notif("All players in the lobby have already joined!", 2)
+
+func all_players_in_minigolf() -> bool:
+	var active_peers: Array[int] = []
+	if multiplayer.multiplayer_peer and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED:
+		active_peers.append(1) # Include Host
+		active_peers.append_array(multiplayer.get_peers()) # Include connected clients
+	else:
+		# Fallback for local/offline testing: local peer ID (usually 1)
+		active_peers.append(multiplayer.get_unique_id())
+
+	if active_peers.is_empty():
+		return true
+	for peer_id in active_peers:
+		if not minigolf_players.has(peer_id):
+			return false
+	return true
+
+@rpc("any_peer", "call_local", "reliable")
+func send_minigolf_invite() -> void:
+	if not multiplayer.is_server():
+		return
+	
+	var sender_id = multiplayer.get_remote_sender_id()
+	if sender_id == 0:
+		sender_id = multiplayer.get_unique_id()
+	var sender_name = MultiplayerManager.get_player_name(sender_id)
+	var recipients = multiplayer.get_peers()
+	if sender_id != 1:
+		recipients.append(1) # Include host if joiner sent the invite
+	
+	for peer_id in recipients:
+		if peer_id != sender_id and not minigolf_players.has(peer_id):
+			if peer_id == 1:
+				# Local host execution
+				receive_minigolf_invite(sender_name)
+			else:
+				# Remote client RPC
+				rpc_id(peer_id, "receive_minigolf_invite", sender_name)
+
+@rpc("authority", "call_local", "reliable")
+func receive_minigolf_invite(sender_name: String) -> void:
+	game_manager.show_temp_notif("%s invited you to play Minigolf!" % sender_name, 4, false, true)
+
+func accept_minigolf_invite():
+	game_notif.hide()
+	if MultiplayerManager.is_minigolf_minigame_started:
+		game_manager.show_temp_notif("A Minigolf game is currently in progress!")
+		return
+	rpc("add_minigolf_player", multiplayer.get_unique_id())
+	
+	# update ui
+	lobby_button.disabled = true
+	exit_button.disabled = true
+	minigames_button.disabled = false
+	minigames_popup.show()
+	minigames_mainmenu.hide()
+	minigames_tagmenu.hide()
+	minigolf_menu.show()
+	lobby_popup.hide()
+	
+	# remove player from tag lobby if they were in it
+	var my_id = multiplayer.get_unique_id()
+	if MultiplayerManager.joined_tag_peers.has(my_id):
+		MultiplayerManager.rpc("unregister_tag_player", my_id)
+		game_manager.reset_tag_player_colors

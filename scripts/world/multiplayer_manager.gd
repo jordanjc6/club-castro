@@ -2,9 +2,10 @@ extends Node
 
 signal player_disconnected_notif(message: String)
 signal player_reconnecting_notif(message: String)
-signal player_reconnected_notif(message: String)
+signal player_reconnected_notif(message: String, tag_notif: bool)
 signal tag_lobby_updated(joined_peers: Array[int])
 signal player_names_updated(names: Dictionary)
+signal player_left_multiplayer_lobby(id: int)
 
 # --- EOS Credentials ---
 const PRODUCT_ID = "ec9ba98721e9490985c87199b1c2ad6b"
@@ -761,6 +762,7 @@ func _delete_player(id: int):
 	else:
 		unregister_tag_player(id)
 	
+	player_left_multiplayer_lobby.emit(id)
 	player_rods.erase(id)
 	active_lures.erase(id)
 	

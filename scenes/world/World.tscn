@@ -944,7 +944,19 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_lplgh")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_lplgh")
 theme_override_styles/hover = SubResource("StyleBoxFlat_d6tky")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_d6tky")
-text = "Join Tag"
+text = "Join"
+
+[node name="JoinMinigolfButton" type="Button" parent="HUD/GameNotification/MarginContainer/VBoxContainer" unique_id=49994179]
+visible = false
+custom_minimum_size = Vector2(200, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_lplgh")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_lplgh")
+theme_override_styles/hover = SubResource("StyleBoxFlat_d6tky")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_d6tky")
+text = "Join"
 
 [node name="LoadingSpinner" parent="HUD" unique_id=837070289 instance=ExtResource("7_qh0kd")]
 visible = false

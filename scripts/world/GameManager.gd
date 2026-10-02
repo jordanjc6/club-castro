@@ -37,6 +37,7 @@ signal minigames_button_pressed(player_id: int)
 @onready var game_notif: PanelContainer = $"../HUD/GameNotification"
 var _notif_tween: Tween = null
 @onready var join_tag_button: Button = $"../HUD/GameNotification/MarginContainer/VBoxContainer/JoinTagButton"
+@onready var join_minigolf_button: Button = $"../HUD/GameNotification/MarginContainer/VBoxContainer/JoinMinigolfButton"
 @onready var loading_spinner: TextureProgressBar = $"../HUD/LoadingSpinner"
 
 # tag minigame ##############################################################
@@ -339,7 +340,7 @@ func on_player_disconnected(message: String):
 	exit_button.disabled = false
 	show_temp_notif(message)
 
-func show_temp_notif(text: String, time: float = 4.5, is_tag_invite: bool = false):
+func show_temp_notif(text: String, time: float = 4.5, is_tag_invite: bool = false, is_minigolf_invite: bool = false):
 	# Kill any existing notification tween to cancel its hide timer
 	if _notif_tween and _notif_tween.is_valid():
 		_notif_tween.kill()
@@ -350,6 +351,8 @@ func show_temp_notif(text: String, time: float = 4.5, is_tag_invite: bool = fals
 	
 	if is_instance_valid(join_tag_button):
 		join_tag_button.visible = is_tag_invite
+	if is_instance_valid(join_minigolf_button):
+		join_minigolf_button.visible = is_minigolf_invite
 	
 	game_notif.show()
 	
