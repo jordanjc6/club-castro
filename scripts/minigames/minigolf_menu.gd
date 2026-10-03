@@ -39,7 +39,7 @@ const DEFAULT_NAMETAG_COLOR = Color("0000003c")
 const ROULETTE_BORDER_WIDTH = 8
 
 # minigolf minigame 
-var minigolf_players: Array[int] = []
+var minigolf_players: Array[int] = []  # store participants and turn order
 const PLAYER_TAG_BG_COLOR: Color = COLOR_BROWN
 
 func _ready() -> void:
@@ -51,7 +51,7 @@ func _ready() -> void:
 	minigolf_menu_close_button.pressed.connect(minigolf_close_pressed)
 	minigolf_invite_button.pressed.connect(minigolf_invite_pressed)
 	join_minigolf_button.pressed.connect(accept_minigolf_invite)
-	#minigolf_start_button.pressed.connect(_minigolf_start_pressed)
+	minigolf_start_button.pressed.connect(minigolf_start_pressed)
 
 func on_minigames_button_pressed(by_player_id: int):
 	close_minigolf_menu()
@@ -84,7 +84,7 @@ func check_remaining_players():
 func reset_minigolf_state():
 	if multiplayer.is_server():
 		minigolf_players.clear()
-		MultiplayerManager.is_minigolf_minigame_started = false
+		MultiplayerManager.rpc("set_minigolf_started", false)
 		rpc("sync_minigolf_lobby_ui", minigolf_players)
 
 func reset_state_for_single_player_return():
@@ -225,3 +225,41 @@ func accept_minigolf_invite():
 	if MultiplayerManager.joined_tag_peers.has(my_id):
 		MultiplayerManager.rpc("unregister_tag_player", my_id)
 		game_manager.reset_tag_player_colors
+
+func minigolf_start_pressed():
+	rpc("request_start_minigolf")
+
+@rpc("any_peer", "call_local", "reliable")
+func request_start_minigolf() -> void:
+	if multiplayer.is_server():
+		MultiplayerManager.rpc("set_minigolf_started", true)
+		randomize_minigolf_turn_order()
+		rpc("set_minigolf_ui")
+		teleport_players_to_minigolf()
+		await get_tree().create_timer(5).timeout
+		disable_player_movement()
+
+func randomize_minigolf_turn_order():
+	minigolf_players.shuffle()
+
+@rpc("authority", "call_local", "reliable")
+func set_minigolf_ui() -> void:
+	lobby_nav.hide()
+	minigolf_menu.hide()
+	for player in get_tree().get_nodes_in_group("player"):
+		player.hide()
+
+func teleport_players_to_minigolf() -> void:
+	if not multiplayer.is_server():
+		return
+	var new_zone_offset = Vector2(0, 950)
+	var target_position = Vector2(250, 1200)
+	for player in get_tree().get_nodes_in_group("player"):
+		player.update_zone_offset.rpc_id(player.player_id, new_zone_offset)
+		player.global_position = target_position
+		player.hide()
+		lobby_nav.hide()
+
+func disable_player_movement():
+	for player in get_tree().get_nodes_in_group("player"):
+		player.set_movement_disabled.rpc(true)

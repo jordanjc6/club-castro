@@ -4,6 +4,14 @@
 
 [node name="MinigolfMinigame" type="Node2D" unique_id=231246832]
 
+[node name="Boundary" type="StaticBody2D" parent="." unique_id=256848579]
+visible = false
+collision_mask = 0
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Boundary" unique_id=445997261]
+position = Vector2(-3, 946)
+polygon = PackedVector2Array(-4, -1, 1286, 4, 1284, 732, -3, 728, -1, 33, -47, 33, -43, 752, 1320, 761, 1312, -45, -45, -52, -49, 35)
+
 [node name="Screen" type="CanvasLayer" parent="." unique_id=794230799]
 layer = -1
 offset = Vector2(0, 950)

@@ -344,7 +344,6 @@ func update_camera_grid() -> void:
 	
 	camera.global_position = target_camera_pos
 
-
 @rpc("authority", "call_local", "reliable")
 func update_zone_offset(new_offset: Vector2) -> void:
 	current_grid_offset = new_offset

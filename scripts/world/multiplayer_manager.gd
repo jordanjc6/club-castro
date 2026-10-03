@@ -1050,6 +1050,10 @@ func set_tag_minigame_started(started: bool) -> void:
 	is_tag_minigame_started = started
 	print("Tag minigame active state set to: ", is_tag_minigame_started)
 
+@rpc("authority", "call_local", "reliable")
+func set_minigolf_started(started: bool) -> void:
+	is_minigolf_minigame_started = started
+
 # Notify a client when they attempt to join an active session
 @rpc("authority", "call_local", "reliable")
 func notify_tag_in_progress() -> void:
