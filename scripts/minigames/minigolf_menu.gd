@@ -25,6 +25,11 @@ extends PanelContainer
 @onready var minigolf_start_button: Button = $"MarginContainer/VBoxContainer/Footer/StartGameButton"
 @onready var minigolf_players_grid: GridContainer = $"MarginContainer/VBoxContainer/Players"
 
+# MinigolfMinigame
+@onready var minigolf_minigame: Node2D = $"../../../MinigolfMinigame"
+@onready var minigolf_minigame_game_info: HBoxContainer = $"../../../MinigolfMinigame/Screen/UI/HBoxContainer/HUD/RotationWrapper/VBoxContainer/GameInfo"
+@onready var minigolf_minigame_player_grid: GridContainer = $"../../../MinigolfMinigame/Screen/UI/HBoxContainer/HUD/RotationWrapper/VBoxContainer/PlayerGrid"
+
 # other
 @onready var game_notif: PanelContainer = $"../../GameNotification"
 var _notif_tween: Tween = null
@@ -35,12 +40,15 @@ var _notif_tween: Tween = null
 # style constants
 const COLOR_BROWN = Color("3d251e")
 const COLOR_GOLD = Color("ffd700")  
+const COLOR_GREEN = Color("2e7d32")
 const DEFAULT_NAMETAG_COLOR = Color("0000003c")
 const ROULETTE_BORDER_WIDTH = 8
 
 # minigolf minigame 
 var minigolf_players: Array[int] = []  # store participants and turn order
 const PLAYER_TAG_BG_COLOR: Color = COLOR_BROWN
+var current_turn_id: int  # player id
+var current_course_number: int  # 1 or 2 or 3 out of 3 (each game will play 3 courses)
 
 func _ready() -> void:
 	game_manager.minigames_button_pressed.connect(on_minigames_button_pressed)
@@ -87,7 +95,7 @@ func reset_minigolf_state():
 		MultiplayerManager.rpc("set_minigolf_started", false)
 		rpc("sync_minigolf_lobby_ui", minigolf_players)
 
-func reset_state_for_single_player_return():
+func reset_state_for_single_player_return(msg: String):
 	minigolf_menu.hide()
 	reset_minigolf_state()
 
@@ -234,6 +242,9 @@ func request_start_minigolf() -> void:
 	if multiplayer.is_server():
 		MultiplayerManager.rpc("set_minigolf_started", true)
 		randomize_minigolf_turn_order()
+		current_turn_id = minigolf_players[0]
+		current_course_number = 1
+		broadcast_minigolf_state(minigolf_players, current_turn_id, current_course_number)
 		rpc("set_minigolf_ui")
 		teleport_players_to_minigolf()
 		await get_tree().create_timer(5).timeout
@@ -242,12 +253,80 @@ func request_start_minigolf() -> void:
 func randomize_minigolf_turn_order():
 	minigolf_players.shuffle()
 
+func broadcast_minigolf_state(turn_order: Array[int], active_turn_id: int, current_course_num: int) -> void:
+	if multiplayer.is_server():
+		rpc("sync_minigolf_state", turn_order, active_turn_id, current_course_num)
+
+@rpc("authority", "call_local", "reliable")
+func sync_minigolf_state(turn_order: Array[int], active_turn_id: int, current_course_num: int) -> void:
+	minigolf_players = turn_order
+	current_turn_id = active_turn_id
+	current_course_number = current_course_num
+
 @rpc("authority", "call_local", "reliable")
 func set_minigolf_ui() -> void:
 	lobby_nav.hide()
 	minigolf_menu.hide()
+	update_game_info()
+	update_player_grid()
 	for player in get_tree().get_nodes_in_group("player"):
 		player.hide()
+
+func update_game_info():
+	var courseLabel = minigolf_minigame_game_info.get_node("CourseLabel")
+	var turnLabel = minigolf_minigame_game_info.get_node("TurnLabel")
+	courseLabel.text = "Course %s/3" % current_course_number
+	turnLabel.text = "%s's turn" % MultiplayerManager.get_player_name(current_turn_id)
+
+func update_player_grid() -> void:
+	# Fetch all pre-existing Label children inside PlayerGrid
+	var label_nodes = minigolf_minigame_player_grid.get_children()
+	
+	for i in range(label_nodes.size()):
+		var label = label_nodes[i] as Label
+		if not label:
+			continue
+			
+		if i < minigolf_players.size():
+			var peer_id = minigolf_players[i]
+			# Fetch monkey/player name from your MultiplayerManager lookup
+			var player_name = MultiplayerManager.get_player_name(peer_id)
+			
+			label.text = "%d. %s" % [i + 1, player_name]
+			label.show()
+			
+			# Check if this player is currently taking their turn
+			var is_turn = (peer_id == current_turn_id)
+			_apply_label_style(label, is_turn)
+		else:
+			# Hide extra labels if there are fewer than 6 players in the game
+			label.hide()
+
+# Creates a rounded card style for each player's HUD label
+func _apply_label_style(label: Label, is_current_turn: bool = false) -> void:
+	var style = StyleBoxFlat.new()
+	
+	# Background colors
+	if is_current_turn:
+		style.bg_color = COLOR_GREEN # Highlight active turn player (Green)
+		style.border_color = COLOR_GOLD # Gold border
+		style.set_border_width_all(2)
+	else:
+		style.bg_color = Color(0.1, 0.1, 0.1, 0.6) # Dark semi-transparent
+		style.border_color = Color(0.3, 0.3, 0.3, 0.8)
+		style.set_border_width_all(1)
+	
+	# Border corner rounding
+	style.set_corner_radius_all(8)
+	
+	# Content padding inside the rounded box
+	style.content_margin_left = 10
+	style.content_margin_right = 10
+	style.content_margin_top = 4
+	style.content_margin_bottom = 4
+	
+	# Apply stylebox override to the label
+	label.add_theme_stylebox_override("normal", style)
 
 func teleport_players_to_minigolf() -> void:
 	if not multiplayer.is_server():
@@ -263,3 +342,53 @@ func teleport_players_to_minigolf() -> void:
 func disable_player_movement():
 	for player in get_tree().get_nodes_in_group("player"):
 		player.set_movement_disabled.rpc(true)
+		
+################# Below Not Used Yet ###################
+
+# Call on Server to switch turns during minigolf gameplay
+func advance_to_next_turn() -> void:
+	if not multiplayer.is_server():
+		return
+		
+	var current_index = minigolf_players.find(current_turn_id)
+	var next_index = (current_index + 1) % minigolf_players.size()
+	current_turn_id = minigolf_players[next_index]
+	
+	# Sync state to all clients and trigger local UI updates
+	broadcast_minigolf_state(minigolf_players, current_turn_id, current_course_number)
+	rpc("refresh_minigolf_hud")
+
+@rpc("authority", "call_local", "reliable")
+func refresh_minigolf_hud() -> void:
+	update_game_info()
+	update_player_grid()
+
+# Call on the server when all players finish the current hole
+func advance_to_next_course() -> void:
+	if not multiplayer.is_server():
+		return
+		
+	# Check if all 3 courses have been completed
+	if current_course_number >= 3:
+		#end_minigolf_game()
+		return
+
+	# Increment course count & reset turn to the first player
+	current_course_number += 1
+	current_turn_id = minigolf_players[0]
+	
+	# Broadcast updated course state to all connected clients
+	broadcast_minigolf_state(minigolf_players, current_turn_id, current_course_number)
+	
+	# Trigger client-side UI and course layout updates
+	rpc("refresh_minigolf_course")
+
+
+@rpc("authority", "call_local", "reliable")
+func refresh_minigolf_course() -> void:
+	# Update CourseLabel (e.g. "Course 2/3") and active TurnLabel on all screens
+	update_game_info()
+	update_player_grid()
+	
+	# Optional: Reset golf ball positions or load course 2/3 tiles here
+	# load_course_layout(current_course_number)
