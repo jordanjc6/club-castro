@@ -265,6 +265,8 @@ func sync_minigolf_state(turn_order: Array[int], active_turn_id: int, current_co
 
 @rpc("authority", "call_local", "reliable")
 func set_minigolf_ui() -> void:
+	if not minigolf_players.has(multiplayer.get_unique_id()):
+		return
 	lobby_nav.hide()
 	minigolf_menu.hide()
 	update_game_info()
@@ -279,7 +281,6 @@ func update_game_info():
 	turnLabel.text = "%s's turn" % MultiplayerManager.get_player_name(current_turn_id)
 
 func update_player_grid() -> void:
-	# Fetch all pre-existing Label children inside PlayerGrid
 	var label_nodes = minigolf_minigame_player_grid.get_children()
 	
 	for i in range(label_nodes.size()):
@@ -297,13 +298,12 @@ func update_player_grid() -> void:
 			
 			# Check if this player is currently taking their turn
 			var is_turn = (peer_id == current_turn_id)
-			_apply_label_style(label, is_turn)
+			apply_player_label_style(label, is_turn)
 		else:
 			# Hide extra labels if there are fewer than 6 players in the game
 			label.hide()
 
-# Creates a rounded card style for each player's HUD label
-func _apply_label_style(label: Label, is_current_turn: bool = false) -> void:
+func apply_player_label_style(label: Label, is_current_turn: bool = false) -> void:
 	var style = StyleBoxFlat.new()
 	
 	# Background colors
@@ -334,14 +334,16 @@ func teleport_players_to_minigolf() -> void:
 	var new_zone_offset = Vector2(0, 950)
 	var target_position = Vector2(250, 1200)
 	for player in get_tree().get_nodes_in_group("player"):
-		player.update_zone_offset.rpc_id(player.player_id, new_zone_offset)
-		player.global_position = target_position
-		player.hide()
-		lobby_nav.hide()
+		if minigolf_players.has(player.player_id):
+			player.update_zone_offset.rpc_id(player.player_id, new_zone_offset)
+			player.global_position = target_position
+			player.hide()
+			lobby_nav.hide()
 
 func disable_player_movement():
 	for player in get_tree().get_nodes_in_group("player"):
-		player.set_movement_disabled.rpc(true)
+		if minigolf_players.has(player.player_id):
+			player.set_movement_disabled.rpc(true)
 		
 ################# Below Not Used Yet ###################
 
