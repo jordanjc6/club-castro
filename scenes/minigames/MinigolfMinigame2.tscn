@@ -1,11 +1,11 @@
-[gd_scene format=3 uid="uid://3w72gsda0b6i"]
+[gd_scene format=3 uid="uid://btyrvmtfjv273"]
 
-[ext_resource type="Texture2D" uid="uid://tiu625i0s3fp" path="res://assets/textures/wooden.jpg" id="1_0x1ge"]
-[ext_resource type="Script" uid="uid://dsw4gdjkfd02b" path="res://scripts/minigames/minigolf_minigame.gd" id="1_s0toe"]
-[ext_resource type="PackedScene" uid="uid://dh1dlag4v3roy" path="res://scenes/minigames/minigolf/courses/Course1.tscn" id="2_vut6l"]
+[ext_resource type="Script" uid="uid://dsw4gdjkfd02b" path="res://scripts/minigames/minigolf_minigame.gd" id="1_nm238"]
+[ext_resource type="Texture2D" uid="uid://tiu625i0s3fp" path="res://assets/textures/wooden.jpg" id="2_83303"]
+[ext_resource type="PackedScene" uid="uid://dh1dlag4v3roy" path="res://scenes/minigames/minigolf/courses/Course1.tscn" id="3_5f1pw"]
 
 [node name="MinigolfMinigame" type="Node2D" unique_id=231246832]
-script = ExtResource("1_s0toe")
+script = ExtResource("1_nm238")
 
 [node name="Boundary" type="StaticBody2D" parent="." unique_id=256848579]
 visible = false
@@ -28,7 +28,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("1_0x1ge")
+texture = ExtResource("2_83303")
 expand_mode = 1
 stretch_mode = 6
 
@@ -141,7 +141,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 86.0
 
-[node name="Course1" parent="Screen/UI/HBoxContainer/Course" unique_id=1944665442 instance=ExtResource("2_vut6l")]
+[node name="Course1" parent="Screen/UI/HBoxContainer/Course" unique_id=1944665442 instance=ExtResource("3_5f1pw")]
 layout_mode = 2
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=1807575260]
