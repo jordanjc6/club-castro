@@ -47,8 +47,6 @@ const ROULETTE_BORDER_WIDTH = 8
 # minigolf minigame 
 var minigolf_players: Array[int] = []  # store participants and turn order
 const PLAYER_TAG_BG_COLOR: Color = COLOR_BROWN
-var current_turn_id: int  # player id
-var current_course_number: int  # 1 or 2 or 3 out of 3 (each game will play 3 courses)
 
 func _ready() -> void:
 	game_manager.minigames_button_pressed.connect(on_minigames_button_pressed)
@@ -240,28 +238,12 @@ func minigolf_start_pressed():
 @rpc("any_peer", "call_local", "reliable")
 func request_start_minigolf() -> void:
 	if multiplayer.is_server():
-		MultiplayerManager.rpc("set_minigolf_started", true)
-		randomize_minigolf_turn_order()
-		current_turn_id = minigolf_players[0]
-		current_course_number = 1
-		broadcast_minigolf_state(minigolf_players, current_turn_id, current_course_number)
+		minigolf_players.shuffle()
+		minigolf_minigame.rpc("start_minigolf", minigolf_players)  # handoff control to MinigolfMinigame
 		rpc("set_minigolf_ui")
 		teleport_players_to_minigolf()
 		await get_tree().create_timer(5).timeout
 		disable_player_movement()
-
-func randomize_minigolf_turn_order():
-	minigolf_players.shuffle()
-
-func broadcast_minigolf_state(turn_order: Array[int], active_turn_id: int, current_course_num: int) -> void:
-	if multiplayer.is_server():
-		rpc("sync_minigolf_state", turn_order, active_turn_id, current_course_num)
-
-@rpc("authority", "call_local", "reliable")
-func sync_minigolf_state(turn_order: Array[int], active_turn_id: int, current_course_num: int) -> void:
-	minigolf_players = turn_order
-	current_turn_id = active_turn_id
-	current_course_number = current_course_num
 
 @rpc("authority", "call_local", "reliable")
 func set_minigolf_ui() -> void:
@@ -269,18 +251,18 @@ func set_minigolf_ui() -> void:
 		return
 	lobby_nav.hide()
 	minigolf_menu.hide()
-	update_game_info()
-	update_player_grid()
+	update_game_info(1, minigolf_players[0])
+	update_player_grid(minigolf_players, minigolf_players[0])
 	for player in get_tree().get_nodes_in_group("player"):
 		player.hide()
 
-func update_game_info():
+func update_game_info(course_num: int, turn_id: int):
 	var courseLabel = minigolf_minigame_game_info.get_node("CourseLabel")
 	var turnLabel = minigolf_minigame_game_info.get_node("TurnLabel")
-	courseLabel.text = "Course %s/3" % current_course_number
-	turnLabel.text = "%s's turn" % MultiplayerManager.get_player_name(current_turn_id)
+	courseLabel.text = "Course %s/3" % course_num
+	turnLabel.text = "%s's turn" % MultiplayerManager.get_player_name(turn_id)
 
-func update_player_grid() -> void:
+func update_player_grid(players: Array, curr_turn_id: int) -> void:
 	var label_nodes = minigolf_minigame_player_grid.get_children()
 	
 	for i in range(label_nodes.size()):
@@ -288,8 +270,8 @@ func update_player_grid() -> void:
 		if not label:
 			continue
 			
-		if i < minigolf_players.size():
-			var peer_id = minigolf_players[i]
+		if i < players.size():
+			var peer_id = players[i]
 			# Fetch monkey/player name from your MultiplayerManager lookup
 			var player_name = MultiplayerManager.get_player_name(peer_id)
 			
@@ -297,7 +279,7 @@ func update_player_grid() -> void:
 			label.show()
 			
 			# Check if this player is currently taking their turn
-			var is_turn = (peer_id == current_turn_id)
+			var is_turn = (peer_id == curr_turn_id)
 			apply_player_label_style(label, is_turn)
 		else:
 			# Hide extra labels if there are fewer than 6 players in the game
@@ -344,53 +326,3 @@ func disable_player_movement():
 	for player in get_tree().get_nodes_in_group("player"):
 		if minigolf_players.has(player.player_id):
 			player.set_movement_disabled.rpc(true)
-		
-################# Below Not Used Yet ###################
-
-# Call on Server to switch turns during minigolf gameplay
-func advance_to_next_turn() -> void:
-	if not multiplayer.is_server():
-		return
-		
-	var current_index = minigolf_players.find(current_turn_id)
-	var next_index = (current_index + 1) % minigolf_players.size()
-	current_turn_id = minigolf_players[next_index]
-	
-	# Sync state to all clients and trigger local UI updates
-	broadcast_minigolf_state(minigolf_players, current_turn_id, current_course_number)
-	rpc("refresh_minigolf_hud")
-
-@rpc("authority", "call_local", "reliable")
-func refresh_minigolf_hud() -> void:
-	update_game_info()
-	update_player_grid()
-
-# Call on the server when all players finish the current hole
-func advance_to_next_course() -> void:
-	if not multiplayer.is_server():
-		return
-		
-	# Check if all 3 courses have been completed
-	if current_course_number >= 3:
-		#end_minigolf_game()
-		return
-
-	# Increment course count & reset turn to the first player
-	current_course_number += 1
-	current_turn_id = minigolf_players[0]
-	
-	# Broadcast updated course state to all connected clients
-	broadcast_minigolf_state(minigolf_players, current_turn_id, current_course_number)
-	
-	# Trigger client-side UI and course layout updates
-	rpc("refresh_minigolf_course")
-
-
-@rpc("authority", "call_local", "reliable")
-func refresh_minigolf_course() -> void:
-	# Update CourseLabel (e.g. "Course 2/3") and active TurnLabel on all screens
-	update_game_info()
-	update_player_grid()
-	
-	# Optional: Reset golf ball positions or load course 2/3 tiles here
-	# load_course_layout(current_course_number)

@@ -1,9 +1,11 @@
 [gd_scene format=3 uid="uid://3w72gsda0b6i"]
 
 [ext_resource type="Texture2D" uid="uid://tiu625i0s3fp" path="res://assets/textures/wooden.jpg" id="1_0x1ge"]
+[ext_resource type="Script" uid="uid://dsw4gdjkfd02b" path="res://scripts/minigames/minigolf_minigame.gd" id="1_s0toe"]
 [ext_resource type="PackedScene" uid="uid://dh1dlag4v3roy" path="res://scenes/minigames/minigolf/courses/Course1.tscn" id="2_vut6l"]
 
 [node name="MinigolfMinigame" type="Node2D" unique_id=231246832]
+script = ExtResource("1_s0toe")
 
 [node name="Boundary" type="StaticBody2D" parent="." unique_id=256848579]
 visible = false
