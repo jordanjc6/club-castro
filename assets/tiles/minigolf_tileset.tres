@@ -1,0 +1,41 @@
+[gd_resource type="TileSet" format=3 uid="uid://7tj23bt4wta7"]
+
+[ext_resource type="Texture2D" uid="uid://dppg1j088iy8e" path="res://assets/textures/turf64.jpg" id="1_ublmp"]
+[ext_resource type="Texture2D" uid="uid://beoat0agnhjeu" path="res://assets/textures/bricks64.png" id="2_x6ovr"]
+[ext_resource type="Texture2D" uid="uid://ceb6r6q6dv3fg" path="res://assets/textures/checkered-start.png" id="3_wit3e"]
+[ext_resource type="Texture2D" uid="uid://bn1ldv8fypgkj" path="res://assets/textures/space.png" id="4_q43t5"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_x6ovr"]
+texture = ExtResource("1_ublmp")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+0:0/0/custom_data_0 = "grass"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wit3e"]
+texture = ExtResource("2_x6ovr")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
+0:0/0/custom_data_0 = "brick"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_q43t5"]
+texture = ExtResource("3_wit3e")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+0:0/0/custom_data_0 = "tee"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wecfj"]
+texture = ExtResource("4_q43t5")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+0:0/0/custom_data_0 = "space"
+
+[resource]
+tile_size = Vector2i(64, 64)
+physics_layer_0/collision_layer = 1
+custom_data_layer_0/name = "surface_type"
+custom_data_layer_0/type = 4
+sources/1 = SubResource("TileSetAtlasSource_x6ovr")
+sources/2 = SubResource("TileSetAtlasSource_wit3e")
+sources/3 = SubResource("TileSetAtlasSource_q43t5")
+sources/4 = SubResource("TileSetAtlasSource_wecfj")

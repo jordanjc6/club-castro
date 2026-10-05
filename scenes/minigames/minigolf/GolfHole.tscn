@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://dw3vmt3w4kuu3"]
+
+[ext_resource type="Texture2D" uid="uid://drms784g8i2mj" path="res://assets/icons/golf-hole.png" id="1_jlo7x"]
+[ext_resource type="Script" uid="uid://b8js1h87vhbeo" path="res://scripts/minigames/GolfHole.gd" id="1_ryyur"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_00mmp"]
+radius = 32.06244
+
+[node name="GolfHole" type="Area2D" unique_id=1468353498]
+script = ExtResource("1_ryyur")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1479243631]
+modulate = Color(0, 0, 0, 1)
+texture = ExtResource("1_jlo7x")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=880986783]
+shape = SubResource("CircleShape2D_00mmp")
