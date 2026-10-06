@@ -77,6 +77,7 @@ func _spawn_local_drag_preview(pos: Vector2) -> void:
 	dragged_ball_preview.global_position = pos
 	dragged_ball_preview.z_index = 10
 
+	# !!! commenting this out causes problems
 	if dragged_ball_preview.has_method("setup_as_preview"):
 		dragged_ball_preview.setup_as_preview()
 
@@ -112,6 +113,8 @@ func sync_drag_preview_start(peer_id: int, pos: Vector2) -> void:
 
 @rpc("any_peer", "call_local", "reliable")
 func confirm_ball_placement(peer_id: int, pos: Vector2) -> void:
+	# !!!
+	return
 	if is_instance_valid(dragged_ball_preview):
 		dragged_ball_preview.queue_free()
 		dragged_ball_preview = null
