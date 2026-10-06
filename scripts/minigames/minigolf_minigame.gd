@@ -14,6 +14,35 @@ var player_data: Dictionary = {}
 var current_turn_id: int  # Active Player ID
 var current_course_number: int = 1  # Course 1, 2, or 3 out of 3
 var dragged_ball_preview: Node2D = null
+var _last_synced_preview_pos: Vector2 = Vector2.ZERO
+var _target_remote_preview_pos: Vector2 = Vector2.ZERO
+
+# Fixed 60Hz update loop - zero frame-rate lag
+func _physics_process(_delta: float) -> void:
+	if is_instance_valid(dragged_ball_preview) and dragged_ball_preview.is_dragging:
+		# Only active player sends position updates
+		if multiplayer.get_unique_id() == current_turn_id:
+			var current_pos = dragged_ball_preview.global_position
+			
+			# Only transmit if position shifted more than 1 pixel
+			if current_pos.distance_squared_to(_last_synced_preview_pos) > 1.0:
+				_last_synced_preview_pos = current_pos
+				rpc("update_drag_preview_position", current_pos)
+
+# Unreliable RPC keeps network footprint ultra-light
+@rpc("any_peer", "call_local", "unreliable")
+func update_drag_preview_position(pos: Vector2) -> void:
+	if multiplayer.get_unique_id() != current_turn_id:
+		_target_remote_preview_pos = pos
+
+# Smooth visual movement on remote clients
+func _process(delta: float) -> void:
+	if is_instance_valid(dragged_ball_preview) and dragged_ball_preview.is_dragging:
+		if multiplayer.get_unique_id() != current_turn_id:
+			dragged_ball_preview.global_position = dragged_ball_preview.global_position.lerp(
+				_target_remote_preview_pos, 
+				delta * 25.0
+			)
 
 # --- Listen for Mouse/Touch Release Anywhere on Screen ---
 func _input(event: InputEvent) -> void:
@@ -109,6 +138,7 @@ func sync_drag_preview_start(peer_id: int, pos: Vector2) -> void:
 	dragged_ball_preview = golf_ball_scene.instantiate()
 	dragged_ball_preview.name = "BallPreview_%d" % peer_id
 	dragged_ball_preview.global_position = pos
+	_target_remote_preview_pos = pos  # Set initial interpolation point
 	dragged_ball_preview.z_index = 10
 
 	if dragged_ball_preview.has_method("setup_as_preview"):

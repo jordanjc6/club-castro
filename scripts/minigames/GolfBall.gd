@@ -14,7 +14,11 @@ func _ready() -> void:
 		freeze = true
 
 func _process(_delta: float) -> void:
-	if is_dragging:
+	# Only follow mouse locally if this ball is actively being dragged
+	if is_dragging and is_preview:
+		# If we don't own the turn, don't override global_position with local mouse!
+		if not is_multiplayer_authority():
+			return
 		global_position = get_global_mouse_position()
 
 func _physics_process(_delta: float) -> void:
@@ -27,6 +31,13 @@ func setup_as_preview() -> void:
 	is_preview = true
 	is_dragging = true
 	freeze = true
+
+	# Disable MultiplayerSynchronizer on previews to prevent network cache errors
+	var syncer = get_node_or_null("MultiplayerSynchronizer")
+	if is_instance_valid(syncer):
+		syncer.public_visibility = false
+		syncer.set_process(false)
+		syncer.set_physics_process(false)
 
 func confirm_as_playable() -> void:
 	is_preview = false
