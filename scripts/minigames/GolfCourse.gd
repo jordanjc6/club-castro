@@ -14,6 +14,19 @@ func _on_tee_button_down() -> void:
 
 # Evaluates whether the ball's Area2D is overlapping the TeeArea
 func is_area_on_tee(check_area: Area2D) -> bool:
-	if not is_instance_valid(check_area):
+	if not is_instance_valid(check_area) or not is_instance_valid(tee_area):
 		return false
-	return tee_area.overlaps_area(check_area)
+		
+	var tee_shape: CollisionShape2D = tee_area.get_node_or_null("CollisionShape2D")
+	var ball_shape: CollisionShape2D = check_area.get_node_or_null("CollisionShape2D")
+	
+	if tee_shape == null or ball_shape == null:
+		return false
+		
+	# Simple geometric overlap check between global positions
+	var tee_rect = Rect2(
+		tee_shape.global_position - (tee_shape.shape.size / 2.0),
+		tee_shape.shape.size
+	)
+	
+	return tee_rect.has_point(check_area.global_position)

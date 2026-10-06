@@ -28,6 +28,15 @@ func setup_as_preview() -> void:
 	is_dragging = true
 	freeze = true
 
+func confirm_as_playable() -> void:
+	is_preview = false
+	is_dragging = false
+	linear_velocity = Vector2.ZERO
+	angular_velocity = 0.0
+	freeze = false
+	sleeping = false
+	modulate.a = 1.0 # Restore full opacity (preview was 0.6)
+
 # Call this from your aiming/shooting script on the player's turn
 func stroke(force_vector: Vector2) -> void:
 	apply_central_impulse(force_vector)

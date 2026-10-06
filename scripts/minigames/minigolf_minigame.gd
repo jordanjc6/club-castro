@@ -53,9 +53,17 @@ func _check_drop_and_confirm(peer_id: int) -> void:
 	var active_course = course_container.get_child(0)
 	var ball_area: Area2D = dragged_ball_preview.get_node_or_null("GolfBallArea")
 	
+	# --- DEBUG PRINTS START ---
+	print("--- DROP CHECK ---")
+	print("Ball Area Node Exists: ", is_instance_valid(ball_area))
+	
 	var is_valid_placement = false
 	if active_course.has_method("is_area_on_tee") and ball_area != null:
 		is_valid_placement = active_course.is_area_on_tee(ball_area)
+		print("is_area_on_tee Result: ", is_valid_placement)
+	else:
+		print("ERROR: active_course missing 'is_area_on_tee' method OR ball_area is null!")
+	# --- DEBUG PRINTS END ---
 
 	if is_valid_placement:
 		var final_pos = dragged_ball_preview.global_position
@@ -113,14 +121,26 @@ func sync_drag_preview_start(peer_id: int, pos: Vector2) -> void:
 
 @rpc("any_peer", "call_local", "reliable")
 func confirm_ball_placement(peer_id: int, pos: Vector2) -> void:
-	# !!!
-	return
-	if is_instance_valid(dragged_ball_preview):
-		dragged_ball_preview.queue_free()
-		dragged_ball_preview = null
+	if not is_instance_valid(dragged_ball_preview):
+		return
 
-	if multiplayer.is_server():
-		confirm_ball_placement_server(peer_id, pos)
+	# Stop the drag follow loop and position at final coordinates
+	dragged_ball_preview.is_dragging = false
+	dragged_ball_preview.global_position = pos
+
+	# Convert preview into active physics ball
+	if dragged_ball_preview.has_method("confirm_as_playable"):
+		dragged_ball_preview.confirm_as_playable()
+	else:
+		dragged_ball_preview.freeze = false
+		dragged_ball_preview.modulate.a = 1.0
+
+	# Assign persistent reference to player data
+	if player_data.has(peer_id):
+		player_data[peer_id]["ball_node"] = dragged_ball_preview
+
+	# Reset local drag handle reference for future turns
+	dragged_ball_preview = null
 
 func confirm_ball_placement_server(peer_id: int, pos: Vector2) -> void:
 	if not multiplayer.is_server() or course_container.get_child_count() == 0:
@@ -190,6 +210,10 @@ func load_course(course_num: int) -> void:
 		var course_scene = load(course_path) as PackedScene
 		var course_instance = course_scene.instantiate()
 		course_container.add_child(course_instance)
+		
+		# Dynamically connect signal on load
+		if course_instance.has_signal("tee_button_pressed"):
+			course_instance.tee_button_pressed.connect(_on_tee_button_pressed)
 
 func advance_to_next_turn() -> void:
 	if not multiplayer.is_server():

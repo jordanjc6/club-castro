@@ -31,6 +31,8 @@ properties/4/spawn = true
 properties/4/replication_mode = 2
 
 [node name="GolfBall" type="RigidBody2D" unique_id=967587289]
+collision_layer = 64
+collision_mask = 32
 physics_material_override = SubResource("PhysicsMaterial_muokh")
 gravity_scale = 0.0
 linear_damp = 1.3
@@ -46,6 +48,8 @@ scale = Vector2(0.4, 0.4)
 shape = SubResource("CircleShape2D_peo2a")
 
 [node name="GolfBallArea" type="Area2D" parent="." unique_id=1429062706]
+collision_layer = 0
+collision_mask = 128
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GolfBallArea" unique_id=516340781]
 scale = Vector2(0.4, 0.4)

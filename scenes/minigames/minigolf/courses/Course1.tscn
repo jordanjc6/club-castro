@@ -29,6 +29,8 @@ tile_set = ExtResource("1_bmfkd")
 position = Vector2(910, 353)
 
 [node name="TeeArea" type="Area2D" parent="." unique_id=2060443125]
+collision_layer = 128
+collision_mask = 128
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TeeArea" unique_id=1836706522]
 position = Vector2(96.5, 352.75)
