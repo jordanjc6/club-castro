@@ -26,6 +26,10 @@ func _physics_process(_delta: float) -> void:
 		linear_velocity = Vector2.ZERO
 		angular_velocity = 0.0
 		is_moving = false
+		
+		var controller = get_tree().get_first_node_in_group("minigolf_controller")
+		if is_instance_valid(controller) and controller.has_method("on_ball_stopped"):
+			controller.on_ball_stopped(self)
 
 func setup_as_preview() -> void:
 	is_preview = true
@@ -50,5 +54,8 @@ func confirm_as_playable() -> void:
 
 # Call this from your aiming/shooting script on the player's turn
 func stroke(force_vector: Vector2) -> void:
+	freeze = false
+	sleeping = false
 	apply_central_impulse(force_vector)
+	linear_velocity = force_vector / mass
 	is_moving = true

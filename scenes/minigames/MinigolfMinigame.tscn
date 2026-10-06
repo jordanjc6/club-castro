@@ -56,6 +56,7 @@ mouse_filter = 2
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 14.0
+mouse_filter = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
@@ -63,6 +64,7 @@ theme_override_constants/margin_bottom = 10
 
 [node name="RotationWrapper" type="Control" parent="Screen/UI/HBoxContainer/HUD" unique_id=1805505125]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Screen/UI/HBoxContainer/HUD/RotationWrapper" unique_id=893446089]
 layout_mode = 0
@@ -70,10 +72,12 @@ offset_left = 159.0
 offset_right = 859.0
 offset_bottom = 159.0
 rotation = 1.5707964
+mouse_filter = 2
 
 [node name="GameInfo" type="HBoxContainer" parent="Screen/UI/HBoxContainer/HUD/RotationWrapper/VBoxContainer" unique_id=45575231]
 layout_mode = 2
 size_flags_vertical = 3
+mouse_filter = 2
 
 [node name="CourseLabel" type="Label" parent="Screen/UI/HBoxContainer/HUD/RotationWrapper/VBoxContainer/GameInfo" unique_id=161755231]
 layout_mode = 2
@@ -90,6 +94,7 @@ horizontal_alignment = 2
 [node name="PlayerGrid" type="GridContainer" parent="Screen/UI/HBoxContainer/HUD/RotationWrapper/VBoxContainer" unique_id=863497064]
 layout_mode = 2
 size_flags_vertical = 3
+mouse_filter = 2
 theme_override_constants/h_separation = 10
 theme_override_constants/v_separation = 10
 columns = 3
@@ -140,6 +145,7 @@ horizontal_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 86.0
+mouse_filter = 2
 
 [node name="Course1" parent="Screen/UI/HBoxContainer/Course" unique_id=1944665442 instance=ExtResource("2_vut6l")]
 layout_mode = 2
