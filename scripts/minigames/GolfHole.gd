@@ -48,20 +48,30 @@ func _check_ball_sink_condition(ball: RigidBody2D, index: int) -> void:
 		if current_speed <= allowed_speed:
 			print(">>> BALL SUNK! Overlap: %.1f%% | Speed: %.1f" % [overlap_pct * 100.0, current_speed])
 			
-			# 1. Immediately freeze physics so it stops rolling away
+			# 1. Freeze physics movement
 			ball.linear_velocity = Vector2.ZERO
 			ball.angular_velocity = 0.0
 			ball.freeze = true
 			
-			# Remove from active hole array so it doesn't trigger again
+			# 2. DISABLE ALL COLLISIONS
+			# Disable physical RigidBody2D collision layers
+			ball.collision_layer = 0
+			ball.collision_mask = 0
+			
+			# Disable child GolfBallArea collisions
+			var ball_area = ball.get_node_or_null("GolfBallArea") as Area2D
+			if is_instance_valid(ball_area):
+				ball_area.monitoring = false
+				ball_area.monitorable = false
+				ball_area.collision_layer = 0
+				ball_area.collision_mask = 0
+
 			balls_in_hole_area.remove_at(index)
 
-			# 2. Smooth Drop-In Animation
+			# 3. Play sink animation
 			_animate_ball_sinking(ball)
 			
 			emit_signal("ball_sunk", ball)
-		else:
-			print("--- BALL DIDN'T SINK (Too fast): Speed: %.1f > Allowed: %.1f" % [current_speed, allowed_speed])
 
 
 func _animate_ball_sinking(ball: RigidBody2D) -> void:

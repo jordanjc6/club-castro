@@ -1,5 +1,4 @@
 Minigolf
-- add move to next course logic (reset course-specific data, restart sequence like in first course)
 - game over after 3 holes
 - handle state if a player disconnects mid-game
 - handle state if all players quit mid-game

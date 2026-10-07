@@ -36,8 +36,7 @@ var _last_synced_aim_pos: Vector2 = Vector2.ZERO
 func _ready() -> void:
 	print("[DEBUG] _ready() called")
 	add_to_group("minigolf_controller")
-	course_container.get_node("Course1").tee_button_pressed.connect(_on_tee_button_pressed)
-	course_container.child_entered_tree.connect(_on_course_child_entered)
+	load_course(current_course_number)
 
 func _physics_process(_delta: float) -> void:
 	# 1. 60Hz Rate-limited preview position broadcast
@@ -88,7 +87,10 @@ func _input(event: InputEvent) -> void:
 		if active_course == null:
 			return
 
-		var my_ball = player_data[my_id]["ball_node"] as RigidBody2D if player_data.has(my_id) else null
+		# Safely check if my_id exists AND ball_node is a living, non-freed instance
+		var my_ball: RigidBody2D = null
+		if player_data.has(my_id) and is_instance_valid(player_data[my_id]["ball_node"]):
+			my_ball = player_data[my_id]["ball_node"] as RigidBody2D
 
 		if is_instance_valid(my_ball) and current_ball_state == BallState.PLACED:
 			rpc("sync_aim_start", input_pos)
@@ -124,41 +126,38 @@ func _input(event: InputEvent) -> void:
 			return
 
 		# Shoot ball if releasing during AIMING state
-		var my_ball = player_data[my_id]["ball_node"] as RigidBody2D if player_data.has(my_id) else null
+		var my_ball: RigidBody2D = null
+		if player_data.has(my_id) and is_instance_valid(player_data[my_id]["ball_node"]):
+			my_ball = player_data[my_id]["ball_node"] as RigidBody2D
+
 		if current_ball_state == BallState.AIMING and is_instance_valid(my_ball):
 			_execute_shot(multiplayer.get_unique_id())
 
 # --- Triggered by transparent TeeTouchButton in Course scene ---
 func _on_tee_button_pressed(touch_pos: Vector2) -> void:
 	print("\n--- [DEBUG] TEE BUTTON PRESSED ---")
-	print("  -> Touch Pos: ", touch_pos, " | Peer ID: ", multiplayer.get_unique_id())
 	if multiplayer.get_unique_id() != current_turn_id:
 		print("  -> REJECTED: Not my turn!")
 		return
 
 	var my_id = multiplayer.get_unique_id()
 	if player_data.has(my_id) and player_data[my_id]["current_strokes"] > 0:
-			print("  -> REJECTED: Cannot place ball after first stroke! (Strokes: %d)" % player_data[my_id]["current_strokes"])
-			return
+		print("  -> REJECTED: Cannot place ball after taking a stroke!")
+		return
+
 	var active_course = course_container.get_child(0) if course_container.get_child_count() > 0 else null
 	if active_course == null:
 		return
 
-	# Convert screen space position into Course1's local coordinate space
 	var local_pos = active_course.make_canvas_position_local(touch_pos)
 
-	# Remove existing ball if replacing
 	if player_data.has(my_id) and is_instance_valid(player_data[my_id]["ball_node"]):
-		print("  -> Removing existing player ball before spawning new preview...")
 		rpc("remove_player_ball", my_id)
 
-	print("  -> Triggering sync_drag_preview_start RPC...")
 	rpc("sync_drag_preview_start", my_id, local_pos)
 
 func _check_drop_and_confirm(peer_id: int) -> void:
-	print("\n--- [DEBUG] CHECK DROP AND CONFIRM ---")
 	if course_container.get_child_count() == 0 or not is_instance_valid(dragged_ball_preview):
-		print("  -> CANCELLED: Course missing or dragged_ball_preview invalid")
 		rpc("cancel_drag_preview", peer_id)
 		return
 
@@ -168,24 +167,18 @@ func _check_drop_and_confirm(peer_id: int) -> void:
 	var is_valid_placement = false
 	if active_course.has_method("is_area_on_tee") and ball_area != null:
 		is_valid_placement = active_course.is_area_on_tee(ball_area)
-		print("  -> is_area_on_tee Result: ", is_valid_placement)
 
-	# --- CHECK IF PREVIEW BALL IS TOUCHING ANOTHER BALL ---
 	if is_valid_placement and dragged_ball_preview.get("is_overlapping_ball") == true:
-		print("  -> Placement REJECTED: Overlapping another ball!")
 		is_valid_placement = false
 
 	if is_valid_placement:
 		var final_pos = dragged_ball_preview.global_position
-		print("  -> Placement VALID! Confirming ball placement at pos: ", final_pos)
 		rpc("confirm_ball_placement", peer_id, final_pos)
 	else:
-		print("  -> Placement INVALID! Cancelling drag preview...")
 		rpc("cancel_drag_preview", peer_id)
 
 @rpc("any_peer", "call_local", "unreliable")
 func sync_drag_preview_start(peer_id: int, pos: Vector2) -> void:
-	print("[DEBUG] RPC sync_drag_preview_start for Peer: ", peer_id)
 	if is_instance_valid(dragged_ball_preview):
 		dragged_ball_preview.queue_free()
 
@@ -195,14 +188,11 @@ func sync_drag_preview_start(peer_id: int, pos: Vector2) -> void:
 
 	dragged_ball_preview = golf_ball_scene.instantiate()
 	dragged_ball_preview.name = "BallPreview_%d" % peer_id
-	
-	# Give ownership/authority of the preview node to the player whose turn it is
 	dragged_ball_preview.set_multiplayer_authority(peer_id)
 	
 	active_course.add_child(dragged_ball_preview, true)
 	dragged_ball_preview.position = pos
 	
-	# Enable dragging flag locally for the active player
 	if multiplayer.get_unique_id() == peer_id and "is_dragging" in dragged_ball_preview:
 		dragged_ball_preview.is_dragging = true
 
@@ -224,17 +214,12 @@ func update_drag_preview_position(pos: Vector2) -> void:
 
 @rpc("any_peer", "call_local", "reliable")
 func confirm_ball_placement(peer_id: int, pos: Vector2) -> void:
-	print("[DEBUG] RPC confirm_ball_placement for Peer: ", peer_id)
 	if not is_instance_valid(dragged_ball_preview):
-		print("  -> ERROR: dragged_ball_preview is null during confirmation!")
 		return
 
 	dragged_ball_preview.is_dragging = false
 	dragged_ball_preview.global_position = pos
-	
-	# Rename to permanent node name
 	dragged_ball_preview.name = "GolfBall_%d" % peer_id
-	print("  -> Renamed ball node to: ", dragged_ball_preview.name)
 
 	if dragged_ball_preview.has_method("confirm_as_playable"):
 		dragged_ball_preview.confirm_as_playable()
@@ -244,17 +229,12 @@ func confirm_ball_placement(peer_id: int, pos: Vector2) -> void:
 
 	if player_data.has(peer_id):
 		player_data[peer_id]["ball_node"] = dragged_ball_preview
-		print("  -> Stored ball_node reference into player_data for peer: ", peer_id)
-	else:
-		print("  -> WARNING: player_data does NOT contain key for peer: ", peer_id)
 
 	dragged_ball_preview = null
 	current_ball_state = BallState.PLACED
-	print("  -> current_ball_state updated to PLACED")
 
 @rpc("any_peer", "call_local", "reliable")
 func cancel_drag_preview(peer_id: int) -> void:
-	print("[DEBUG] RPC cancel_drag_preview for Peer: ", peer_id)
 	if is_instance_valid(dragged_ball_preview):
 		dragged_ball_preview.queue_free()
 		dragged_ball_preview = null
@@ -262,7 +242,6 @@ func cancel_drag_preview(peer_id: int) -> void:
 
 @rpc("any_peer", "call_local", "reliable")
 func remove_player_ball(peer_id: int) -> void:
-	print("[DEBUG] RPC remove_player_ball for Peer: ", peer_id)
 	if player_data.has(peer_id) and is_instance_valid(player_data[peer_id]["ball_node"]):
 		player_data[peer_id]["ball_node"].queue_free()
 		player_data[peer_id]["ball_node"] = null
@@ -270,13 +249,10 @@ func remove_player_ball(peer_id: int) -> void:
 # --- Aiming Sync & Shot Calculations ---
 @rpc("any_peer", "call_local", "reliable")
 func sync_aim_start(start_pos: Vector2) -> void:
-	print("\n--- [DEBUG] RPC sync_aim_start EXECUTED ---")
-	print("  -> Start Pos: ", start_pos)
 	current_ball_state = BallState.AIMING
 	drag_start_pos = start_pos
 	current_drag_pos = start_pos
 	_last_synced_aim_pos = start_pos
-	print("  -> State set to AIMING. Calling queue_redraw()...")
 	_refresh_aim_draw()
 
 @rpc("any_peer", "call_local", "unreliable")
@@ -287,12 +263,8 @@ func update_aim_position(pos: Vector2) -> void:
 func _execute_shot(peer_id: int) -> void:
 	var drag_vector = drag_start_pos - current_drag_pos
 	var distance = clamp(drag_vector.length(), 0.0, MAX_POWER_DISTANCE)
-	print("\n--- [DEBUG] EXECUTING SHOT ---")
-	print("  -> Drag Start: ", drag_start_pos, " | Drag Current: ", current_drag_pos)
-	print("  -> Computed Distance: ", distance, " / ", MAX_POWER_DISTANCE)
 
 	if distance < 10.0:
-		print("  -> CANCELLED: Drag distance too small (< 10.0 pixels)!")
 		current_ball_state = BallState.PLACED
 		_refresh_aim_draw()
 		return
@@ -307,22 +279,15 @@ func _execute_shot(peer_id: int) -> void:
 		stroke_dir = stroke_dir.rotated(random_error_angle)
 
 	var final_force_vector = stroke_dir * (power_percent * MAX_IMPULSE_FORCE)
-	print("  -> Computed Impulse Vector: ", final_force_vector)
-	print("  -> Triggering sync_ball_stroke RPC...")
 	rpc("sync_ball_stroke", peer_id, final_force_vector)
 
 @rpc("any_peer", "call_local", "reliable")
 func sync_ball_stroke(peer_id: int, impulse: Vector2) -> void:
-	print("\n--- [DEBUG] RPC sync_ball_stroke EXECUTED ---")
-	print("  -> Peer ID: ", peer_id, " | Impulse Vector: ", impulse)
 	current_ball_state = BallState.MOVING
 	_refresh_aim_draw()
 
 	if player_data.has(peer_id) and is_instance_valid(player_data[peer_id]["ball_node"]):
 		var ball = player_data[peer_id]["ball_node"] as RigidBody2D
-		print("  -> Applying force to Ball Node: ", ball.name, " (Freeze was: ", ball.freeze, ")")
-		
-		# Ensure physics body is awake before impulse
 		ball.freeze = false
 		ball.sleeping = false
 		
@@ -334,21 +299,48 @@ func sync_ball_stroke(peer_id: int, impulse: Vector2) -> void:
 		player_data[peer_id]["current_strokes"] += 1
 		player_data[peer_id]["total_strokes"] += 1
 		refresh_minigolf_hud()
-	else:
-		print("  -> ERROR: Player ball node is missing or invalid in player_data for peer: ", peer_id)
+
+# --- Hole Sinking Logic ---
+func _on_ball_sunk(sunk_ball: RigidBody2D) -> void:
+	if not multiplayer.is_server():
+		return
+
+	# Find which peer owns this ball
+	var owner_peer_id = 0
+	for p_id in player_data:
+		if player_data[p_id].get("ball_node") == sunk_ball:
+			owner_peer_id = p_id
+			break
+
+	if owner_peer_id != 0:
+		print("[SERVER] Ball sunk for Peer: ", owner_peer_id)
+		rpc("sync_player_finished_hole", owner_peer_id)
+		
+		# Check if any OTHER remaining unsunk balls are still rolling across the green
+		if _are_all_balls_stopped():
+			print("  -> Sunk ball finished sequence and no other balls moving. Advancing turn...")
+			current_ball_state = BallState.PLACED
+			advance_to_next_turn()
+		else:
+			print("  -> Ball sunk, but other balls are still rolling. Waiting...")
+
+@rpc("authority", "call_local", "reliable")
+func sync_player_finished_hole(peer_id: int) -> void:
+	if player_data.has(peer_id):
+		player_data[peer_id]["finished_hole"] = true
+		print("[DEBUG] Peer %d marked finished_hole = true" % peer_id)
+	
+	refresh_minigolf_hud()
 
 func on_ball_stopped(_ball: RigidBody2D) -> void:
 	print("\n--- [DEBUG] A BALL HAS STOPPED ---")
 	if not multiplayer.is_server():
 		return
 
-	# Only proceed if EVERY ball on the course has come to a stop
 	if _are_all_balls_stopped():
-		print("  -> All balls on the field have stopped. Advancing turn...")
+		print("  -> All active balls have stopped. Advancing turn...")
 		current_ball_state = BallState.PLACED
 		advance_to_next_turn()
-	else:
-		print("  -> Other balls are still rolling from collisions. Waiting...")
 
 # Whenever state or drag position updates:
 func _refresh_aim_draw() -> void:
@@ -364,96 +356,66 @@ func _draw() -> void:
 	if not is_instance_valid(active_ball):
 		return
 
-	# Force rendering above background layers and tilemaps
 	z_index = 20
 
-	# 1. Convert Ball global position to local node space
 	var ball_pos = to_local(active_ball.global_position)
-	
-	# 2. Convert Drag screen coordinates into local node space
 	var local_start = to_local(drag_start_pos)
 	var local_curr = to_local(current_drag_pos)
 	
-	# 3. Vector pointing from drag touch point back towards drag start
 	var drag_vector = local_start - local_curr
 	var distance = clamp(drag_vector.length(), 0.0, MAX_POWER_DISTANCE)
 	var power_percent = distance / MAX_POWER_DISTANCE
 
-	# Require minimum drag distance before drawing to avoid static dots at rest
 	if power_percent < 0.05:
 		return
 
-	# Direction vector facing opposite of pull/drag direction
 	var aim_dir = drag_vector.normalized()
 	var line_length = distance * 2.0
 	var main_line_end = ball_pos + (aim_dir * line_length)
 
-	# Calculate spread angle based on power threshold
 	var spread_angle = 0.0
 	if power_percent > ACCURACY_THRESHOLD:
 		var excess_power = (power_percent - ACCURACY_THRESHOLD) / (1.0 - ACCURACY_THRESHOLD)
 		spread_angle = excess_power * MAX_DEVIATION_ANGLE
 
-	# Color shift: Green/White -> Yellow -> Red
 	var line_color = Color.WHITE.lerp(Color.YELLOW, power_percent) if power_percent < ACCURACY_THRESHOLD else Color.YELLOW.lerp(Color.RED, (power_percent - ACCURACY_THRESHOLD) / 0.5)
 	
-	print("\n=== [DRAW INSPECTION] ===")
-	print("  1. Executing Node Name: ", self.name)
-	print("  2. Executing Node Path: ", get_path())
-	print("  3. Canvas / Layer ID:   ", get_canvas_layer_node())
-	print("  4. Node Global Pos:     ", global_position)
-	print("  5. Node Local Z-Index:  ", z_index)
-	print("  6. Is Canvas Relative:  ", z_as_relative)
-	print("  7. Ball Global Pos:     ", active_ball.global_position)
-	print("  8. Drawn 'ball_pos' (Local):   ", ball_pos)
-	print("  9. Drawn 'main_line_end' (Local): ", main_line_end)
-	print("  10. Drawn 'main_line_end' (Global Calculated): ", to_global(main_line_end))
-	print("=========================\n")
-	
 	if spread_angle <= 0.001:
-		# --- LOW POWER: Single Guide Line + End Circle ---
 		draw_line(ball_pos, main_line_end, line_color, 4.0)
 		draw_circle(main_line_end, 8.0, line_color)
 	else:
-		# --- HIGH POWER: Widening Accuracy Cone ---
 		var left_dir = aim_dir.rotated(-spread_angle)
 		var right_dir = aim_dir.rotated(spread_angle)
 
 		var left_end = ball_pos + (left_dir * line_length)
 		var right_end = ball_pos + (right_dir * line_length)
 
-		# Outline lines
 		draw_line(ball_pos, left_end, line_color, 3.0)
 		draw_line(ball_pos, right_end, line_color, 3.0)
 		draw_line(left_end, right_end, line_color, 2.0)
 
-		# Translucent filled spread cone
 		var cone_points = PackedVector2Array([ball_pos, left_end, right_end])
 		var fill_color = Color(line_color.r, line_color.g, line_color.b, 0.25)
 		draw_polygon(cone_points, PackedColorArray([fill_color, fill_color, fill_color]))
 		
-		# Center trajectory line
 		draw_line(ball_pos, main_line_end, Color(1, 1, 1, 0.4), 1.5)
 
 # --- Initialization & Course Handling ---
 func _on_course_child_entered(node: Node) -> void:
-	print("[DEBUG] Course Child Entered: ", node.name, " | Class: ", node.get_class())
 	if node is RigidBody2D and player_data.has(current_turn_id):
 		player_data[current_turn_id]["ball_node"] = node
-		print("  -> Assigned ball_node reference via child_entered_tree")
 
 @rpc("authority", "call_local", "reliable")
 func start_minigolf(turn_order: Array[int]) -> void:
-	print("[DEBUG] start_minigolf RPC called. Turn order: ", turn_order)
 	if multiplayer.is_server():
 		MultiplayerManager.rpc("set_minigolf_started", true)
 	current_course_number = 1
 	current_turn_id = turn_order[0]
 	initialize_game_state(turn_order)
+	load_course(current_course_number)
 	refresh_minigolf_hud()
 
 func initialize_game_state(turn_order: Array[int]) -> void:
-	print("[DEBUG] Initializing Game State for players: ", turn_order)
 	minigolf_turn_order = turn_order
 	player_data.clear()
 	for i in range(turn_order.size()):
@@ -472,7 +434,8 @@ func load_course(course_num: int) -> void:
 	for child in course_container.get_children():
 		child.queue_free()
 		
-	var course_path = "res://scenes/courses/Course%d.tscn" % course_num
+	#var course_path = "res://scenes/minigames/minigolf/courses/Course%d.tscn" % course_num
+	var course_path = "res://scenes/minigames/minigolf/courses/Course1.tscn"
 	if ResourceLoader.exists(course_path):
 		var course_scene = load(course_path) as PackedScene
 		var course_instance = course_scene.instantiate()
@@ -481,15 +444,41 @@ func load_course(course_num: int) -> void:
 		if course_instance.has_signal("tee_button_pressed"):
 			course_instance.tee_button_pressed.connect(_on_tee_button_pressed)
 
+		# Connect GolfHole signal
+		var hole_node = course_instance.find_child("GolfHole", true, false)
+		if is_instance_valid(hole_node) and hole_node.has_signal("ball_sunk"):
+			hole_node.ball_sunk.connect(_on_ball_sunk)
+
 func advance_to_next_turn() -> void:
 	if not multiplayer.is_server():
 		return
-		
+
+	# 1. Check if ALL players have finished the hole
+	var all_finished = true
+	for p_id in player_data:
+		if not player_data[p_id].get("finished_hole", false):
+			all_finished = false
+			break
+
+	if all_finished:
+		print("[SERVER] All players finished hole! Advancing course...")
+		advance_to_next_course()
+		return
+
+	# 2. Find next player who HAS NOT finished the hole
 	var current_index = minigolf_turn_order.find(current_turn_id)
-	var next_index = (current_index + 1) % minigolf_turn_order.size()
-	current_turn_id = minigolf_turn_order[next_index]
+	var next_id = current_turn_id
+
+	for i in range(1, minigolf_turn_order.size() + 1):
+		var check_index = (current_index + i) % minigolf_turn_order.size()
+		var candidate_id = minigolf_turn_order[check_index]
+		
+		if not player_data[candidate_id].get("finished_hole", false):
+			next_id = candidate_id
+			break
+
+	current_turn_id = next_id
 	print("[DEBUG] Server advancing turn to Peer: ", current_turn_id)
-	
 	broadcast_minigolf_state(minigolf_turn_order, current_turn_id, current_course_number)
 
 func broadcast_minigolf_state(turn_order: Array[int], active_turn_id: int, current_course_num: int) -> void:
@@ -502,14 +491,11 @@ func sync_minigolf_state(turn_order: Array[int], active_turn_id: int, current_co
 	current_turn_id = active_turn_id
 	current_course_number = current_course_num
 	
-	# Update local ball state when turn changes
 	var my_id = multiplayer.get_unique_id()
-	if player_data.has(my_id) and is_instance_valid(player_data[my_id]["ball_node"]):
+	if player_data.has(my_id) and is_instance_valid(player_data[my_id]["ball_node"]) and not player_data[my_id]["finished_hole"]:
 		current_ball_state = BallState.PLACED
-		print("[DEBUG] Turn switched to me! Local ball found -> State set to PLACED")
 	else:
 		current_ball_state = BallState.PLACING
-		print("[DEBUG] Turn switched to me! No ball on field -> State set to PLACING")
 
 	refresh_minigolf_hud()
 
@@ -524,18 +510,12 @@ func advance_to_next_course() -> void:
 		return
 		
 	if current_course_number >= 3:
+		print("[SERVER] Minigolf game complete!")
 		return
 
 	current_course_number += 1
 	minigolf_turn_order.shuffle()
 	current_turn_id = minigolf_turn_order[0]
-	
-	for peer_id in player_data:
-		player_data[peer_id]["finished_hole"] = false
-		player_data[peer_id]["current_strokes"] = 0
-		if is_instance_valid(player_data[peer_id]["ball_node"]):
-			player_data[peer_id]["ball_node"].queue_free()
-			player_data[peer_id]["ball_node"] = null
 	
 	rpc("refresh_minigolf_course", minigolf_turn_order, current_turn_id, current_course_number)
 
@@ -544,13 +524,29 @@ func refresh_minigolf_course(turn_order: Array[int], active_turn_id: int, curren
 	minigolf_turn_order = turn_order
 	current_turn_id = active_turn_id
 	current_course_number = current_course_num
+	
+	# --- RESET STROKES & BALL STATE FOR EVERY PLAYER LOCALLY ---
+	for peer_id in player_data:
+		player_data[peer_id]["finished_hole"] = false
+		player_data[peer_id]["current_strokes"] = 0 # MUST BE RESET TO 0!
+		if is_instance_valid(player_data[peer_id]["ball_node"]):
+			player_data[peer_id]["ball_node"].queue_free()
+			player_data[peer_id]["ball_node"] = null
+	
+	load_course(current_course_number)
+	
+	# Reset local ball state to PLACING for the new course
+	current_ball_state = BallState.PLACING
 	refresh_minigolf_hud()
 
 func _are_all_balls_stopped() -> bool:
 	for peer_id in player_data:
+		# Ignore players who have already finished the hole
+		if player_data[peer_id].get("finished_hole", false):
+			continue
+
 		var ball = player_data[peer_id].get("ball_node") as RigidBody2D
 		if is_instance_valid(ball):
-			# Check linear velocity magnitude and sleeping status
 			if not ball.sleeping and ball.linear_velocity.length_squared() > 1.0:
 				return false
 	return true
