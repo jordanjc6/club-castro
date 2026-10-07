@@ -354,7 +354,7 @@ func on_minigolf_game_ended(final_players: Array[int]) -> void:
 	enable_player_movement()
 	
 	# 2. Wait 2 seconds (matching startup delay)
-	await get_tree().create_timer(5.0).timeout
+	#await get_tree().create_timer(1).timeout
 	
 	# 3. Teleport players back to overworld
 	teleport_players_to_overworld()
@@ -375,61 +375,72 @@ func teleport_players_to_overworld() -> void:
 	var default_zone_offset = Vector2(0, 0)
 	var target_position = Vector2(647, 528)
 	
-	print("[SERVER] Teleporting players to overworld. List count: ", minigolf_players.size())
+	print("[SERVER] Teleporting minigolf participants back to overworld...")
 	
-	# Close minigolf popup UI on all peers
+	# RPC all clients to update overworld UI ONLY if they played
 	rpc("set_overworld_ui")
 	
 	for player in get_tree().get_nodes_in_group("player"):
 		var p_id = player.player_id
-		print("  -> Checking player node: ", player.name, " | Peer ID: ", p_id)
 		
+		# ONLY target players who were in minigolf_players
 		if minigolf_players.has(p_id):
-			print("     --> MATCH FOUND! Sending unified teleport RPC to peer: ", p_id)
-			# Send ONE unified RPC directly to the client peer controlling this player
-			rpc_id(p_id, "sync_client_teleport_return", target_position, default_zone_offset)
+			print("  -> Teleporting Minigolf Participant Peer: ", p_id)
+			
+			# 1. Reset camera/zone offset on the participant client
+			player.update_zone_offset.rpc_id(p_id, default_zone_offset)
+			
+			# 2. Update position on the server instance
+			player.global_position = target_position
+			player.show()
+			
+			# 3. Direct the specific participant client to update locally
+			rpc_id(p_id, "teleport_local_client_player", target_position)
 		else:
-			print("     --> REJECTED: Peer ID ", p_id, " not in minigolf_players array!")
+			print("  -> Skipping non-participant Peer: ", p_id)
 
 @rpc("authority", "call_local", "reliable")
-func sync_client_teleport_return(target_pos: Vector2, zone_offset: Vector2) -> void:
+func teleport_local_client_player(target_pos: Vector2) -> void:
 	var my_id = multiplayer.get_unique_id()
-	print("[CLIENT %d] Executing unified teleport to: %s with zone_offset: %s" % [my_id, target_pos, zone_offset])
 	
+	# Guard clause: Ensure this machine was actually in the match
+	if not minigolf_players.has(my_id):
+		return
+
 	for player in get_tree().get_nodes_in_group("player"):
-		# 1. Update camera/zone offset for local viewport owner
-		if player.player_id == my_id and player.has_method("update_zone_offset"):
-			player.update_zone_offset(zone_offset)
-		
-		# 2. Force position, unhide, and zero out physics for ALL players on this machine
-		if "velocity" in player:
-			player.velocity = Vector2.ZERO
-		
-		# Unfreeze physics processing if it was paused during minigolf
-		player.set_physics_process(true)
-		
-		# Teleport & show node on local viewport
-		player.global_position = target_pos
+		# 1. Unhide ALL player nodes on local screen so remote players become visible!
 		player.show()
 		
-		# Re-enable local movement state if this is our player node
-		if player.player_id == my_id and player.has_method("set_movement_disabled"):
-			player.set_movement_disabled(false)
+		# 2. ONLY update velocity & local position for the character owned by this peer
+		if player.player_id == my_id:
+			if "velocity" in player:
+				player.velocity = Vector2.ZERO
+				
+			player.global_position = target_pos
 			
-		print("  -> Player %d node forced to overworld pos locally!" % player.player_id)
-
+			if player.has_method("set_movement_disabled"):
+				player.set_movement_disabled(false)
+			print("[CLIENT %d] Successfully teleported participant locally to %s" % [my_id, target_pos])
 
 @rpc("authority", "call_local", "reliable")
 func set_overworld_ui() -> void:
-	print("[DEBUG] Executing set_overworld_ui on Peer: ", multiplayer.get_unique_id())
+	var my_id = multiplayer.get_unique_id()
+
+	# ONLY close minigolf UI and restore nav for players who were in minigolf
+	if not minigolf_players.has(my_id):
+		return
+
+	print("[DEBUG] Restoring Overworld UI for participant Peer: ", my_id)
 	
 	if is_instance_valid(minigolf_menu):
 		minigolf_menu.show()
 		
 	if is_instance_valid(minigames_popup):
-		minigames_popup.hide()
+		minigames_popup.show()
 		
 	if is_instance_valid(lobby_nav):
 		lobby_nav.show()
 		
-	enable_lobby_nav_buttons()
+	lobby_button.disabled = true
+	minigames_button.disabled = false
+	exit_button.disabled = true
