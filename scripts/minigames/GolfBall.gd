@@ -21,11 +21,33 @@ func _process(_delta: float) -> void:
 			return
 		global_position = get_global_mouse_position()
 
+#func _physics_process(_delta: float) -> void:
+	#if linear_velocity.length() < STOP_THRESHOLD and is_moving:
+		#linear_velocity = Vector2.ZERO
+		#angular_velocity = 0.0
+		#is_moving = false
+		#
+		#var controller = get_tree().get_first_node_in_group("minigolf_controller")
+		#if is_instance_valid(controller) and controller.has_method("on_ball_stopped"):
+			#controller.on_ball_stopped(self)
+
 func _physics_process(_delta: float) -> void:
-	if linear_velocity.length() < STOP_THRESHOLD and is_moving:
+	# Ignore preview or frozen balls
+	if freeze or is_preview:
+		return
+
+	var current_speed = linear_velocity.length()
+
+	# 1. Detect if this ball was bumped/knocked by another ball
+	if not is_moving and current_speed > STOP_THRESHOLD:
+		is_moving = true
+
+	# 2. When the ball slows down below threshold after moving
+	if is_moving and current_speed < STOP_THRESHOLD:
 		linear_velocity = Vector2.ZERO
 		angular_velocity = 0.0
 		is_moving = false
+		sleeping = true
 		
 		var controller = get_tree().get_first_node_in_group("minigolf_controller")
 		if is_instance_valid(controller) and controller.has_method("on_ball_stopped"):

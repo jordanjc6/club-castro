@@ -203,11 +203,14 @@ func sync_drag_preview_start(peer_id: int, pos: Vector2) -> void:
 	dragged_ball_preview = golf_ball_scene.instantiate()
 	dragged_ball_preview.name = "BallPreview_%d" % peer_id
 	
+	# Give ownership/authority of the preview node to the player whose turn it is
+	dragged_ball_preview.set_multiplayer_authority(peer_id)
+	
 	active_course.add_child(dragged_ball_preview, true)
 	dragged_ball_preview.position = pos
 	
-	# Enable dragging flag
-	if "is_dragging" in dragged_ball_preview:
+	# Enable dragging flag locally for the active player
+	if multiplayer.get_unique_id() == peer_id and "is_dragging" in dragged_ball_preview:
 		dragged_ball_preview.is_dragging = true
 
 	_target_remote_preview_pos = dragged_ball_preview.global_position
@@ -342,10 +345,17 @@ func sync_ball_stroke(peer_id: int, impulse: Vector2) -> void:
 		print("  -> ERROR: Player ball node is missing or invalid in player_data for peer: ", peer_id)
 
 func on_ball_stopped(_ball: RigidBody2D) -> void:
-	print("\n--- [DEBUG] ON BALL STOPPED ---")
-	if multiplayer.is_server():
+	print("\n--- [DEBUG] A BALL HAS STOPPED ---")
+	if not multiplayer.is_server():
+		return
+
+	# Only proceed if EVERY ball on the course has come to a stop
+	if _are_all_balls_stopped():
+		print("  -> All balls on the field have stopped. Advancing turn...")
 		current_ball_state = BallState.PLACED
 		advance_to_next_turn()
+	else:
+		print("  -> Other balls are still rolling from collisions. Waiting...")
 
 # Whenever state or drag position updates:
 func _refresh_aim_draw() -> void:
@@ -541,3 +551,12 @@ func refresh_minigolf_course(turn_order: Array[int], active_turn_id: int, curren
 	current_turn_id = active_turn_id
 	current_course_number = current_course_num
 	refresh_minigolf_hud()
+
+func _are_all_balls_stopped() -> bool:
+	for peer_id in player_data:
+		var ball = player_data[peer_id].get("ball_node") as RigidBody2D
+		if is_instance_valid(ball):
+			# Check linear velocity magnitude and sleeping status
+			if not ball.sleeping and ball.linear_velocity.length_squared() > 1.0:
+				return false
+	return true
