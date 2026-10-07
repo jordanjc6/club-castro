@@ -331,7 +331,7 @@ func teleport_players_to_minigolf() -> void:
 			player.update_zone_offset.rpc_id(player.player_id, new_zone_offset)
 			player.global_position = target_position
 			player.hide()
-			lobby_nav.hide()
+			#lobby_nav.hide()
 
 func disable_player_movement():
 	for player in get_tree().get_nodes_in_group("player"):
