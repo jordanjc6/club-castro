@@ -8,10 +8,10 @@ friction = 0.1
 bounce = 0.8
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_peo2a"]
-radius = 32.01562
+radius = 22.63846
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_00mmp"]
-radius = 32.140316
+radius = 22.63846
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_muokh"]
 properties/0/path = NodePath(".:position")
@@ -40,7 +40,7 @@ angular_damp = 2.0
 script = ExtResource("1_muokh")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1619521384]
-scale = Vector2(0.4, 0.4)
+scale = Vector2(0.3, 0.3)
 texture = ExtResource("1_467wi")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1493962247]
