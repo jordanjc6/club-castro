@@ -166,7 +166,6 @@ func _on_tee_button_pressed(touch_pos: Vector2) -> void:
 	print("  -> Triggering sync_drag_preview_start RPC...")
 	rpc("sync_drag_preview_start", my_id, local_pos)
 
-# --- Validate Area2D Overlap and Confirm Placement ---
 func _check_drop_and_confirm(peer_id: int) -> void:
 	print("\n--- [DEBUG] CHECK DROP AND CONFIRM ---")
 	if course_container.get_child_count() == 0 or not is_instance_valid(dragged_ball_preview):
@@ -181,6 +180,11 @@ func _check_drop_and_confirm(peer_id: int) -> void:
 	if active_course.has_method("is_area_on_tee") and ball_area != null:
 		is_valid_placement = active_course.is_area_on_tee(ball_area)
 		print("  -> is_area_on_tee Result: ", is_valid_placement)
+
+	# --- CHECK IF PREVIEW BALL IS TOUCHING ANOTHER BALL ---
+	if is_valid_placement and dragged_ball_preview.get("is_overlapping_ball") == true:
+		print("  -> Placement REJECTED: Overlapping another ball!")
+		is_valid_placement = false
 
 	if is_valid_placement:
 		var final_pos = dragged_ball_preview.global_position
