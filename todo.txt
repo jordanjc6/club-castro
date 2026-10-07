@@ -1,0 +1,5 @@
+Minigolf
+- disallow pressing tee area to place ball if not the player's first turn of the course
+  (note: should be keeping player_info/data dictionary updated with stroke counts, can use that)
+
+- allow golf balls to collide with eachother (perhaps set layer/mask for golf balls to hit e/o)

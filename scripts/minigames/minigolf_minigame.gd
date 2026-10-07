@@ -99,11 +99,21 @@ func _input(event: InputEvent) -> void:
 		else:
 			print("  -> PRESS IGNORED FOR AIMING: Ball node is invalid OR state is not PLACED")
 
-	# --- 2. MOUSE / TOUCH MOTION (AIM DRAGGING) ---
+	# --- 2. MOUSE / TOUCH MOTION ---
 	var is_motion = (event is InputEventMouseMotion) or (event is InputEventScreenDrag)
-	if is_motion and current_ball_state == BallState.AIMING:
-		if my_id == current_turn_id:
-			var input_pos = get_viewport().get_mouse_position()
+	
+	if is_motion and my_id == current_turn_id:
+		var input_pos = get_viewport().get_mouse_position()
+		
+		# A) DRAGGING PREVIEW BALL ON TEE
+		if current_ball_state == BallState.PLACING and is_instance_valid(dragged_ball_preview) and dragged_ball_preview.get("is_dragging"):
+			var active_course = course_container.get_child(0) if course_container.get_child_count() > 0 else null
+			if is_instance_valid(active_course):
+				# Move preview ball directly to local mouse position on the course
+				dragged_ball_preview.position = active_course.make_canvas_position_local(input_pos)
+		
+		# B) AIMING TRAJECTORY CONE
+		elif current_ball_state == BallState.AIMING:
 			current_drag_pos = input_pos
 			print("[DEBUG] Motion Dragging | Start: ", drag_start_pos, " | Curr: ", current_drag_pos, " | Dist: ", (drag_start_pos - current_drag_pos).length())
 			_refresh_aim_draw()
@@ -180,7 +190,6 @@ func _check_drop_and_confirm(peer_id: int) -> void:
 		print("  -> Placement INVALID! Cancelling drag preview...")
 		rpc("cancel_drag_preview", peer_id)
 
-# --- Drag Preview Spawning & RPCs ---
 @rpc("any_peer", "call_local", "unreliable")
 func sync_drag_preview_start(peer_id: int, pos: Vector2) -> void:
 	print("[DEBUG] RPC sync_drag_preview_start for Peer: ", peer_id)
@@ -194,10 +203,13 @@ func sync_drag_preview_start(peer_id: int, pos: Vector2) -> void:
 	dragged_ball_preview = golf_ball_scene.instantiate()
 	dragged_ball_preview.name = "BallPreview_%d" % peer_id
 	
-	# Add to course and assign local position relative to Course1
 	active_course.add_child(dragged_ball_preview, true)
 	dragged_ball_preview.position = pos
 	
+	# Enable dragging flag
+	if "is_dragging" in dragged_ball_preview:
+		dragged_ball_preview.is_dragging = true
+
 	_target_remote_preview_pos = dragged_ball_preview.global_position
 	dragged_ball_preview.z_index = 10
 
@@ -208,7 +220,6 @@ func sync_drag_preview_start(peer_id: int, pos: Vector2) -> void:
 	dragged_ball_preview.modulate = Color(p_color.r, p_color.g, p_color.b, 0.6)
 
 	current_ball_state = BallState.PLACING
-	print("  -> Spawned Node Name: ", dragged_ball_preview.name, " | State set to PLACING")
 
 @rpc("any_peer", "call_local", "unreliable")
 func update_drag_preview_position(pos: Vector2) -> void:
@@ -486,6 +497,16 @@ func sync_minigolf_state(turn_order: Array[int], active_turn_id: int, current_co
 	minigolf_turn_order = turn_order
 	current_turn_id = active_turn_id
 	current_course_number = current_course_num
+	
+	# Update local ball state when turn changes
+	var my_id = multiplayer.get_unique_id()
+	if player_data.has(my_id) and is_instance_valid(player_data[my_id]["ball_node"]):
+		current_ball_state = BallState.PLACED
+		print("[DEBUG] Turn switched to me! Local ball found -> State set to PLACED")
+	else:
+		current_ball_state = BallState.PLACING
+		print("[DEBUG] Turn switched to me! No ball on field -> State set to PLACING")
+
 	refresh_minigolf_hud()
 
 @rpc("authority", "call_local", "reliable")
