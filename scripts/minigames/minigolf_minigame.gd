@@ -151,6 +151,9 @@ func _on_tee_button_pressed(touch_pos: Vector2) -> void:
 		return
 
 	var my_id = multiplayer.get_unique_id()
+	if player_data.has(my_id) and player_data[my_id]["current_strokes"] > 0:
+			print("  -> REJECTED: Cannot place ball after first stroke! (Strokes: %d)" % player_data[my_id]["current_strokes"])
+			return
 	var active_course = course_container.get_child(0) if course_container.get_child_count() > 0 else null
 	if active_course == null:
 		return
