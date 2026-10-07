@@ -464,6 +464,7 @@ func start_minigolf(turn_order: Array[int]) -> void:
 	current_course_number = 1
 	current_turn_id = turn_order[0]
 	initialize_game_state(turn_order)
+	refresh_minigolf_hud()
 
 func initialize_game_state(turn_order: Array[int]) -> void:
 	print("[DEBUG] Initializing Game State for players: ", turn_order)

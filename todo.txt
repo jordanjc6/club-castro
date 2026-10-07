@@ -1,8 +1,8 @@
 Minigolf
-- sometimes player turn + turn highlight visual incorrect on one screen but logic good
-  since they still accept it's not their turn, why
 - add sink ball into hole logic/visual
 - add move to next course logic (reset course-specific data, restart sequence like in first course)
 - game over after 3 holes
 - handle state if a player disconnects mid-game
 - handle state if all players quit mid-game
+- add more tiles (half/triangle, rounded, smaller/bigger)
+- design more courses

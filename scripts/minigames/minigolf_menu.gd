@@ -251,8 +251,6 @@ func set_minigolf_ui() -> void:
 		return
 	lobby_nav.hide()
 	minigolf_menu.hide()
-	update_game_info(1, minigolf_players[0])
-	update_player_grid(minigolf_players, minigolf_players[0])
 	for player in get_tree().get_nodes_in_group("player"):
 		player.hide()
 
