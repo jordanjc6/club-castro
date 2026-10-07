@@ -509,8 +509,9 @@ func advance_to_next_course() -> void:
 	if not multiplayer.is_server():
 		return
 		
-	if current_course_number >= 3:
+	if current_course_number >= 1:
 		print("[SERVER] Minigolf game complete!")
+		rpc("end_minigolf_game")
 		return
 
 	current_course_number += 1
@@ -550,3 +551,49 @@ func _are_all_balls_stopped() -> bool:
 			if not ball.sleeping and ball.linear_velocity.length_squared() > 1.0:
 				return false
 	return true
+
+@rpc("authority", "call_local", "reliable")
+func end_minigolf_game() -> void:
+	print("[DEBUG] Teardown: Resetting Minigolf state variables...")
+
+	# 1. Clean up active or dragged ball nodes
+	if is_instance_valid(dragged_ball_preview):
+		dragged_ball_preview.queue_free()
+		dragged_ball_preview = null
+
+	for peer_id in player_data:
+		var ball = player_data[peer_id].get("ball_node") as RigidBody2D
+		if is_instance_valid(ball):
+			ball.queue_free()
+
+	# Preserve turn order list for teardown handoff
+	var active_participants: Array[int] = minigolf_turn_order.duplicate()
+
+	# 2. Reset game state variables back to defaults
+	minigolf_turn_order.clear()
+	player_data.clear()
+	current_turn_id = 0
+	current_course_number = 1
+	current_ball_state = BallState.PLACING
+
+	# 3. Clear aim/drag position vectors
+	drag_start_pos = Vector2.ZERO
+	current_drag_pos = Vector2.ZERO
+	_last_synced_preview_pos = Vector2.ZERO
+	_target_remote_preview_pos = Vector2.ZERO
+	_last_synced_aim_pos = Vector2.ZERO
+
+	# 4. Clear course container nodes
+	for child in course_container.get_children():
+		child.queue_free()
+
+	# 5. Clear screen redraw overlays
+	_refresh_aim_draw()
+
+	# 6. Update global game flag via server authority
+	if multiplayer.is_server():
+		MultiplayerManager.rpc("set_minigolf_started", false)
+	
+	print("return to overworld ui and teleport players back")
+	if is_instance_valid(minigolf_menu) and minigolf_menu.has_method("on_minigolf_game_ended"):
+		minigolf_menu.on_minigolf_game_ended(active_participants)
