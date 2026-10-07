@@ -531,7 +531,7 @@ func sync_minigolf_state(turn_order: Array[int], active_turn_id: int, current_co
 func refresh_minigolf_hud() -> void:
 	if is_instance_valid(minigolf_menu):
 		minigolf_menu.update_game_info(current_course_number, current_turn_id)
-		minigolf_menu.update_player_grid(minigolf_turn_order, current_turn_id)
+		minigolf_menu.update_player_grid(minigolf_turn_order, current_turn_id, player_data)
 
 func advance_to_next_course() -> void:
 	if not multiplayer.is_server():

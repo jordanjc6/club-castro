@@ -257,10 +257,17 @@ func set_minigolf_ui() -> void:
 func update_game_info(course_num: int, turn_id: int):
 	var courseLabel = minigolf_minigame_game_info.get_node("CourseLabel")
 	var turnLabel = minigolf_minigame_game_info.get_node("TurnLabel")
+	
 	courseLabel.text = "Course %s/3" % course_num
-	turnLabel.text = "%s's turn" % MultiplayerManager.get_player_name(turn_id)
+	
+	# Check if it's THIS machine's turn locally
+	var my_id = multiplayer.get_unique_id()
+	if turn_id == my_id:
+		turnLabel.text = "Your turn!"
+	else:
+		turnLabel.text = "%s's turn" % MultiplayerManager.get_player_name(turn_id)
 
-func update_player_grid(players: Array, curr_turn_id: int) -> void:
+func update_player_grid(players: Array, curr_turn_id: int, player_data: Dictionary = {}) -> void:
 	var label_nodes = minigolf_minigame_player_grid.get_children()
 	
 	for i in range(label_nodes.size()):
@@ -270,42 +277,45 @@ func update_player_grid(players: Array, curr_turn_id: int) -> void:
 			
 		if i < players.size():
 			var peer_id = players[i]
-			# Fetch monkey/player name from your MultiplayerManager lookup
 			var player_name = MultiplayerManager.get_player_name(peer_id)
 			
-			label.text = "%d. %s" % [i + 1, player_name]
+			# Fetch strokes & assigned ball color from player_data
+			var current_strokes = 0
+			var total_strokes = 0
+			var p_color = Color.WHITE
+			
+			if player_data.has(peer_id):
+				current_strokes = player_data[peer_id].get("current_strokes", 0)
+				total_strokes = player_data[peer_id].get("total_strokes", 0)
+				p_color = player_data[peer_id].get("color", Color.WHITE)
+
+			label.text = "%d. %s: %d (%d)" % [i + 1, player_name, current_strokes, total_strokes]
 			label.show()
 			
-			# Check if this player is currently taking their turn
+			# Pass player's unique ball color to the style box helper
 			var is_turn = (peer_id == curr_turn_id)
-			apply_player_label_style(label, is_turn)
+			apply_player_label_style(label, is_turn, p_color)
 		else:
-			# Hide extra labels if there are fewer than 6 players in the game
 			label.hide()
 
-func apply_player_label_style(label: Label, is_current_turn: bool = false) -> void:
+func apply_player_label_style(label: Label, is_current_turn: bool = false, ball_color: Color = Color.WHITE) -> void:
 	var style = StyleBoxFlat.new()
 	
-	# Background colors
 	if is_current_turn:
-		style.bg_color = COLOR_GREEN # Highlight active turn player (Green)
-		style.border_color = COLOR_GOLD # Gold border
-		style.set_border_width_all(2)
+		style.bg_color = COLOR_GREEN
+		style.border_color = ball_color # Use the player's specific golf ball color!
+		style.set_border_width_all(3)    # Thickened slightly so ball color pops
 	else:
-		style.bg_color = Color(0.1, 0.1, 0.1, 0.6) # Dark semi-transparent
+		style.bg_color = Color(0.1, 0.1, 0.1, 0.6)
 		style.border_color = Color(0.3, 0.3, 0.3, 0.8)
 		style.set_border_width_all(1)
 	
-	# Border corner rounding
 	style.set_corner_radius_all(8)
-	
-	# Content padding inside the rounded box
 	style.content_margin_left = 10
 	style.content_margin_right = 10
 	style.content_margin_top = 4
 	style.content_margin_bottom = 4
 	
-	# Apply stylebox override to the label
 	label.add_theme_stylebox_override("normal", style)
 
 func teleport_players_to_minigolf() -> void:
