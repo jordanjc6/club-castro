@@ -4,6 +4,7 @@ extends Node2D
 
 @onready var minigolf_menu: PanelContainer = $"../HUD/MinigamesPopup/MinigolfMenu"
 @onready var course_container: MarginContainer = $Screen/UI/HBoxContainer/Course
+@onready var aim_overlay: Node2D = $Screen/AimOverlay
 
 # Constants
 const BALL_COLORS: Array[Color] = [
@@ -105,7 +106,7 @@ func _input(event: InputEvent) -> void:
 			var input_pos = get_viewport().get_mouse_position()
 			current_drag_pos = input_pos
 			print("[DEBUG] Motion Dragging | Start: ", drag_start_pos, " | Curr: ", current_drag_pos, " | Dist: ", (drag_start_pos - current_drag_pos).length())
-			queue_redraw()
+			_refresh_aim_draw()
 
 	# --- 3. MOUSE / TOUCH RELEASE ---
 	var is_release = (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed) \
@@ -260,12 +261,12 @@ func sync_aim_start(start_pos: Vector2) -> void:
 	current_drag_pos = start_pos
 	_last_synced_aim_pos = start_pos
 	print("  -> State set to AIMING. Calling queue_redraw()...")
-	queue_redraw()
+	_refresh_aim_draw()
 
 @rpc("any_peer", "call_local", "unreliable")
 func update_aim_position(pos: Vector2) -> void:
 	current_drag_pos = pos
-	queue_redraw()
+	_refresh_aim_draw()
 
 func _execute_shot(peer_id: int) -> void:
 	var drag_vector = drag_start_pos - current_drag_pos
@@ -277,7 +278,7 @@ func _execute_shot(peer_id: int) -> void:
 	if distance < 10.0:
 		print("  -> CANCELLED: Drag distance too small (< 10.0 pixels)!")
 		current_ball_state = BallState.PLACED
-		queue_redraw()
+		_refresh_aim_draw()
 		return
 
 	var power_percent = distance / MAX_POWER_DISTANCE
@@ -299,7 +300,7 @@ func sync_ball_stroke(peer_id: int, impulse: Vector2) -> void:
 	print("\n--- [DEBUG] RPC sync_ball_stroke EXECUTED ---")
 	print("  -> Peer ID: ", peer_id, " | Impulse Vector: ", impulse)
 	current_ball_state = BallState.MOVING
-	queue_redraw()
+	_refresh_aim_draw()
 
 	if player_data.has(peer_id) and is_instance_valid(player_data[peer_id]["ball_node"]):
 		var ball = player_data[peer_id]["ball_node"] as RigidBody2D
@@ -326,59 +327,89 @@ func on_ball_stopped(_ball: RigidBody2D) -> void:
 		current_ball_state = BallState.PLACED
 		advance_to_next_turn()
 
+# Whenever state or drag position updates:
+func _refresh_aim_draw() -> void:
+	if is_instance_valid(aim_overlay):
+		aim_overlay.queue_redraw()
+
 # --- Aiming Visual Cone Renderer ---
 func _draw() -> void:
-	if current_ball_state != BallState.AIMING:
-		return
-	if not player_data.has(current_turn_id):
-		print("[DEBUG _draw] Aborted: player_data missing current_turn_id: ", current_turn_id)
+	if current_ball_state != BallState.AIMING or not player_data.has(current_turn_id):
 		return
 
 	var active_ball = player_data[current_turn_id]["ball_node"] as RigidBody2D
 	if not is_instance_valid(active_ball):
-		print("[DEBUG _draw] Aborted: active_ball is NOT valid for current_turn_id: ", current_turn_id)
 		return
 
+	# Force rendering above background layers and tilemaps
 	z_index = 20
-	
+
+	# 1. Convert Ball global position to local node space
 	var ball_pos = to_local(active_ball.global_position)
-	var drag_vector = drag_start_pos - current_drag_pos
+	
+	# 2. Convert Drag screen coordinates into local node space
+	var local_start = to_local(drag_start_pos)
+	var local_curr = to_local(current_drag_pos)
+	
+	# 3. Vector pointing from drag touch point back towards drag start
+	var drag_vector = local_start - local_curr
 	var distance = clamp(drag_vector.length(), 0.0, MAX_POWER_DISTANCE)
 	var power_percent = distance / MAX_POWER_DISTANCE
 
-	print("[DEBUG _draw] DRAWING ACTIVE | BallPos: ", ball_pos, " | Power%: ", power_percent)
-
+	# Require minimum drag distance before drawing to avoid static dots at rest
 	if power_percent < 0.05:
 		return
 
+	# Direction vector facing opposite of pull/drag direction
 	var aim_dir = drag_vector.normalized()
 	var line_length = distance * 2.0
 	var main_line_end = ball_pos + (aim_dir * line_length)
 
+	# Calculate spread angle based on power threshold
 	var spread_angle = 0.0
 	if power_percent > ACCURACY_THRESHOLD:
 		var excess_power = (power_percent - ACCURACY_THRESHOLD) / (1.0 - ACCURACY_THRESHOLD)
 		spread_angle = excess_power * MAX_DEVIATION_ANGLE
 
+	# Color shift: Green/White -> Yellow -> Red
 	var line_color = Color.WHITE.lerp(Color.YELLOW, power_percent) if power_percent < ACCURACY_THRESHOLD else Color.YELLOW.lerp(Color.RED, (power_percent - ACCURACY_THRESHOLD) / 0.5)
-
+	
+	print("\n=== [DRAW INSPECTION] ===")
+	print("  1. Executing Node Name: ", self.name)
+	print("  2. Executing Node Path: ", get_path())
+	print("  3. Canvas / Layer ID:   ", get_canvas_layer_node())
+	print("  4. Node Global Pos:     ", global_position)
+	print("  5. Node Local Z-Index:  ", z_index)
+	print("  6. Is Canvas Relative:  ", z_as_relative)
+	print("  7. Ball Global Pos:     ", active_ball.global_position)
+	print("  8. Drawn 'ball_pos' (Local):   ", ball_pos)
+	print("  9. Drawn 'main_line_end' (Local): ", main_line_end)
+	print("  10. Drawn 'main_line_end' (Global Calculated): ", to_global(main_line_end))
+	print("=========================\n")
+	
 	if spread_angle <= 0.001:
+		# --- LOW POWER: Single Guide Line + End Circle ---
 		draw_line(ball_pos, main_line_end, line_color, 4.0)
 		draw_circle(main_line_end, 8.0, line_color)
 	else:
+		# --- HIGH POWER: Widening Accuracy Cone ---
 		var left_dir = aim_dir.rotated(-spread_angle)
 		var right_dir = aim_dir.rotated(spread_angle)
 
 		var left_end = ball_pos + (left_dir * line_length)
 		var right_end = ball_pos + (right_dir * line_length)
 
+		# Outline lines
 		draw_line(ball_pos, left_end, line_color, 3.0)
 		draw_line(ball_pos, right_end, line_color, 3.0)
 		draw_line(left_end, right_end, line_color, 2.0)
 
+		# Translucent filled spread cone
 		var cone_points = PackedVector2Array([ball_pos, left_end, right_end])
 		var fill_color = Color(line_color.r, line_color.g, line_color.b, 0.25)
 		draw_polygon(cone_points, PackedColorArray([fill_color, fill_color, fill_color]))
+		
+		# Center trajectory line
 		draw_line(ball_pos, main_line_end, Color(1, 1, 1, 0.4), 1.5)
 
 # --- Initialization & Course Handling ---
