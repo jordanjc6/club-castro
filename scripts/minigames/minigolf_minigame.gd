@@ -141,6 +141,12 @@ func _on_tee_button_pressed(touch_pos: Vector2) -> void:
 		return
 
 	var my_id = multiplayer.get_unique_id()
+	var active_course = course_container.get_child(0) if course_container.get_child_count() > 0 else null
+	if active_course == null:
+		return
+
+	# Convert screen space position into Course1's local coordinate space
+	var local_pos = active_course.make_canvas_position_local(touch_pos)
 
 	# Remove existing ball if replacing
 	if player_data.has(my_id) and is_instance_valid(player_data[my_id]["ball_node"]):
@@ -148,7 +154,7 @@ func _on_tee_button_pressed(touch_pos: Vector2) -> void:
 		rpc("remove_player_ball", my_id)
 
 	print("  -> Triggering sync_drag_preview_start RPC...")
-	rpc("sync_drag_preview_start", my_id, touch_pos)
+	rpc("sync_drag_preview_start", my_id, local_pos)
 
 # --- Validate Area2D Overlap and Confirm Placement ---
 func _check_drop_and_confirm(peer_id: int) -> void:
@@ -187,8 +193,12 @@ func sync_drag_preview_start(peer_id: int, pos: Vector2) -> void:
 
 	dragged_ball_preview = golf_ball_scene.instantiate()
 	dragged_ball_preview.name = "BallPreview_%d" % peer_id
-	dragged_ball_preview.global_position = pos
-	_target_remote_preview_pos = pos
+	
+	# Add to course and assign local position relative to Course1
+	active_course.add_child(dragged_ball_preview, true)
+	dragged_ball_preview.position = pos
+	
+	_target_remote_preview_pos = dragged_ball_preview.global_position
 	dragged_ball_preview.z_index = 10
 
 	if dragged_ball_preview.has_method("setup_as_preview"):
@@ -197,7 +207,6 @@ func sync_drag_preview_start(peer_id: int, pos: Vector2) -> void:
 	var p_color = player_data[peer_id]["color"] if player_data.has(peer_id) else Color.WHITE
 	dragged_ball_preview.modulate = Color(p_color.r, p_color.g, p_color.b, 0.6)
 
-	active_course.add_child(dragged_ball_preview, true)
 	current_ball_state = BallState.PLACING
 	print("  -> Spawned Node Name: ", dragged_ball_preview.name, " | State set to PLACING")
 
