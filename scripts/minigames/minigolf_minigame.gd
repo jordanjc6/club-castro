@@ -67,55 +67,46 @@ func _process(delta: float) -> void:
 func _input(event: InputEvent) -> void:
 	var my_id = multiplayer.get_unique_id()
 	
+	# Helper to get exact screen position across Mouse, Touch, Motion, and Drag
+	var input_pos = Vector2.ZERO
+	if event is InputEventMouseButton or event is InputEventMouseMotion:
+		input_pos = event.position
+	elif event is InputEventScreenTouch or event is InputEventScreenDrag:
+		input_pos = event.position
+	else:
+		input_pos = get_viewport().get_mouse_position()
+
 	# --- 1. MOUSE / TOUCH PRESS ---
 	var is_press = (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) \
 				or (event is InputEventScreenTouch and event.pressed)
 
 	if is_press:
-		print("\n--- [DEBUG] INPUT PRESS DETECTED ---")
-		print("  -> Local Peer ID: ", my_id, " | Current Turn ID: ", current_turn_id)
-		print("  -> Is My Turn?: ", my_id == current_turn_id)
-		
 		if my_id != current_turn_id:
-			print("  -> REJECTED: Not my turn!")
 			return
 
 		var active_course = course_container.get_child(0) if course_container.get_child_count() > 0 else null
-		print("  -> Active Course Found: ", is_instance_valid(active_course))
 		if active_course == null:
 			return
 
-		print("  -> Player Data Has My ID (", my_id, "): ", player_data.has(my_id))
 		var my_ball = player_data[my_id]["ball_node"] as RigidBody2D if player_data.has(my_id) else null
-		print("  -> My Ball Node Valid: ", is_instance_valid(my_ball))
-		print("  -> Current Ball State: ", current_ball_state, " (0:PLACING, 1:PLACED, 2:AIMING, 3:MOVING)")
-
-		var input_pos = get_viewport().get_mouse_position()
 
 		if is_instance_valid(my_ball) and current_ball_state == BallState.PLACED:
-			print("  -> CONDITIONS MET! Triggering sync_aim_start at pos: ", input_pos)
 			rpc("sync_aim_start", input_pos)
 			return
-		else:
-			print("  -> PRESS IGNORED FOR AIMING: Ball node is invalid OR state is not PLACED")
 
 	# --- 2. MOUSE / TOUCH MOTION ---
 	var is_motion = (event is InputEventMouseMotion) or (event is InputEventScreenDrag)
 	
 	if is_motion and my_id == current_turn_id:
-		var input_pos = get_viewport().get_mouse_position()
-		
 		# A) DRAGGING PREVIEW BALL ON TEE
 		if current_ball_state == BallState.PLACING and is_instance_valid(dragged_ball_preview) and dragged_ball_preview.get("is_dragging"):
 			var active_course = course_container.get_child(0) if course_container.get_child_count() > 0 else null
 			if is_instance_valid(active_course):
-				# Move preview ball directly to local mouse position on the course
 				dragged_ball_preview.position = active_course.make_canvas_position_local(input_pos)
 		
 		# B) AIMING TRAJECTORY CONE
 		elif current_ball_state == BallState.AIMING:
 			current_drag_pos = input_pos
-			print("[DEBUG] Motion Dragging | Start: ", drag_start_pos, " | Curr: ", current_drag_pos, " | Dist: ", (drag_start_pos - current_drag_pos).length())
 			_refresh_aim_draw()
 
 	# --- 3. MOUSE / TOUCH RELEASE ---
@@ -126,12 +117,8 @@ func _input(event: InputEvent) -> void:
 		if my_id != current_turn_id:
 			return
 
-		print("\n--- [DEBUG] INPUT RELEASE DETECTED ---")
-		print("  -> Current Ball State: ", current_ball_state)
-
 		# Drop preview ball onto Tee
 		if is_instance_valid(dragged_ball_preview) and dragged_ball_preview.get("is_dragging"):
-			print("  -> Dropping Drag Preview Ball...")
 			dragged_ball_preview.is_dragging = false
 			_check_drop_and_confirm(multiplayer.get_unique_id())
 			return
@@ -139,7 +126,6 @@ func _input(event: InputEvent) -> void:
 		# Shoot ball if releasing during AIMING state
 		var my_ball = player_data[my_id]["ball_node"] as RigidBody2D if player_data.has(my_id) else null
 		if current_ball_state == BallState.AIMING and is_instance_valid(my_ball):
-			print("  -> Attempting _execute_shot...")
 			_execute_shot(multiplayer.get_unique_id())
 
 # --- Triggered by transparent TeeTouchButton in Course scene ---
