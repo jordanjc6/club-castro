@@ -8,12 +8,13 @@ extends Node2D
 @onready var notif_popup: PanelContainer = $Screen/Notification
 
 # Constants
-const NUM_COURSES_PER_GAME = 3
+const NUM_COURSES_PER_GAME = 1
 const AVAILABLE_COURSES: Array[int] = [1, 2, 3]
 const BALL_COLORS: Array[Color] = [
 	Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE
 ]
 const HOLE_WINNER_NOTIF_TIME = 4  # display course winner notif for 4s
+const GAME_RESULT_NOTIF_TIME = 5.5
 
 enum BallState { PLACING, PLACED, AIMING, MOVING }
 
@@ -30,6 +31,7 @@ var current_course_number: int = 1  # 1, 2, 3 out of 3 courses played each game
 var played_courses: Array[int] = []
 var dragged_ball_preview: Node2D = null
 var current_ball_state: BallState = BallState.PLACING
+var notif_tween: Tween = null
 
 # Aiming & Network Sync Parameters
 var drag_start_pos: Vector2 = Vector2.ZERO
@@ -531,18 +533,75 @@ func announce_course_winner() -> void:
 		winner_msg += " Game over!"
 	
 	# Broadcast banner RPC to all peers
-	rpc("show_hole_winner_notification", winner_msg)
+	rpc("show_notification", winner_msg, HOLE_WINNER_NOTIF_TIME)
+
+func announce_game_result() -> void:
+	if not multiplayer.is_server():
+		return
+	
+	# 1. Collect all players into an array for sorting
+	var sorted_players: Array = []
+	for p_id in player_data:
+		sorted_players.append(player_data[p_id])
+
+	# 2. Sort players by lowest total_strokes first
+	sorted_players.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return a.get("total_strokes", 0) < b.get("total_strokes", 0)
+	)
+
+	# 3. Determine overall winner(s) with lowest total strokes
+	var lowest_strokes: int = sorted_players[0].get("total_strokes", 0) if not sorted_players.is_empty() else 0
+	var winners: Array[String] = []
+
+	for player in sorted_players:
+		if player.get("total_strokes", 0) == lowest_strokes:
+			winners.append(player.get("name", "Player"))
+		else:
+			break # Since array is sorted, stop checking once stroke count increases
+
+	# Build top summary message
+	var winner_msg = ""
+	if winners.size() == 1:
+		winner_msg = "%s won the game in %d total strokes!" % [winners[0], lowest_strokes]
+	else:
+		winner_msg = "The game ends in a tie! (%s) with %d total strokes!" % [", ".join(winners), lowest_strokes]
+
+	# 4. Build formatted leaderboard string
+	var lines: Array[String] = [winner_msg, ""] # Blank line separation
+	var current_rank: int = 1
+
+	for i in range(sorted_players.size()):
+		var player = sorted_players[i]
+		
+		# Handle ties for ranking display
+		if i > 0 and player.get("total_strokes", 0) > sorted_players[i - 1].get("total_strokes", 0):
+			current_rank = i + 1
+
+		var line = "%d. %s (%d)" % [
+			current_rank, 
+			player.get("name", "Player"), 
+			player.get("total_strokes", 0)
+		]
+		lines.append(line)
+
+	var final_msg: String = "\n".join(lines)
+	
+	# Broadcast banner RPC to all peers
+	rpc("show_notification", final_msg, GAME_RESULT_NOTIF_TIME)
 
 @rpc("authority", "call_local", "reliable")
-func show_hole_winner_notification(message: String) -> void:
+func show_notification(message: String, time: float) -> void:
 	var label = notif_popup.get_node("MarginContainer/Label")
 	label.text = message
 	notif_popup.show()
-	await get_tree().create_timer(HOLE_WINNER_NOTIF_TIME).timeout
-	notif_popup.hide()
-	
-	#if is_instance_valid(minigolf_menu) and "game_manager" in minigolf_menu:
-		#minigolf_menu.game_manager.show_temp_notif(message, HOLE_WINNER_NOTIF_TIME)
+
+	# Kill active notification timer if a new one arrives
+	if notif_tween and notif_tween.is_running():
+		notif_tween.kill()
+
+	notif_tween = create_tween()
+	notif_tween.tween_interval(time)
+	notif_tween.tween_callback(notif_popup.hide)
 
 func broadcast_minigolf_state(turn_order: Array[int], active_turn_id: int, current_course_num: int) -> void:
 	if multiplayer.is_server():
@@ -572,9 +631,11 @@ func advance_to_next_course() -> void:
 	if not multiplayer.is_server():
 		return
 		
-	# End game after 3 unique courses have been played
+	# End game after NUM_COURSES_PER_GAME played
 	if current_course_number >= NUM_COURSES_PER_GAME:
 		print("[SERVER] Minigolf game complete!")
+		announce_game_result()
+		await get_tree().create_timer(GAME_RESULT_NOTIF_TIME).timeout
 		rpc("end_minigolf_game")
 		return
 
@@ -584,7 +645,6 @@ func advance_to_next_course() -> void:
 		if not played_courses.has(course_id):
 			unplayed_courses.append(course_id)
 
-	# Safety fallback in case pool is smaller than 3
 	var next_course_id: int = 1
 	if not unplayed_courses.is_empty():
 		next_course_id = unplayed_courses.pick_random()
