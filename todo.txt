@@ -1,3 +1,7 @@
 Minigolf
-- add more tiles (half/triangle, rounded, smaller/bigger)
+- add game result display at end of minigolf game
 - design more courses
+- add more tile shapes (half/triangle, rounded, smaller/bigger)
+- add sand
+- add water
+- add space
