@@ -5,6 +5,7 @@ extends Node2D
 @onready var minigolf_menu: PanelContainer = $"../HUD/MinigamesPopup/MinigolfMenu"
 @onready var course_container: MarginContainer = $Screen/UI/HBoxContainer/Course
 @onready var aim_overlay: Node2D = $Screen/AimOverlay
+@onready var notif_popup: PanelContainer = $Screen/Notification
 
 # Constants
 const NUM_COURSES_PER_GAME = 3
@@ -428,6 +429,7 @@ func sync_game_start(turn_order: Array[int], starting_course_id: int) -> void:
 	initialize_game_state(turn_order)
 	load_course(starting_course_id)
 	refresh_minigolf_hud()
+	notif_popup.hide()
 
 func initialize_game_state(turn_order: Array[int]) -> void:
 	minigolf_turn_order = turn_order
@@ -533,8 +535,14 @@ func announce_course_winner() -> void:
 
 @rpc("authority", "call_local", "reliable")
 func show_hole_winner_notification(message: String) -> void:
-	if is_instance_valid(minigolf_menu) and "game_manager" in minigolf_menu:
-		minigolf_menu.game_manager.show_temp_notif(message, HOLE_WINNER_NOTIF_TIME)
+	var label = notif_popup.get_node("MarginContainer/Label")
+	label.text = message
+	notif_popup.show()
+	await get_tree().create_timer(HOLE_WINNER_NOTIF_TIME).timeout
+	notif_popup.hide()
+	
+	#if is_instance_valid(minigolf_menu) and "game_manager" in minigolf_menu:
+		#minigolf_menu.game_manager.show_temp_notif(message, HOLE_WINNER_NOTIF_TIME)
 
 func broadcast_minigolf_state(turn_order: Array[int], active_turn_id: int, current_course_num: int) -> void:
 	if multiplayer.is_server():

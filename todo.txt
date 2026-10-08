@@ -1,5 +1,4 @@
 Minigolf
-- add course result display 
 - add game result display at end of minigolf game
 - add exit btn
 - design more courses
