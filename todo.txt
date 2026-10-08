@@ -1,4 +1,5 @@
 Minigolf
+- add course result display 
 - add game result display at end of minigolf game
 - design more courses
 - add more tile shapes (half/triangle, rounded, smaller/bigger)
