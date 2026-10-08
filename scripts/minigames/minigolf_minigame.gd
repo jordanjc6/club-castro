@@ -7,6 +7,7 @@ extends Node2D
 @onready var aim_overlay: Node2D = $Screen/AimOverlay
 
 # Constants
+const AVAILABLE_COURSES: Array[int] = [1, 2, 3]
 const BALL_COLORS: Array[Color] = [
 	Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE
 ]
@@ -22,7 +23,8 @@ const MAX_DEVIATION_ANGLE: float = 0.35  # Max error angle in radians (~20 deg)
 var minigolf_turn_order: Array[int] = []
 var player_data: Dictionary = {}
 var current_turn_id: int
-var current_course_number: int = 1
+var current_course_number: int = 1  # 1, 2, 3 out of 3 courses played each game
+var played_courses: Array[int] = []
 var dragged_ball_preview: Node2D = null
 var current_ball_state: BallState = BallState.PLACING
 
@@ -36,7 +38,6 @@ var _last_synced_aim_pos: Vector2 = Vector2.ZERO
 func _ready() -> void:
 	print("[DEBUG] _ready() called")
 	add_to_group("minigolf_controller")
-	load_course(current_course_number)
 
 func _physics_process(_delta: float) -> void:
 	# 1. 60Hz Rate-limited preview position broadcast
@@ -409,10 +410,21 @@ func _on_course_child_entered(node: Node) -> void:
 func start_minigolf(turn_order: Array[int]) -> void:
 	if multiplayer.is_server():
 		MultiplayerManager.rpc("set_minigolf_started", true)
+		
+		# Pick first random course ID from available pool
+		played_courses.clear()
+		var first_course_id = AVAILABLE_COURSES.pick_random()
+		played_courses.append(first_course_id)
+		
+		# Broadcast starting state to all peers
+		rpc("sync_game_start", turn_order, first_course_id)
+
+@rpc("authority", "call_local", "reliable")
+func sync_game_start(turn_order: Array[int], starting_course_id: int) -> void:
 	current_course_number = 1
 	current_turn_id = turn_order[0]
 	initialize_game_state(turn_order)
-	load_course(current_course_number)
+	load_course(starting_course_id)
 	refresh_minigolf_hud()
 
 func initialize_game_state(turn_order: Array[int]) -> void:
@@ -434,8 +446,8 @@ func load_course(course_num: int) -> void:
 	for child in course_container.get_children():
 		child.queue_free()
 		
-	#var course_path = "res://scenes/minigames/minigolf/courses/Course%d.tscn" % course_num
-	var course_path = "res://scenes/minigames/minigolf/courses/Course1.tscn"
+	var course_path = "res://scenes/minigames/minigolf/courses/Course%d.tscn" % course_num
+	#var course_path = "res://scenes/minigames/minigolf/courses/Course1.tscn"
 	if ResourceLoader.exists(course_path):
 		var course_scene = load(course_path) as PackedScene
 		var course_instance = course_scene.instantiate()
@@ -509,34 +521,49 @@ func advance_to_next_course() -> void:
 	if not multiplayer.is_server():
 		return
 		
-	if current_course_number >= 1:
+	# End game after 3 unique courses have been played
+	if current_course_number >= 3:
 		print("[SERVER] Minigolf game complete!")
 		rpc("end_minigolf_game")
 		return
 
+	# Filter available courses to only unplayed ones
+	var unplayed_courses: Array[int] = []
+	for course_id in AVAILABLE_COURSES:
+		if not played_courses.has(course_id):
+			unplayed_courses.append(course_id)
+
+	# Safety fallback in case pool is smaller than 3
+	var next_course_id: int = 1
+	if not unplayed_courses.is_empty():
+		next_course_id = unplayed_courses.pick_random()
+	else:
+		next_course_id = AVAILABLE_COURSES.pick_random()
+
+	played_courses.append(next_course_id)
 	current_course_number += 1
+	
 	minigolf_turn_order.shuffle()
 	current_turn_id = minigolf_turn_order[0]
 	
-	rpc("refresh_minigolf_course", minigolf_turn_order, current_turn_id, current_course_number)
+	rpc("refresh_minigolf_course", minigolf_turn_order, current_turn_id, current_course_number, next_course_id)
 
 @rpc("authority", "call_local", "reliable")
-func refresh_minigolf_course(turn_order: Array[int], active_turn_id: int, current_course_num: int) -> void:
+func refresh_minigolf_course(turn_order: Array[int], active_turn_id: int, course_round_num: int, course_id_to_load: int) -> void:
 	minigolf_turn_order = turn_order
 	current_turn_id = active_turn_id
-	current_course_number = current_course_num
+	current_course_number = course_round_num
 	
-	# --- RESET STROKES & BALL STATE FOR EVERY PLAYER LOCALLY ---
+	# Reset strokes and ball instances for all players locally
 	for peer_id in player_data:
 		player_data[peer_id]["finished_hole"] = false
-		player_data[peer_id]["current_strokes"] = 0 # MUST BE RESET TO 0!
+		player_data[peer_id]["current_strokes"] = 0
 		if is_instance_valid(player_data[peer_id]["ball_node"]):
 			player_data[peer_id]["ball_node"].queue_free()
 			player_data[peer_id]["ball_node"] = null
 	
-	load_course(current_course_number)
+	load_course(course_id_to_load)
 	
-	# Reset local ball state to PLACING for the new course
 	current_ball_state = BallState.PLACING
 	refresh_minigolf_hud()
 
@@ -601,6 +628,7 @@ func end_minigolf_game() -> void:
 	var active_participants: Array[int] = minigolf_turn_order.duplicate()
 
 	# 2. Reset game state variables back to defaults
+	played_courses.clear()
 	minigolf_turn_order.clear()
 	player_data.clear()
 	current_turn_id = 0
