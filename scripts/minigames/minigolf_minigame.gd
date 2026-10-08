@@ -7,10 +7,12 @@ extends Node2D
 @onready var aim_overlay: Node2D = $Screen/AimOverlay
 
 # Constants
+const NUM_COURSES_PER_GAME = 3
 const AVAILABLE_COURSES: Array[int] = [1, 2, 3]
 const BALL_COLORS: Array[Color] = [
 	Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE
 ]
+const HOLE_WINNER_NOTIF_TIME = 4  # display course winner notif for 4s
 
 enum BallState { PLACING, PLACED, AIMING, MOVING }
 
@@ -474,6 +476,8 @@ func advance_to_next_turn() -> void:
 
 	if all_finished:
 		print("[SERVER] All players finished hole! Advancing course...")
+		announce_course_winner()
+		await get_tree().create_timer(HOLE_WINNER_NOTIF_TIME).timeout
 		advance_to_next_course()
 		return
 
@@ -492,6 +496,45 @@ func advance_to_next_turn() -> void:
 	current_turn_id = next_id
 	print("[DEBUG] Server advancing turn to Peer: ", current_turn_id)
 	broadcast_minigolf_state(minigolf_turn_order, current_turn_id, current_course_number)
+
+func announce_course_winner() -> void:
+	if not multiplayer.is_server():
+		return
+	
+	var lowest_strokes: int = 999
+	var winners: Array[String] = []
+
+	# Calculate lowest stroke count for this course
+	for p_id in player_data:
+		var strokes = player_data[p_id].get("current_strokes", 0)
+		var p_name = player_data[p_id].get("name", "Player")
+
+		if strokes < lowest_strokes:
+			lowest_strokes = strokes
+			winners.clear()
+			winners.append(p_name)
+		elif strokes == lowest_strokes:
+			winners.append(p_name)
+
+	# Build winner text string
+	var winner_msg = ""
+	if winners.size() == 1:
+		winner_msg = "%s won the hole in %d strokes!" % [winners[0], lowest_strokes]
+	else:
+		winner_msg = "Tie for the hole! (%s) with %d strokes!" % [", ".join(winners), lowest_strokes]
+	
+	if current_course_number < NUM_COURSES_PER_GAME:
+		winner_msg += " Advancing to next course.."
+	else:
+		winner_msg += " Game over!"
+	
+	# Broadcast banner RPC to all peers
+	rpc("show_hole_winner_notification", winner_msg)
+
+@rpc("authority", "call_local", "reliable")
+func show_hole_winner_notification(message: String) -> void:
+	if is_instance_valid(minigolf_menu) and "game_manager" in minigolf_menu:
+		minigolf_menu.game_manager.show_temp_notif(message, HOLE_WINNER_NOTIF_TIME)
 
 func broadcast_minigolf_state(turn_order: Array[int], active_turn_id: int, current_course_num: int) -> void:
 	if multiplayer.is_server():
@@ -522,7 +565,7 @@ func advance_to_next_course() -> void:
 		return
 		
 	# End game after 3 unique courses have been played
-	if current_course_number >= 3:
+	if current_course_number >= NUM_COURSES_PER_GAME:
 		print("[SERVER] Minigolf game complete!")
 		rpc("end_minigolf_game")
 		return
