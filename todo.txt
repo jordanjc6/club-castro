@@ -1,5 +1,3 @@
 Minigolf
-- handle state if a player disconnects mid-game
-- handle state if all players quit mid-game
 - add more tiles (half/triangle, rounded, smaller/bigger)
 - design more courses

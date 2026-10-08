@@ -80,21 +80,31 @@ func hide_minigames_popups():
 @rpc("any_peer", "call_local", "reliable")
 func remove_minigolf_player(id: int) -> void:
 	if multiplayer.is_server():
-		print("REMOVE PLAYER")
+		print("[SERVER] Removing Minigolf player ID: ", id)
 		minigolf_players.erase(id)
 		rpc("sync_minigolf_lobby_ui", minigolf_players)
+
+		# IF GAME IS ACTIVE: Tell minigame to handle mid-game departure
+		if MultiplayerManager.is_minigolf_minigame_started:
+			if is_instance_valid(minigolf_minigame) and minigolf_minigame.has_method("handle_midgame_player_disconnect"):
+				minigolf_minigame.handle_midgame_player_disconnect(id)
+
 		check_remaining_players()
 
 func check_remaining_players():
 	if minigolf_players.is_empty():
+		print("[SERVER] All minigolf players left. Resetting match state...")
 		reset_minigolf_state()
 
 func reset_minigolf_state():
 	if multiplayer.is_server():
-		print("REMOVE PLAYERS")
 		minigolf_players.clear()
 		MultiplayerManager.rpc("set_minigolf_started", false)
 		rpc("sync_minigolf_lobby_ui", minigolf_players)
+		
+		# Force teardown of active minigame entities if room becomes empty
+		if is_instance_valid(minigolf_minigame) and minigolf_minigame.has_method("end_minigolf_game"):
+			minigolf_minigame.rpc("end_minigolf_game")
 
 func reset_state_for_single_player_return(msg: String):
 	minigolf_menu.hide()
@@ -359,14 +369,15 @@ func on_minigolf_game_ended(final_players: Array[int]) -> void:
 	# 3. Teleport players back to overworld
 	teleport_players_to_overworld()
 
-
 func enable_player_movement() -> void:
-	print("[SERVER] Re-enabling movement for minigolf_players: ", minigolf_players)
+	print("[SERVER/LOCAL] Re-enabling movement for minigolf_players: ", minigolf_players)
 	for player in get_tree().get_nodes_in_group("player"):
-		if minigolf_players.has(player.player_id):
-			print("  -> Re-enabling movement for Peer: ", player.player_id)
-			player.set_movement_disabled.rpc(false)
-
+		# Check validity before inspecting properties
+		if is_instance_valid(player) and "player_id" in player:
+			if minigolf_players.has(player.player_id):
+				print("  -> Re-enabling movement for Peer: ", player.player_id)
+				if player.has_method("set_movement_disabled"):
+					player.set_movement_disabled(false)
 
 func teleport_players_to_overworld() -> void:
 	if not multiplayer.is_server():
@@ -377,50 +388,41 @@ func teleport_players_to_overworld() -> void:
 	
 	print("[SERVER] Teleporting minigolf participants back to overworld...")
 	
-	# RPC all clients to update overworld UI ONLY if they played
 	rpc("set_overworld_ui")
 	
 	for player in get_tree().get_nodes_in_group("player"):
+		if not is_instance_valid(player) or not ("player_id" in player):
+			continue
+
 		var p_id = player.player_id
 		
-		# ONLY target players who were in minigolf_players
 		if minigolf_players.has(p_id):
 			print("  -> Teleporting Minigolf Participant Peer: ", p_id)
-			
-			# 1. Reset camera/zone offset on the participant client
 			player.update_zone_offset.rpc_id(p_id, default_zone_offset)
-			
-			# 2. Update position on the server instance
 			player.global_position = target_position
 			player.show()
-			
-			# 3. Direct the specific participant client to update locally
 			rpc_id(p_id, "teleport_local_client_player", target_position)
-		else:
-			print("  -> Skipping non-participant Peer: ", p_id)
 
 @rpc("authority", "call_local", "reliable")
 func teleport_local_client_player(target_pos: Vector2) -> void:
 	var my_id = multiplayer.get_unique_id()
 	
-	# Guard clause: Ensure this machine was actually in the match
 	if not minigolf_players.has(my_id):
 		return
 
 	for player in get_tree().get_nodes_in_group("player"):
-		# 1. Unhide ALL player nodes on local screen so remote players become visible!
-		player.show()
-		
-		# 2. ONLY update velocity & local position for the character owned by this peer
-		if player.player_id == my_id:
-			if "velocity" in player:
-				player.velocity = Vector2.ZERO
-				
-			player.global_position = target_pos
+		if is_instance_valid(player) and "player_id" in player:
+			player.show()
 			
-			if player.has_method("set_movement_disabled"):
-				player.set_movement_disabled(false)
-			print("[CLIENT %d] Successfully teleported participant locally to %s" % [my_id, target_pos])
+			if player.player_id == my_id:
+				if "velocity" in player:
+					player.velocity = Vector2.ZERO
+					
+				player.global_position = target_pos
+				
+				if player.has_method("set_movement_disabled"):
+					player.set_movement_disabled(false)
+				print("[CLIENT %d] Successfully teleported participant locally to %s" % [my_id, target_pos])
 
 @rpc("authority", "call_local", "reliable")
 func set_overworld_ui() -> void:

@@ -552,6 +552,37 @@ func _are_all_balls_stopped() -> bool:
 				return false
 	return true
 
+func handle_midgame_player_disconnect(disconnected_peer_id: int) -> void:
+	if not multiplayer.is_server():
+		return
+
+	print("[MINIGAME SERVER] Handling mid-game disconnect for Peer: ", disconnected_peer_id)
+
+	# 1. Clean up ball node on field if it exists
+	if player_data.has(disconnected_peer_id):
+		var ball = player_data[disconnected_peer_id].get("ball_node") as RigidBody2D
+		if is_instance_valid(ball):
+			ball.queue_free()
+		player_data.erase(disconnected_peer_id)
+
+	# 2. Remove from turn rotation
+	if minigolf_turn_order.has(disconnected_peer_id):
+		minigolf_turn_order.erase(disconnected_peer_id)
+
+	# 3. IF NO PLAYERS LEFT: End game immediately
+	if minigolf_turn_order.is_empty():
+		print("[MINIGAME SERVER] No active players left in minigolf! Force ending match...")
+		rpc("end_minigolf_game")
+		return
+
+	# 4. IF IT WAS THIS DISCONNECTED PLAYER'S TURN: Advance to next player
+	if current_turn_id == disconnected_peer_id:
+		print("[MINIGAME SERVER] Disconnected player was active turn owner. Advancing turn...")
+		advance_to_next_turn()
+	else:
+		# Sync updated grid & stroke count across remaining players
+		rpc("sync_game_state", current_course_number, current_turn_id, player_data)
+
 @rpc("authority", "call_local", "reliable")
 func end_minigolf_game() -> void:
 	print("[DEBUG] Teardown: Resetting Minigolf state variables...")
