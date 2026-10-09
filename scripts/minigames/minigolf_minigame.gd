@@ -63,6 +63,7 @@ func request_manual_exit(peer_id: int) -> void:
 	# ROUTE 1: HOST LEAVES -> Terminate match completely for all players
 	if peer_id == 1:
 		print("[MINIGAME SERVER] Host clicked exit! Force-closing game for all players...")
+		rpc("disable_exit_game_button")
 		rpc("show_notification", "Host exited the match. Closing game...", 2.5)
 		await get_tree().create_timer(2.5).timeout
 		current_course_number = 999
@@ -518,6 +519,7 @@ func start_minigolf(turn_order: Array[int]) -> void:
 
 @rpc("authority", "call_local", "reliable")
 func sync_game_start(turn_order: Array[int], starting_course_id: int) -> void:
+	exit_game_button.disabled = false
 	current_course_number = 1
 	current_turn_id = turn_order[0]
 	initialize_game_state(turn_order)
@@ -710,6 +712,10 @@ func show_notification(message: String, time: float) -> void:
 	notif_tween = create_tween()
 	notif_tween.tween_interval(time)
 	notif_tween.tween_callback(notif_popup.hide)
+
+@rpc("authority", "call_local", "reliable")
+func disable_exit_game_button():
+	exit_game_button.disabled = true
 
 func broadcast_minigolf_state(turn_order: Array[int], active_turn_id: int, current_course_num: int) -> void:
 	if multiplayer.is_server():

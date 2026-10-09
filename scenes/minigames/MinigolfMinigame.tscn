@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://tiu625i0s3fp" path="res://assets/textures/wooden.jpg" id="1_0x1ge"]
 [ext_resource type="Script" uid="uid://dsw4gdjkfd02b" path="res://scripts/minigames/minigolf_minigame.gd" id="1_s0toe"]
 [ext_resource type="Script" uid="uid://cx4q8nwepvbif" path="res://scripts/minigames/aim_overlay.gd" id="4_6ssiq"]
-[ext_resource type="Script" uid="uid://bknaby53d7dgl" path="res://scripts/world/side_nav.gd" id="4_4268k"]
+[ext_resource type="Script" uid="uid://dxjcfd8mvfuk2" path="res://scripts/minigames/minigolf_sidenav.gd" id="4_4268k"]
 [ext_resource type="Texture2D" uid="uid://egdknrgtofd" path="res://assets/icons/left-arrow.svg" id="5_37d5r"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s0toe"]
@@ -244,7 +244,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_titiu")
 theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_titiu")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_titiu")
 theme_override_styles/focus = SubResource("StyleBoxFlat_titiu")
-text = "Host Game"
+text = "Exit Game"
 
 [node name="ToggleButton" type="Button" parent="Screen/MinigolfSidenav" unique_id=688712479]
 custom_minimum_size = Vector2(40, 60)

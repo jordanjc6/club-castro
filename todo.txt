@@ -1,5 +1,4 @@
 Minigolf
-- update minigolf nav animation
 - make minigolf playable in singleplayer
 - design more courses
 - add more tile shapes (half/triangle, rounded, smaller/bigger)
