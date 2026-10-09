@@ -247,12 +247,21 @@ func minigolf_start_pressed():
 @rpc("any_peer", "call_local", "reliable")
 func request_start_minigolf() -> void:
 	if multiplayer.is_server():
+		if minigolf_players.size() < 2:
+			rpc("notify_not_enough_players")
+			return
 		minigolf_players.shuffle()
 		minigolf_minigame.rpc("start_minigolf", minigolf_players)
 		rpc("set_minigolf_ui")
 		teleport_players_to_minigolf()
 		await get_tree().create_timer(5).timeout
 		disable_player_movement()
+
+@rpc("authority", "call_local", "reliable")
+func notify_not_enough_players() -> void:
+	if not minigolf_players.has(multiplayer.get_unique_id()):
+		return
+	game_manager.show_temp_notif("Need at least 2 players!", 2)
 
 @rpc("authority", "call_local", "reliable")
 func set_minigolf_ui() -> void:
@@ -358,12 +367,16 @@ func enable_player_movement() -> void:
 	print("[SERVER/LOCAL] Re-enabling movement for minigolf_players: ", minigolf_players)
 	for player in get_tree().get_nodes_in_group("player"):
 		if is_instance_valid(player) and "player_id" in player:
-			if minigolf_players.has(player.player_id):
-				print("  -> Re-enabling movement for Peer: ", player.player_id)
+			var p_id = player.player_id
+			if minigolf_players.has(p_id):
+				print("  -> Re-enabling movement for Peer: ", p_id)
+				
+				# 1. Un-freeze locally on host machine
 				if player.has_method("set_movement_disabled"):
 					player.set_movement_disabled(false)
-					if player.has_method("rpc"):
-						player.rpc("set_movement_disabled", false)
+				
+				# 2. Target specific peer across network to un-freeze on their machine
+				player.rpc_id(p_id, "set_movement_disabled", false)
 
 func teleport_players_to_overworld() -> void:
 	if not multiplayer.is_server():
@@ -387,13 +400,18 @@ func teleport_players_to_overworld() -> void:
 			player.update_zone_offset.rpc_id(p_id, default_zone_offset)
 			player.global_position = target_position
 			
-			# Use custom wrapper if defined on player script, otherwise call local .show()
+			# Re-enable movement on host & RPC to target peer
+			if player.has_method("set_movement_disabled"):
+				player.set_movement_disabled(false)
+				player.rpc_id(p_id, "set_movement_disabled", false)
+			
 			if player.has_method("set_player_visible"):
 				player.rpc("set_player_visible", true)
 			else:
 				player.show()
 
-			rpc_id(p_id, "teleport_local_client_player", target_position)
+			# Notify all client peers to refresh player visibility, velocity, & animation processing
+			rpc("teleport_local_client_player", target_position)
 
 @rpc("authority", "call_local", "reliable")
 func set_overworld_ui() -> void:
@@ -468,11 +486,17 @@ func teleport_local_client_player(target_pos: Vector2) -> void:
 	
 	for player in get_tree().get_nodes_in_group("player"):
 		if is_instance_valid(player) and "player_id" in player:
+			# Ensure all player nodes in the scene re-enable process & movement
+			if player.has_method("set_movement_disabled"):
+				player.set_movement_disabled(false)
+			
+			# Restore physics & process execution if disabled during minigolf
+			player.set_physics_process(true)
+			player.set_process(true)
+
 			if player.player_id == my_id:
 				player.show()
 				if "velocity" in player:
 					player.velocity = Vector2.ZERO
 				player.global_position = target_pos
-				if player.has_method("set_movement_disabled"):
-					player.set_movement_disabled(false)
-				print("[CLIENT %d] Successfully teleported participant locally to %s" % [my_id, target_pos])
+				print("[CLIENT %d] Successfully restored overworld player state at %s" % [my_id, target_pos])
