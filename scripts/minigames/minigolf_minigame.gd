@@ -45,12 +45,103 @@ func _ready() -> void:
 	print("[DEBUG] _ready() called")
 	add_to_group("minigolf_controller")
 	exit_game_button.pressed.connect(exit_game_button_pressed)
+	enable_minigame_processing(false)
 
-func exit_game_button_pressed():
-	pass
+# --- Voluntary Exit Button Logic ---
+func exit_game_button_pressed() -> void:
+	var my_id = multiplayer.get_unique_id()
+	print("[MINIGAME] Manual Exit button clicked by Peer: ", my_id)
+	rpc_id(1, "request_manual_exit", my_id)
+
+@rpc("any_peer", "call_local", "reliable")
+func request_manual_exit(peer_id: int) -> void:
+	if not multiplayer.is_server():
+		return
+
+	print("[MINIGAME SERVER] Processing manual exit request for Peer: ", peer_id)
+
+	# ROUTE 1: HOST LEAVES -> Terminate match completely for all players
+	if peer_id == 1:
+		print("[MINIGAME SERVER] Host clicked exit! Force-closing game for all players...")
+		rpc("show_notification", "Host exited the match. Closing game...", 3.0)
+		await get_tree().create_timer(1.0).timeout
+		rpc("end_minigolf_game")
+		return
+
+	# ROUTE 2: JOINER LEAVES -> Teleport joiner back, clear state, and continue match for Host
+	var player_name = player_data[peer_id].get("name", "A player") if player_data.has(peer_id) else "A player"
+	rpc("show_notification", "%s left the match." % player_name, 3.0)
+
+	rpc_id(peer_id, "confirm_local_exit")
+
+	if is_instance_valid(minigolf_menu) and minigolf_menu.has_method("teleport_single_quitting_joiner_to_overworld"):
+		minigolf_menu.teleport_single_quitting_joiner_to_overworld(peer_id)
+
+	process_joiner_manual_exit(peer_id)
+
+@rpc("authority", "call_local", "reliable")
+func confirm_local_exit() -> void:
+	print("[CLIENT] Local exit confirmed. Cleaning up local minigolf state...")
+
+	if is_instance_valid(dragged_ball_preview):
+		dragged_ball_preview.queue_free()
+		dragged_ball_preview = null
+
+	for child in course_container.get_children():
+		child.queue_free()
+
+	current_ball_state = BallState.PLACING
+
+	if is_instance_valid(notif_popup):
+		notif_popup.hide()
+
+# --- DEDICATED JOINER MANUAL EXIT STATE CLEANUP ---
+func process_joiner_manual_exit(quitting_peer_id: int) -> void:
+	if not multiplayer.is_server():
+		return
+
+	print("[MINIGAME SERVER] Executing process_joiner_manual_exit for Peer: ", quitting_peer_id)
+
+	# 1. Clean up joiner's ball on field across network
+	rpc("remove_player_ball", quitting_peer_id)
+	player_data.erase(quitting_peer_id)
+
+	# 2. Erase joiner from turn rotation
+	var was_active_turn = (current_turn_id == quitting_peer_id)
+	if minigolf_turn_order.has(quitting_peer_id):
+		minigolf_turn_order.erase(quitting_peer_id)
+
+	# 3. IF NO PLAYERS REMAIN: Teardown match completely
+	if minigolf_turn_order.is_empty():
+		rpc("end_minigolf_game")
+		return
+
+	# 4. IF JOINER WAS ACTIVE TURN: Advance turn and un-freeze input on Host/remaining client
+	if was_active_turn:
+		current_turn_id = minigolf_turn_order[0] # Usually Host (Peer 1)
+		print("[MINIGAME SERVER] Exiting joiner was active turn owner. Advancing turn to Peer: ", current_turn_id)
+		rpc("force_local_turn_unfreeze", current_turn_id)
+		broadcast_minigolf_state(minigolf_turn_order, current_turn_id, current_course_number)
+	else:
+		broadcast_minigolf_state(minigolf_turn_order, current_turn_id, current_course_number)
+
+@rpc("authority", "call_local", "reliable")
+func force_local_turn_unfreeze(target_peer_id: int) -> void:
+	var my_id = multiplayer.get_unique_id()
+	if my_id == target_peer_id:
+		print("[CLIENT %d] Un-freezing turn input for Host after joiner exit..." % my_id)
+		current_turn_id = target_peer_id
+		
+		var raw_ball = player_data[my_id].get("ball_node") if player_data.has(my_id) else null
+		if is_instance_valid(raw_ball) and not raw_ball.is_queued_for_deletion() and not player_data[my_id].get("finished_hole", false):
+			current_ball_state = BallState.PLACED
+		else:
+			current_ball_state = BallState.PLACING
+
+	refresh_minigolf_hud()
+	_refresh_aim_draw()
 
 func _physics_process(_delta: float) -> void:
-	# 1. 60Hz Rate-limited preview position broadcast
 	if is_instance_valid(dragged_ball_preview) and dragged_ball_preview.get("is_dragging"):
 		if multiplayer.get_unique_id() == current_turn_id:
 			var current_pos = dragged_ball_preview.global_position
@@ -58,7 +149,6 @@ func _physics_process(_delta: float) -> void:
 				_last_synced_preview_pos = current_pos
 				rpc("update_drag_preview_position", current_pos)
 
-	# 2. 60Hz Rate-limited aiming drag position broadcast
 	if current_ball_state == BallState.AIMING and multiplayer.get_unique_id() == current_turn_id:
 		var raw_mouse = get_viewport().get_mouse_position()
 		if raw_mouse.distance_squared_to(_last_synced_aim_pos) > 1.0:
@@ -66,7 +156,6 @@ func _physics_process(_delta: float) -> void:
 			rpc("update_aim_position", raw_mouse)
 
 func _process(delta: float) -> void:
-	# Smoothly interpolate remote preview movement
 	if is_instance_valid(dragged_ball_preview) and dragged_ball_preview.get("is_dragging"):
 		if multiplayer.get_unique_id() != current_turn_id:
 			dragged_ball_preview.global_position = dragged_ball_preview.global_position.lerp(
@@ -77,7 +166,6 @@ func _process(delta: float) -> void:
 func _input(event: InputEvent) -> void:
 	var my_id = multiplayer.get_unique_id()
 	
-	# Helper to get exact screen position across Mouse, Touch, Motion, and Drag
 	var input_pos = Vector2.ZERO
 	if event is InputEventMouseButton or event is InputEventMouseMotion:
 		input_pos = event.position
@@ -98,10 +186,10 @@ func _input(event: InputEvent) -> void:
 		if active_course == null:
 			return
 
-		# Safely check if my_id exists AND ball_node is a living, non-freed instance
+		var raw_ball = player_data[my_id].get("ball_node") if player_data.has(my_id) else null
 		var my_ball: RigidBody2D = null
-		if player_data.has(my_id) and is_instance_valid(player_data[my_id]["ball_node"]):
-			my_ball = player_data[my_id]["ball_node"] as RigidBody2D
+		if is_instance_valid(raw_ball) and not raw_ball.is_queued_for_deletion():
+			my_ball = raw_ball as RigidBody2D
 
 		if is_instance_valid(my_ball) and current_ball_state == BallState.PLACED:
 			rpc("sync_aim_start", input_pos)
@@ -111,13 +199,11 @@ func _input(event: InputEvent) -> void:
 	var is_motion = (event is InputEventMouseMotion) or (event is InputEventScreenDrag)
 	
 	if is_motion and my_id == current_turn_id:
-		# A) DRAGGING PREVIEW BALL ON TEE
 		if current_ball_state == BallState.PLACING and is_instance_valid(dragged_ball_preview) and dragged_ball_preview.get("is_dragging"):
 			var active_course = course_container.get_child(0) if course_container.get_child_count() > 0 else null
 			if is_instance_valid(active_course):
 				dragged_ball_preview.position = active_course.make_canvas_position_local(input_pos)
 		
-		# B) AIMING TRAJECTORY CONE
 		elif current_ball_state == BallState.AIMING:
 			current_drag_pos = input_pos
 			_refresh_aim_draw()
@@ -130,21 +216,19 @@ func _input(event: InputEvent) -> void:
 		if my_id != current_turn_id:
 			return
 
-		# Drop preview ball onto Tee
 		if is_instance_valid(dragged_ball_preview) and dragged_ball_preview.get("is_dragging"):
 			dragged_ball_preview.is_dragging = false
 			_check_drop_and_confirm(multiplayer.get_unique_id())
 			return
 
-		# Shoot ball if releasing during AIMING state
+		var raw_ball = player_data[my_id].get("ball_node") if player_data.has(my_id) else null
 		var my_ball: RigidBody2D = null
-		if player_data.has(my_id) and is_instance_valid(player_data[my_id]["ball_node"]):
-			my_ball = player_data[my_id]["ball_node"] as RigidBody2D
+		if is_instance_valid(raw_ball) and not raw_ball.is_queued_for_deletion():
+			my_ball = raw_ball as RigidBody2D
 
 		if current_ball_state == BallState.AIMING and is_instance_valid(my_ball):
 			_execute_shot(multiplayer.get_unique_id())
 
-# --- Triggered by transparent TeeTouchButton in Course scene ---
 func _on_tee_button_pressed(touch_pos: Vector2) -> void:
 	print("\n--- [DEBUG] TEE BUTTON PRESSED ---")
 	if multiplayer.get_unique_id() != current_turn_id:
@@ -162,7 +246,8 @@ func _on_tee_button_pressed(touch_pos: Vector2) -> void:
 
 	var local_pos = active_course.make_canvas_position_local(touch_pos)
 
-	if player_data.has(my_id) and is_instance_valid(player_data[my_id]["ball_node"]):
+	var raw_ball = player_data[my_id].get("ball_node") if player_data.has(my_id) else null
+	if is_instance_valid(raw_ball) and not raw_ball.is_queued_for_deletion():
 		rpc("remove_player_ball", my_id)
 
 	rpc("sync_drag_preview_start", my_id, local_pos)
@@ -253,8 +338,10 @@ func cancel_drag_preview(peer_id: int) -> void:
 
 @rpc("any_peer", "call_local", "reliable")
 func remove_player_ball(peer_id: int) -> void:
-	if player_data.has(peer_id) and is_instance_valid(player_data[peer_id]["ball_node"]):
-		player_data[peer_id]["ball_node"].queue_free()
+	if player_data.has(peer_id):
+		var raw_ball = player_data[peer_id].get("ball_node")
+		if is_instance_valid(raw_ball) and not raw_ball.is_queued_for_deletion():
+			raw_ball.queue_free()
 		player_data[peer_id]["ball_node"] = null
 
 # --- Aiming Sync & Shot Calculations ---
@@ -297,15 +384,18 @@ func sync_ball_stroke(peer_id: int, impulse: Vector2) -> void:
 	current_ball_state = BallState.MOVING
 	_refresh_aim_draw()
 
-	if player_data.has(peer_id) and is_instance_valid(player_data[peer_id]["ball_node"]):
-		var ball = player_data[peer_id]["ball_node"] as RigidBody2D
-		ball.freeze = false
-		ball.sleeping = false
-		
-		if ball.has_method("stroke"):
-			ball.stroke(impulse)
-		else:
-			ball.apply_central_impulse(impulse)
+	if player_data.has(peer_id):
+		var raw_ball = player_data[peer_id].get("ball_node")
+		if is_instance_valid(raw_ball) and not raw_ball.is_queued_for_deletion():
+			var ball = raw_ball as RigidBody2D
+			if is_instance_valid(ball):
+				ball.freeze = false
+				ball.sleeping = false
+				
+				if ball.has_method("stroke"):
+					ball.stroke(impulse)
+				else:
+					ball.apply_central_impulse(impulse)
 
 		player_data[peer_id]["current_strokes"] += 1
 		player_data[peer_id]["total_strokes"] += 1
@@ -316,7 +406,6 @@ func _on_ball_sunk(sunk_ball: RigidBody2D) -> void:
 	if not multiplayer.is_server():
 		return
 
-	# Find which peer owns this ball
 	var owner_peer_id = 0
 	for p_id in player_data:
 		if player_data[p_id].get("ball_node") == sunk_ball:
@@ -327,13 +416,9 @@ func _on_ball_sunk(sunk_ball: RigidBody2D) -> void:
 		print("[SERVER] Ball sunk for Peer: ", owner_peer_id)
 		rpc("sync_player_finished_hole", owner_peer_id)
 		
-		# Check if any OTHER remaining unsunk balls are still rolling across the green
 		if _are_all_balls_stopped():
 			print("  -> Sunk ball finished sequence and no other balls moving. Advancing turn...")
-			current_ball_state = BallState.PLACED
 			advance_to_next_turn()
-		else:
-			print("  -> Ball sunk, but other balls are still rolling. Waiting...")
 
 @rpc("authority", "call_local", "reliable")
 func sync_player_finished_hole(peer_id: int) -> void:
@@ -350,10 +435,8 @@ func on_ball_stopped(_ball: RigidBody2D) -> void:
 
 	if _are_all_balls_stopped():
 		print("  -> All active balls have stopped. Advancing turn...")
-		current_ball_state = BallState.PLACED
 		advance_to_next_turn()
 
-# Whenever state or drag position updates:
 func _refresh_aim_draw() -> void:
 	if is_instance_valid(aim_overlay):
 		aim_overlay.queue_redraw()
@@ -363,7 +446,11 @@ func _draw() -> void:
 	if current_ball_state != BallState.AIMING or not player_data.has(current_turn_id):
 		return
 
-	var active_ball = player_data[current_turn_id]["ball_node"] as RigidBody2D
+	var raw_ball = player_data[current_turn_id].get("ball_node")
+	if not is_instance_valid(raw_ball) or raw_ball.is_queued_for_deletion():
+		return
+
+	var active_ball = raw_ball as RigidBody2D
 	if not is_instance_valid(active_ball):
 		return
 
@@ -421,12 +508,11 @@ func start_minigolf(turn_order: Array[int]) -> void:
 	if multiplayer.is_server():
 		MultiplayerManager.rpc("set_minigolf_started", true)
 		
-		# Pick first random course ID from available pool
 		played_courses.clear()
 		var first_course_id = AVAILABLE_COURSES.pick_random()
 		played_courses.append(first_course_id)
 		
-		# Broadcast starting state to all peers
+		enable_minigame_processing(true)
 		rpc("sync_game_start", turn_order, first_course_id)
 
 @rpc("authority", "call_local", "reliable")
@@ -436,7 +522,19 @@ func sync_game_start(turn_order: Array[int], starting_course_id: int) -> void:
 	initialize_game_state(turn_order)
 	load_course(starting_course_id)
 	refresh_minigolf_hud()
-	notif_popup.hide()
+	if is_instance_valid(notif_popup):
+		notif_popup.hide()
+	enable_minigame_processing(true)
+
+# Call this in sync_game_start / start_minigolf:
+func enable_minigame_processing(active: bool) -> void:
+	set_process(active)
+	set_physics_process(active)
+	set_process_input(active)
+	
+	if is_instance_valid(aim_overlay):
+		aim_overlay.set_process(active)
+		aim_overlay.set_process_input(active)
 
 func initialize_game_state(turn_order: Array[int]) -> void:
 	minigolf_turn_order = turn_order
@@ -458,7 +556,6 @@ func load_course(course_num: int) -> void:
 		child.queue_free()
 		
 	var course_path = "res://scenes/minigames/minigolf/courses/Course%d.tscn" % course_num
-	#var course_path = "res://scenes/minigames/minigolf/courses/Course1.tscn"
 	if ResourceLoader.exists(course_path):
 		var course_scene = load(course_path) as PackedScene
 		var course_instance = course_scene.instantiate()
@@ -467,7 +564,6 @@ func load_course(course_num: int) -> void:
 		if course_instance.has_signal("tee_button_pressed"):
 			course_instance.tee_button_pressed.connect(_on_tee_button_pressed)
 
-		# Connect GolfHole signal
 		var hole_node = course_instance.find_child("GolfHole", true, false)
 		if is_instance_valid(hole_node) and hole_node.has_signal("ball_sunk"):
 			hole_node.ball_sunk.connect(_on_ball_sunk)
@@ -476,7 +572,12 @@ func advance_to_next_turn() -> void:
 	if not multiplayer.is_server():
 		return
 
-	# 1. Check if ALL players have finished the hole
+	if minigolf_turn_order.is_empty():
+		print("[SERVER] Turn order is empty. Ending match...")
+		rpc("end_minigolf_game")
+		return
+
+	# 1. Check if ALL remaining players have finished the hole
 	var all_finished = true
 	for p_id in player_data:
 		if not player_data[p_id].get("finished_hole", false):
@@ -492,6 +593,9 @@ func advance_to_next_turn() -> void:
 
 	# 2. Find next player who HAS NOT finished the hole
 	var current_index = minigolf_turn_order.find(current_turn_id)
+	if current_index == -1:
+		current_index = 0
+
 	var next_id = current_turn_id
 
 	for i in range(1, minigolf_turn_order.size() + 1):
@@ -504,7 +608,13 @@ func advance_to_next_turn() -> void:
 
 	current_turn_id = next_id
 	print("[DEBUG] Server advancing turn to Peer: ", current_turn_id)
+
 	broadcast_minigolf_state(minigolf_turn_order, current_turn_id, current_course_number)
+
+	# FOR SINGLE PLAYER SURVIVAL: Force turn un-freeze if only 1 player remains
+	if minigolf_turn_order.size() == 1:
+		var solo_id = minigolf_turn_order[0]
+		rpc_id(solo_id, "force_local_turn_unfreeze", solo_id)
 
 func announce_course_winner() -> void:
 	if not multiplayer.is_server():
@@ -513,7 +623,6 @@ func announce_course_winner() -> void:
 	var lowest_strokes: int = 999
 	var winners: Array[String] = []
 
-	# Calculate lowest stroke count for this course
 	for p_id in player_data:
 		var strokes = player_data[p_id].get("current_strokes", 0)
 		var p_name = player_data[p_id].get("name", "Player")
@@ -525,7 +634,6 @@ func announce_course_winner() -> void:
 		elif strokes == lowest_strokes:
 			winners.append(p_name)
 
-	# Build winner text string
 	var winner_msg = ""
 	if winners.size() == 1:
 		winner_msg = "%s won the hole in %d strokes!" % [winners[0], lowest_strokes]
@@ -537,24 +645,20 @@ func announce_course_winner() -> void:
 	else:
 		winner_msg += " Game over!"
 	
-	# Broadcast banner RPC to all peers
 	rpc("show_notification", winner_msg, HOLE_WINNER_NOTIF_TIME)
 
 func announce_game_result() -> void:
 	if not multiplayer.is_server():
 		return
 	
-	# 1. Collect all players into an array for sorting
 	var sorted_players: Array = []
 	for p_id in player_data:
 		sorted_players.append(player_data[p_id])
 
-	# 2. Sort players by lowest total_strokes first
 	sorted_players.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return a.get("total_strokes", 0) < b.get("total_strokes", 0)
 	)
 
-	# 3. Determine overall winner(s) with lowest total strokes
 	var lowest_strokes: int = sorted_players[0].get("total_strokes", 0) if not sorted_players.is_empty() else 0
 	var winners: Array[String] = []
 
@@ -562,23 +666,20 @@ func announce_game_result() -> void:
 		if player.get("total_strokes", 0) == lowest_strokes:
 			winners.append(player.get("name", "Player"))
 		else:
-			break # Since array is sorted, stop checking once stroke count increases
+			break
 
-	# Build top summary message
 	var winner_msg = ""
 	if winners.size() == 1:
 		winner_msg = "%s won the game in %d total strokes!" % [winners[0], lowest_strokes]
 	else:
 		winner_msg = "The game ends in a tie! (%s) with %d total strokes!" % [", ".join(winners), lowest_strokes]
 
-	# 4. Build formatted leaderboard string
-	var lines: Array[String] = [winner_msg, ""] # Blank line separation
+	var lines: Array[String] = [winner_msg, ""]
 	var current_rank: int = 1
 
 	for i in range(sorted_players.size()):
 		var player = sorted_players[i]
 		
-		# Handle ties for ranking display
 		if i > 0 and player.get("total_strokes", 0) > sorted_players[i - 1].get("total_strokes", 0):
 			current_rank = i + 1
 
@@ -590,17 +691,18 @@ func announce_game_result() -> void:
 		lines.append(line)
 
 	var final_msg: String = "\n".join(lines)
-	
-	# Broadcast banner RPC to all peers
 	rpc("show_notification", final_msg, GAME_RESULT_NOTIF_TIME)
 
 @rpc("authority", "call_local", "reliable")
 func show_notification(message: String, time: float) -> void:
-	var label = notif_popup.get_node("MarginContainer/Label")
-	label.text = message
+	if not is_instance_valid(notif_popup):
+		return
+
+	var label = notif_popup.get_node_or_null("MarginContainer/Label")
+	if label:
+		label.text = message
 	notif_popup.show()
 
-	# Kill active notification timer if a new one arrives
 	if notif_tween and notif_tween.is_running():
 		notif_tween.kill()
 
@@ -619,12 +721,16 @@ func sync_minigolf_state(turn_order: Array[int], active_turn_id: int, current_co
 	current_course_number = current_course_num
 	
 	var my_id = multiplayer.get_unique_id()
-	if player_data.has(my_id) and is_instance_valid(player_data[my_id]["ball_node"]) and not player_data[my_id]["finished_hole"]:
-		current_ball_state = BallState.PLACED
-	else:
-		current_ball_state = BallState.PLACING
+	
+	if current_turn_id == my_id:
+		var raw_ball = player_data[my_id].get("ball_node") if player_data.has(my_id) else null
+		if is_instance_valid(raw_ball) and not raw_ball.is_queued_for_deletion() and not player_data[my_id].get("finished_hole", false):
+			current_ball_state = BallState.PLACED
+		else:
+			current_ball_state = BallState.PLACING
 
 	refresh_minigolf_hud()
+	_refresh_aim_draw()
 
 @rpc("authority", "call_local", "reliable")
 func refresh_minigolf_hud() -> void:
@@ -636,7 +742,10 @@ func advance_to_next_course() -> void:
 	if not multiplayer.is_server():
 		return
 		
-	# End game after NUM_COURSES_PER_GAME played
+	if minigolf_turn_order.is_empty():
+		rpc("end_minigolf_game")
+		return
+
 	if current_course_number >= NUM_COURSES_PER_GAME:
 		print("[SERVER] Minigolf game complete!")
 		announce_game_result()
@@ -644,7 +753,6 @@ func advance_to_next_course() -> void:
 		rpc("end_minigolf_game")
 		return
 
-	# Filter available courses to only unplayed ones
 	var unplayed_courses: Array[int] = []
 	for course_id in AVAILABLE_COURSES:
 		if not played_courses.has(course_id):
@@ -660,7 +768,8 @@ func advance_to_next_course() -> void:
 	current_course_number += 1
 	
 	minigolf_turn_order.shuffle()
-	current_turn_id = minigolf_turn_order[0]
+	if not minigolf_turn_order.is_empty():
+		current_turn_id = minigolf_turn_order[0]
 	
 	rpc("refresh_minigolf_course", minigolf_turn_order, current_turn_id, current_course_number, next_course_id)
 
@@ -670,80 +779,73 @@ func refresh_minigolf_course(turn_order: Array[int], active_turn_id: int, course
 	current_turn_id = active_turn_id
 	current_course_number = course_round_num
 	
-	# Reset strokes and ball instances for all players locally
 	for peer_id in player_data:
 		player_data[peer_id]["finished_hole"] = false
 		player_data[peer_id]["current_strokes"] = 0
-		if is_instance_valid(player_data[peer_id]["ball_node"]):
-			player_data[peer_id]["ball_node"].queue_free()
-			player_data[peer_id]["ball_node"] = null
+		var raw_ball = player_data[peer_id].get("ball_node")
+		if is_instance_valid(raw_ball) and not raw_ball.is_queued_for_deletion():
+			raw_ball.queue_free()
+		player_data[peer_id]["ball_node"] = null
 	
 	load_course(course_id_to_load)
-	
 	current_ball_state = BallState.PLACING
 	refresh_minigolf_hud()
 
 func _are_all_balls_stopped() -> bool:
 	for peer_id in player_data:
-		# Ignore players who have already finished the hole
 		if player_data[peer_id].get("finished_hole", false):
 			continue
 
-		var ball = player_data[peer_id].get("ball_node") as RigidBody2D
-		if is_instance_valid(ball):
-			if not ball.sleeping and ball.linear_velocity.length_squared() > 1.0:
+		var raw_ball = player_data[peer_id].get("ball_node")
+		if is_instance_valid(raw_ball) and not raw_ball.is_queued_for_deletion():
+			var ball = raw_ball as RigidBody2D
+			if is_instance_valid(ball) and not ball.sleeping and ball.linear_velocity.length_squared() > 1.0:
 				return false
 	return true
 
+# --- UNTOUCHED NETWORK DISCONNECT HANDLER ---
 func handle_midgame_player_disconnect(disconnected_peer_id: int) -> void:
 	if not multiplayer.is_server():
 		return
 
-	print("[MINIGAME SERVER] Handling mid-game disconnect for Peer: ", disconnected_peer_id)
+	print("[MINIGAME SERVER] Handling network disconnect for Peer: ", disconnected_peer_id)
 
-	# 1. Clean up ball node on field if it exists
 	if player_data.has(disconnected_peer_id):
-		var ball = player_data[disconnected_peer_id].get("ball_node") as RigidBody2D
-		if is_instance_valid(ball):
-			ball.queue_free()
+		var raw_ball = player_data[disconnected_peer_id].get("ball_node")
+		if is_instance_valid(raw_ball) and not raw_ball.is_queued_for_deletion():
+			raw_ball.queue_free()
 		player_data.erase(disconnected_peer_id)
 
-	# 2. Remove from turn rotation
 	if minigolf_turn_order.has(disconnected_peer_id):
 		minigolf_turn_order.erase(disconnected_peer_id)
 
-	# 3. IF NO PLAYERS LEFT: End game immediately
 	if minigolf_turn_order.is_empty():
 		print("[MINIGAME SERVER] No active players left in minigolf! Force ending match...")
 		rpc("end_minigolf_game")
 		return
 
-	# 4. IF IT WAS THIS DISCONNECTED PLAYER'S TURN: Advance to next player
 	if current_turn_id == disconnected_peer_id:
 		print("[MINIGAME SERVER] Disconnected player was active turn owner. Advancing turn...")
 		advance_to_next_turn()
 	else:
-		# Sync updated grid & stroke count across remaining players
-		rpc("sync_game_state", current_course_number, current_turn_id, player_data)
+		broadcast_minigolf_state(minigolf_turn_order, current_turn_id, current_course_number)
 
 @rpc("authority", "call_local", "reliable")
 func end_minigolf_game() -> void:
 	print("[DEBUG] Teardown: Resetting Minigolf state variables...")
-
-	# 1. Clean up active or dragged ball nodes
+	enable_minigame_processing(false)
+	
 	if is_instance_valid(dragged_ball_preview):
 		dragged_ball_preview.queue_free()
 		dragged_ball_preview = null
 
 	for peer_id in player_data:
-		var ball = player_data[peer_id].get("ball_node") as RigidBody2D
-		if is_instance_valid(ball):
-			ball.queue_free()
+		var raw_ball = player_data[peer_id].get("ball_node")
+		if is_instance_valid(raw_ball) and not raw_ball.is_queued_for_deletion():
+			raw_ball.queue_free()
 
-	# Preserve turn order list for teardown handoff
 	var active_participants: Array[int] = minigolf_turn_order.duplicate()
 
-	# 2. Reset game state variables back to defaults
 	played_courses.clear()
 	minigolf_turn_order.clear()
 	player_data.clear()
@@ -751,21 +853,17 @@ func end_minigolf_game() -> void:
 	current_course_number = 1
 	current_ball_state = BallState.PLACING
 
-	# 3. Clear aim/drag position vectors
 	drag_start_pos = Vector2.ZERO
 	current_drag_pos = Vector2.ZERO
 	_last_synced_preview_pos = Vector2.ZERO
 	_target_remote_preview_pos = Vector2.ZERO
 	_last_synced_aim_pos = Vector2.ZERO
 
-	# 4. Clear course container nodes
 	for child in course_container.get_children():
 		child.queue_free()
 
-	# 5. Clear screen redraw overlays
 	_refresh_aim_draw()
 
-	# 6. Update global game flag via server authority
 	if multiplayer.is_server():
 		MultiplayerManager.rpc("set_minigolf_started", false)
 	

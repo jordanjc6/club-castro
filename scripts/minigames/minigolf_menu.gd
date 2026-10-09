@@ -61,9 +61,10 @@ func _ready() -> void:
 
 func on_minigames_button_pressed(by_player_id: int):
 	close_minigolf_menu()
-	if minigolf_players.has(by_player_id):
-		print("ERASED PLAYER")
-		rpc("remove_minigolf_player", by_player_id)
+	if not MultiplayerManager.is_minigolf_minigame_started:
+		if minigolf_players.has(by_player_id):
+			print("ERASED PLAYER")
+			rpc("remove_minigolf_player", by_player_id)
 
 func close_minigolf_menu():
 	minigolf_menu.hide()
@@ -186,7 +187,6 @@ func all_players_in_minigolf() -> bool:
 		active_peers.append(1) # Include Host
 		active_peers.append_array(multiplayer.get_peers()) # Include connected clients
 	else:
-		# Fallback for local/offline testing: local peer ID (usually 1)
 		active_peers.append(multiplayer.get_unique_id())
 
 	if active_peers.is_empty():
@@ -207,15 +207,13 @@ func send_minigolf_invite() -> void:
 	var sender_name = MultiplayerManager.get_player_name(sender_id)
 	var recipients = multiplayer.get_peers()
 	if sender_id != 1:
-		recipients.append(1) # Include host if joiner sent the invite
+		recipients.append(1)
 	
 	for peer_id in recipients:
 		if peer_id != sender_id and not minigolf_players.has(peer_id):
 			if peer_id == 1:
-				# Local host execution
 				receive_minigolf_invite(sender_name)
 			else:
-				# Remote client RPC
 				rpc_id(peer_id, "receive_minigolf_invite", sender_name)
 
 @rpc("authority", "call_local", "reliable")
@@ -229,7 +227,6 @@ func accept_minigolf_invite():
 		return
 	rpc("add_minigolf_player", multiplayer.get_unique_id())
 	
-	# update ui
 	lobby_button.disabled = true
 	exit_button.disabled = true
 	minigames_button.disabled = false
@@ -239,7 +236,6 @@ func accept_minigolf_invite():
 	minigolf_menu.show()
 	lobby_popup.hide()
 	
-	# remove player from tag lobby if they were in it
 	var my_id = multiplayer.get_unique_id()
 	if MultiplayerManager.joined_tag_peers.has(my_id):
 		MultiplayerManager.rpc("unregister_tag_player", my_id)
@@ -252,7 +248,7 @@ func minigolf_start_pressed():
 func request_start_minigolf() -> void:
 	if multiplayer.is_server():
 		minigolf_players.shuffle()
-		minigolf_minigame.rpc("start_minigolf", minigolf_players)  # handoff control to MinigolfMinigame
+		minigolf_minigame.rpc("start_minigolf", minigolf_players)
 		rpc("set_minigolf_ui")
 		teleport_players_to_minigolf()
 		await get_tree().create_timer(5).timeout
@@ -273,7 +269,6 @@ func update_game_info(course_num: int, turn_id: int):
 	
 	courseLabel.text = "Course %s/3" % course_num
 	
-	# Check if it's THIS machine's turn locally
 	var my_id = multiplayer.get_unique_id()
 	if turn_id == my_id:
 		turnLabel.text = "Your turn!"
@@ -292,7 +287,6 @@ func update_player_grid(players: Array, curr_turn_id: int, player_data: Dictiona
 			var peer_id = players[i]
 			var player_name = MultiplayerManager.get_player_name(peer_id)
 			
-			# Fetch strokes & assigned ball color from player_data
 			var current_strokes = 0
 			var total_strokes = 0
 			var p_color = Color.WHITE
@@ -305,7 +299,6 @@ func update_player_grid(players: Array, curr_turn_id: int, player_data: Dictiona
 			label.text = "%d. %s: %d (%d)" % [i + 1, player_name, current_strokes, total_strokes]
 			label.show()
 			
-			# Pass player's unique ball color to the style box helper
 			var is_turn = (peer_id == curr_turn_id)
 			apply_player_label_style(label, is_turn, p_color)
 		else:
@@ -316,8 +309,8 @@ func apply_player_label_style(label: Label, is_current_turn: bool = false, ball_
 	
 	if is_current_turn:
 		style.bg_color = COLOR_GREEN
-		style.border_color = ball_color # Use the player's specific golf ball color!
-		style.set_border_width_all(3)    # Thickened slightly so ball color pops
+		style.border_color = ball_color
+		style.set_border_width_all(3)
 	else:
 		style.bg_color = Color(0.1, 0.1, 0.1, 0.6)
 		style.border_color = Color(0.3, 0.3, 0.3, 0.8)
@@ -341,7 +334,6 @@ func teleport_players_to_minigolf() -> void:
 			player.update_zone_offset.rpc_id(player.player_id, new_zone_offset)
 			player.global_position = target_position
 			player.hide()
-			#lobby_nav.hide()
 
 func disable_player_movement():
 	for player in get_tree().get_nodes_in_group("player"):
@@ -352,7 +344,6 @@ func on_minigolf_game_ended(final_players: Array[int]) -> void:
 	print("\n=== [DEBUG] ON MINIGOLF GAME ENDED ===")
 	print("  -> Passed participants from minigame: ", final_players)
 
-	# Overwrite and sync minigolf_players across machine local states
 	minigolf_players = final_players.duplicate()
 	if multiplayer.is_server():
 		rpc("sync_minigolf_lobby_ui", minigolf_players)
@@ -360,24 +351,19 @@ func on_minigolf_game_ended(final_players: Array[int]) -> void:
 	if not multiplayer.is_server():
 		return
 		
-	# 1. Re-enable movement for all participant peers
 	enable_player_movement()
-	
-	# 2. Wait 2 seconds (matching startup delay)
-	#await get_tree().create_timer(1).timeout
-	
-	# 3. Teleport players back to overworld
 	teleport_players_to_overworld()
 
 func enable_player_movement() -> void:
 	print("[SERVER/LOCAL] Re-enabling movement for minigolf_players: ", minigolf_players)
 	for player in get_tree().get_nodes_in_group("player"):
-		# Check validity before inspecting properties
 		if is_instance_valid(player) and "player_id" in player:
 			if minigolf_players.has(player.player_id):
 				print("  -> Re-enabling movement for Peer: ", player.player_id)
 				if player.has_method("set_movement_disabled"):
 					player.set_movement_disabled(false)
+					if player.has_method("rpc"):
+						player.rpc("set_movement_disabled", false)
 
 func teleport_players_to_overworld() -> void:
 	if not multiplayer.is_server():
@@ -400,35 +386,19 @@ func teleport_players_to_overworld() -> void:
 			print("  -> Teleporting Minigolf Participant Peer: ", p_id)
 			player.update_zone_offset.rpc_id(p_id, default_zone_offset)
 			player.global_position = target_position
-			player.show()
-			rpc_id(p_id, "teleport_local_client_player", target_position)
-
-@rpc("authority", "call_local", "reliable")
-func teleport_local_client_player(target_pos: Vector2) -> void:
-	var my_id = multiplayer.get_unique_id()
-	
-	if not minigolf_players.has(my_id):
-		return
-
-	for player in get_tree().get_nodes_in_group("player"):
-		if is_instance_valid(player) and "player_id" in player:
-			player.show()
 			
-			if player.player_id == my_id:
-				if "velocity" in player:
-					player.velocity = Vector2.ZERO
-					
-				player.global_position = target_pos
-				
-				if player.has_method("set_movement_disabled"):
-					player.set_movement_disabled(false)
-				print("[CLIENT %d] Successfully teleported participant locally to %s" % [my_id, target_pos])
+			# Use custom wrapper if defined on player script, otherwise call local .show()
+			if player.has_method("set_player_visible"):
+				player.rpc("set_player_visible", true)
+			else:
+				player.show()
+
+			rpc_id(p_id, "teleport_local_client_player", target_position)
 
 @rpc("authority", "call_local", "reliable")
 func set_overworld_ui() -> void:
 	var my_id = multiplayer.get_unique_id()
 
-	# ONLY close minigolf UI and restore nav for players who were in minigolf
 	if not minigolf_players.has(my_id):
 		return
 
@@ -446,3 +416,63 @@ func set_overworld_ui() -> void:
 	lobby_button.disabled = true
 	minigames_button.disabled = false
 	exit_button.disabled = true
+
+# --- NEW: DEDICATED JOINER MANUAL EXIT PIPELINE ---
+func teleport_single_quitting_joiner_to_overworld(quitting_peer_id: int) -> void:
+	if not multiplayer.is_server():
+		return
+		
+	var default_zone_offset = Vector2(0, 0)
+	var target_position = Vector2(647, 528)
+	
+	print("[SERVER] Teleporting quitting joiner Peer %d back to overworld..." % quitting_peer_id)
+	
+	# 1. Erase from lobby player tracking array
+	minigolf_players.erase(quitting_peer_id)
+	rpc("sync_minigolf_lobby_ui", minigolf_players)
+
+	# 2. Restore quitting joiner UI locally
+	rpc_id(quitting_peer_id, "set_quitting_joiner_overworld_ui")
+	
+	# 3. Teleport quitter & un-hide/un-freeze player node safely across the network
+	for player in get_tree().get_nodes_in_group("player"):
+		if is_instance_valid(player) and "player_id" in player and player.player_id == quitting_peer_id:
+			# If your player script has a custom visibility RPC method, call it here:
+			if player.has_method("set_player_visible"):
+				player.rpc("set_player_visible", true)
+			else:
+				# Fallback: Call standard built-in method locally on server instance
+				player.show()
+
+			if player.has_method("set_movement_disabled"):
+				player.set_movement_disabled(false)
+				if player.has_signal("movement_changed") or player.has_method("sync_movement"):
+					player.rpc("set_movement_disabled", false)
+
+			player.update_zone_offset.rpc_id(quitting_peer_id, default_zone_offset)
+			player.global_position = target_position
+			rpc_id(quitting_peer_id, "teleport_local_client_player", target_position)
+
+@rpc("authority", "call_local", "reliable")
+func set_quitting_joiner_overworld_ui() -> void:
+	print("[CLIENT] Restoring Overworld UI for quitting joiner locally...")
+	close_minigolf_menu()
+	hide_minigames_popups()
+	if is_instance_valid(lobby_nav):
+		lobby_nav.show()
+	enable_lobby_nav_buttons()
+
+@rpc("authority", "call_local", "reliable")
+func teleport_local_client_player(target_pos: Vector2) -> void:
+	var my_id = multiplayer.get_unique_id()
+	
+	for player in get_tree().get_nodes_in_group("player"):
+		if is_instance_valid(player) and "player_id" in player:
+			if player.player_id == my_id:
+				player.show()
+				if "velocity" in player:
+					player.velocity = Vector2.ZERO
+				player.global_position = target_pos
+				if player.has_method("set_movement_disabled"):
+					player.set_movement_disabled(false)
+				print("[CLIENT %d] Successfully teleported participant locally to %s" % [my_id, target_pos])

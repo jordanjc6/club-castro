@@ -711,3 +711,7 @@ func show_caught_fish_display(fish_code: String, size_code: String) -> void:
 func set_head_accessory_equipped(equipped: bool) -> void:
 	is_head_accessory_equipped = equipped
 	head_accessory.visible = equipped
+
+@rpc("authority", "call_local", "reliable")
+func set_player_visible(is_visible: bool) -> void:
+	visible = is_visible

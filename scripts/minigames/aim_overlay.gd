@@ -1,17 +1,30 @@
 extends Node2D
 
+@onready var minigolf_minigame = $"../.."
+
 func _draw() -> void:
-	var controller = get_node_or_null("/root/World/MinigolfMinigame") # Adjust path if needed
+	if not is_instance_valid(minigolf_minigame):
+		return
+
+	var controller = get_node_or_null("/root/World/MinigolfMinigame")
 	if not is_instance_valid(controller):
 		controller = get_tree().get_first_node_in_group("minigolf_controller")
-		
+
 	if controller == null or controller.current_ball_state != controller.BallState.AIMING:
 		return
 
 	if not controller.player_data.has(controller.current_turn_id):
 		return
 
-	var active_ball = controller.player_data[controller.current_turn_id]["ball_node"] as RigidBody2D
+	# 1. Fetch raw reference WITHOUT casting yet
+	var raw_ball = controller.player_data[controller.current_turn_id].get("ball_node")
+
+	# 2. Safety check: Ensure raw_ball is valid and not freed/queued for deletion
+	if not is_instance_valid(raw_ball) or raw_ball.is_queued_for_deletion():
+		return
+
+	# 3. Safely cast now that the object is verified alive
+	var active_ball = raw_ball as RigidBody2D
 	if not is_instance_valid(active_ball):
 		return
 
@@ -20,7 +33,7 @@ func _draw() -> void:
 	var local_start = to_local(controller.drag_start_pos)
 	var local_curr = to_local(controller.current_drag_pos)
 	var drag_vector = local_start - local_curr
-	
+
 	var distance = clamp(drag_vector.length(), 0.0, controller.MAX_POWER_DISTANCE)
 	var power_percent = distance / controller.MAX_POWER_DISTANCE
 
