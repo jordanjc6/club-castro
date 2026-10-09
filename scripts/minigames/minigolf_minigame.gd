@@ -6,6 +6,7 @@ extends Node2D
 @onready var course_container: MarginContainer = $Screen/UI/HBoxContainer/Course
 @onready var aim_overlay: Node2D = $Screen/AimOverlay
 @onready var notif_popup: PanelContainer = $Screen/Notification
+@onready var exit_game_button: Button = $Screen/MinigolfSidenav/MultiplayerHUD/VBoxContainer/ExitGameButton
 
 # Constants
 const NUM_COURSES_PER_GAME = 1
@@ -43,6 +44,10 @@ var _last_synced_aim_pos: Vector2 = Vector2.ZERO
 func _ready() -> void:
 	print("[DEBUG] _ready() called")
 	add_to_group("minigolf_controller")
+	exit_game_button.pressed.connect(exit_game_button_pressed)
+
+func exit_game_button_pressed():
+	pass
 
 func _physics_process(_delta: float) -> void:
 	# 1. 60Hz Rate-limited preview position broadcast

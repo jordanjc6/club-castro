@@ -3,6 +3,8 @@
 [ext_resource type="Texture2D" uid="uid://tiu625i0s3fp" path="res://assets/textures/wooden.jpg" id="1_0x1ge"]
 [ext_resource type="Script" uid="uid://dsw4gdjkfd02b" path="res://scripts/minigames/minigolf_minigame.gd" id="1_s0toe"]
 [ext_resource type="Script" uid="uid://cx4q8nwepvbif" path="res://scripts/minigames/aim_overlay.gd" id="4_6ssiq"]
+[ext_resource type="Script" uid="uid://bknaby53d7dgl" path="res://scripts/world/side_nav.gd" id="4_4268k"]
+[ext_resource type="Texture2D" uid="uid://egdknrgtofd" path="res://assets/icons/left-arrow.svg" id="5_37d5r"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s0toe"]
 bg_color = Color(0.7764706, 0.8745098, 0.9647059, 1)
@@ -16,6 +18,23 @@ corner_radius_bottom_left = 40
 [sub_resource type="LabelSettings" id="LabelSettings_6ssiq"]
 font_size = 48
 font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lyii5"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_titiu"]
+bg_color = Color(0, 0, 0, 0.47058824)
+border_width_left = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j7hga"]
+bg_color = Color(0, 0, 0, 0.47058824)
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0, 0, 0, 1)
 
 [node name="MinigolfMinigame" type="Node2D" unique_id=231246832]
 z_index = 100
@@ -194,6 +213,51 @@ text = "<Notification Text>"
 label_settings = SubResource("LabelSettings_6ssiq")
 horizontal_alignment = 1
 autowrap_mode = 2
+
+[node name="MinigolfSidenav" type="HBoxContainer" parent="Screen" unique_id=1469588418]
+offset_left = 1282.0
+offset_top = -3.0
+offset_right = 1524.0
+offset_bottom = 157.0
+rotation = 1.5707964
+theme_override_constants/separation = 0
+script = ExtResource("4_4268k")
+
+[node name="MultiplayerHUD" type="PanelContainer" parent="Screen/MinigolfSidenav" unique_id=1536738844]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_lyii5")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Screen/MinigolfSidenav/MultiplayerHUD" unique_id=737170963]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="ExitGameButton" type="Button" parent="Screen/MinigolfSidenav/MultiplayerHUD/VBoxContainer" unique_id=1445623196]
+custom_minimum_size = Vector2(100, 80)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_titiu")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_titiu")
+theme_override_styles/hover = SubResource("StyleBoxFlat_titiu")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_titiu")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_titiu")
+theme_override_styles/focus = SubResource("StyleBoxFlat_titiu")
+text = "Host Game"
+
+[node name="ToggleButton" type="Button" parent="Screen/MinigolfSidenav" unique_id=688712479]
+custom_minimum_size = Vector2(40, 60)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_j7hga")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_j7hga")
+theme_override_styles/hover = SubResource("StyleBoxFlat_j7hga")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_j7hga")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_j7hga")
+theme_override_styles/focus = SubResource("StyleBoxFlat_j7hga")
+icon = ExtResource("5_37d5r")
+expand_icon = true
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=1807575260]
 _spawnable_scenes = PackedStringArray("uid://cr2gxw5kofcm0")
