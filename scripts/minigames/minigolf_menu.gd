@@ -247,6 +247,9 @@ func minigolf_start_pressed():
 @rpc("any_peer", "call_local", "reliable")
 func request_start_minigolf() -> void:
 	if multiplayer.is_server():
+		if !minigolf_players.has(1):
+			rpc("notify_need_host_to_start")
+			return
 		if minigolf_players.size() < 2:
 			rpc("notify_not_enough_players")
 			return
@@ -262,6 +265,12 @@ func notify_not_enough_players() -> void:
 	if not minigolf_players.has(multiplayer.get_unique_id()):
 		return
 	game_manager.show_temp_notif("Need at least 2 players!", 2)
+
+@rpc("authority", "call_local", "reliable")
+func notify_need_host_to_start() -> void:
+	if not minigolf_players.has(multiplayer.get_unique_id()):
+		return
+	game_manager.show_temp_notif("Need host in minigolf lobby to play!", 2)
 
 @rpc("authority", "call_local", "reliable")
 func set_minigolf_ui() -> void:

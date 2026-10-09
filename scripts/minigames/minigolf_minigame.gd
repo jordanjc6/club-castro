@@ -63,9 +63,10 @@ func request_manual_exit(peer_id: int) -> void:
 	# ROUTE 1: HOST LEAVES -> Terminate match completely for all players
 	if peer_id == 1:
 		print("[MINIGAME SERVER] Host clicked exit! Force-closing game for all players...")
-		rpc("show_notification", "Host exited the match. Closing game...", 3.0)
-		await get_tree().create_timer(1.0).timeout
-		rpc("end_minigolf_game")
+		rpc("show_notification", "Host exited the match. Closing game...", 2.5)
+		await get_tree().create_timer(2.5).timeout
+		current_course_number = 999
+		advance_to_next_course()
 		return
 
 	# ROUTE 2: JOINER LEAVES -> Teleport joiner back, clear state, and continue match for Host
