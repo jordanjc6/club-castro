@@ -8,10 +8,10 @@ friction = 0.1
 bounce = 0.8
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_peo2a"]
-radius = 22.63846
+radius = 33.333332
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_00mmp"]
-radius = 22.63846
+radius = 33.333332
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_muokh"]
 properties/0/path = NodePath(".:position")
@@ -44,7 +44,7 @@ scale = Vector2(0.3, 0.3)
 texture = ExtResource("1_467wi")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1493962247]
-scale = Vector2(0.4, 0.4)
+scale = Vector2(0.3, 0.3)
 shape = SubResource("CircleShape2D_peo2a")
 
 [node name="GolfBallArea" type="Area2D" parent="." unique_id=1429062706]
@@ -52,7 +52,7 @@ collision_layer = 0
 collision_mask = 128
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GolfBallArea" unique_id=516340781]
-scale = Vector2(0.4, 0.4)
+scale = Vector2(0.3, 0.3)
 shape = SubResource("CircleShape2D_00mmp")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1954340887]
