@@ -1,5 +1,5 @@
 Minigolf
-- delay in game ui when starting singleplayer; teleport after game setup?
+- for minigolf: set spawn position of new lobby joiner to fixed spot
 - design more courses
 - add more tile shapes (half/triangle, rounded, smaller/bigger)
 - add sand

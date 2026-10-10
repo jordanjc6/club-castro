@@ -9,7 +9,7 @@ extends Node2D
 @onready var exit_game_button: Button = $Screen/MinigolfSidenav/MultiplayerHUD/VBoxContainer/ExitGameButton
 
 # Constants
-const NUM_COURSES_PER_GAME = 3
+const NUM_COURSES_PER_GAME = 1
 const AVAILABLE_COURSES: Array[int] = [1, 2, 3]
 const BALL_COLORS: Array[Color] = [
 	Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE
@@ -514,15 +514,29 @@ func start_minigolf(turn_order: Array[int]) -> void:
 		var first_course_id = AVAILABLE_COURSES.pick_random()
 		played_courses.append(first_course_id)
 		
+		# Server picks unique colors for everyone
+		var assigned_colors: Dictionary = {}
+		var available_colors = BALL_COLORS.duplicate()
+		available_colors.shuffle() # Randomize the color pool
+		
+		for i in range(turn_order.size()):
+			var peer_id = turn_order[i]
+			if not available_colors.is_empty():
+				# Take the first color from the shuffled pool so it's never repeated
+				assigned_colors[peer_id] = available_colors.pop_front()
+			else:
+				# Fallback if there are more players than available colors
+				assigned_colors[peer_id] = BALL_COLORS.pick_random()
+		
 		enable_minigame_processing(true)
-		rpc("sync_game_start", turn_order, first_course_id)
+		rpc("sync_game_start", turn_order, first_course_id, assigned_colors)
 
 @rpc("authority", "call_local", "reliable")
-func sync_game_start(turn_order: Array[int], starting_course_id: int) -> void:
+func sync_game_start(turn_order: Array[int], starting_course_id: int, assigned_colors: Dictionary) -> void:
 	exit_game_button.disabled = false
 	current_course_number = 1
 	current_turn_id = turn_order[0]
-	initialize_game_state(turn_order)
+	initialize_game_state(turn_order, assigned_colors) # Pass colors here
 	load_course(starting_course_id)
 	refresh_minigolf_hud()
 	if is_instance_valid(notif_popup):
@@ -539,7 +553,7 @@ func enable_minigame_processing(active: bool) -> void:
 		aim_overlay.set_process(active)
 		aim_overlay.set_process_input(active)
 
-func initialize_game_state(turn_order: Array[int]) -> void:
+func initialize_game_state(turn_order: Array[int], assigned_colors: Dictionary) -> void:
 	minigolf_turn_order = turn_order
 	player_data.clear()
 	for i in range(turn_order.size()):
@@ -547,7 +561,8 @@ func initialize_game_state(turn_order: Array[int]) -> void:
 		player_data[peer_id] = {
 			"id": peer_id,
 			"name": MultiplayerManager.get_player_name(peer_id),
-			"color": BALL_COLORS.pick_random(),
+			# Use the server's synced color instead of picking a new random one
+			"color": assigned_colors.get(peer_id, Color.WHITE),
 			"total_strokes": 0,
 			"current_strokes": 0,
 			"ball_node": null,
@@ -700,7 +715,10 @@ func announce_game_result() -> void:
 func show_notification(message: String, time: float) -> void:
 	if not is_instance_valid(notif_popup):
 		return
-
+	
+	if message.contains("Game over!"):
+		exit_game_button.disabled = true
+	
 	var label = notif_popup.get_node_or_null("MarginContainer/Label")
 	if label:
 		label.text = message

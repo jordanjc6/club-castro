@@ -84,9 +84,6 @@ func disable_player_movement():
 func start_singleplayer_game():
 	print("start minigolf!")
 	set_minigolf_ui()
-	teleport_player_to_minigolf()
-	await get_tree().create_timer(5).timeout
-	disable_player_movement()
 	
 	enable_minigame_processing(true)
 	played_courses.clear()
@@ -111,6 +108,10 @@ func start_singleplayer_game():
 	refresh_minigolf_hud(current_course_number, player_data)
 	if is_instance_valid(notif_popup):
 		notif_popup.hide()
+	
+	teleport_player_to_minigolf()
+	await get_tree().create_timer(5).timeout
+	disable_player_movement()
 
 func load_course(course_num: int) -> void:
 	for child in course_container.get_children():
@@ -648,6 +649,7 @@ func announce_course_winner() -> void:
 	if current_course_number < NUM_COURSES_PER_GAME:
 		msg += "Advancing to next course.."
 	else:
+		exit_game_button.disabled = true
 		msg += " Game over!"
 	
 	show_notification(msg, HOLE_WINNER_NOTIF_TIME)
