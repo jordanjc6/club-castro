@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ceb6r6q6dv3fg"
-path="res://.godot/imported/checkered-start.png-e506d769e4696df71504e2d041c869ab.ctex"
+uid="uid://5hc0exl42xnh"
+path="res://.godot/imported/turf32.jpg-93b6a71a1486c8b553bc5ecb1839529b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/checkered-start.png"
-dest_files=["res://.godot/imported/checkered-start.png-e506d769e4696df71504e2d041c869ab.ctex"]
+source_file="res://assets/textures/turf32.jpg"
+dest_files=["res://.godot/imported/turf32.jpg-93b6a71a1486c8b553bc5ecb1839529b.ctex"]
 
 [params]
 

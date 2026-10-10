@@ -15,13 +15,13 @@ const DEFAULT_NAMETAG_COLOR = Color("0000003c")
 const ROULETTE_BORDER_WIDTH = 8
 
 # Constants
-const NUM_COURSES_PER_GAME = 2
-const AVAILABLE_COURSES: Array[int] = [1, 2, 3]
+const NUM_COURSES_PER_GAME = 1
+const AVAILABLE_COURSES: Array[int] = [4]
 const BALL_COLORS: Array[Color] = [
 	Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE
 ]
-const HOLE_WINNER_NOTIF_TIME = 4  # display course winner notif for 4s
-const GAME_RESULT_NOTIF_TIME = 5.5
+const HOLE_WINNER_NOTIF_TIME = 2.5  # display course winner notif for 4s
+const GAME_RESULT_NOTIF_TIME = 4
 
 enum BallState { PLACING, PLACED, AIMING, MOVING }
 

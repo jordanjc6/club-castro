@@ -1,42 +1,42 @@
 [gd_resource type="TileSet" format=3 uid="uid://7tj23bt4wta7"]
 
-[ext_resource type="Texture2D" uid="uid://dppg1j088iy8e" path="res://assets/textures/turf64.jpg" id="1_ublmp"]
-[ext_resource type="Texture2D" uid="uid://beoat0agnhjeu" path="res://assets/textures/bricks64.png" id="2_x6ovr"]
-[ext_resource type="Texture2D" uid="uid://ceb6r6q6dv3fg" path="res://assets/textures/checkered-start.png" id="3_wit3e"]
-[ext_resource type="Texture2D" uid="uid://bn1ldv8fypgkj" path="res://assets/textures/space.png" id="4_q43t5"]
+[ext_resource type="Texture2D" uid="uid://ct1q1g67erghh" path="res://assets/textures/bricks32.png" id="1_wecfj"]
+[ext_resource type="Texture2D" uid="uid://qlha1v44je7" path="res://assets/textures/space32.png" id="4_q43t5"]
+[ext_resource type="Texture2D" uid="uid://5hc0exl42xnh" path="res://assets/textures/turf32.jpg" id="4_wecfj"]
+[ext_resource type="Texture2D" uid="uid://bea5naftetcae" path="res://assets/textures/checkered-start32.png" id="6_8811o"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_x6ovr"]
-texture = ExtResource("1_ublmp")
-texture_region_size = Vector2i(64, 64)
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_8811o"]
+texture = ExtResource("1_wecfj")
+texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
-0:0/0/custom_data_0 = "grass"
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wit3e"]
-texture = ExtResource("2_x6ovr")
-texture_region_size = Vector2i(64, 64)
-0:0/0 = 0
-0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
 0:0/0/custom_data_0 = "brick"
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_q43t5"]
-texture = ExtResource("3_wit3e")
-texture_region_size = Vector2i(64, 64)
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_23r0g"]
+texture = ExtResource("6_8811o")
+texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
 0:0/0/custom_data_0 = "tee"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wecfj"]
 texture = ExtResource("4_q43t5")
-texture_region_size = Vector2i(64, 64)
+texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
 0:0/0/custom_data_0 = "space"
 
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_aic3d"]
+texture = ExtResource("4_wecfj")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/custom_data_0 = "grass"
+
 [resource]
-tile_size = Vector2i(64, 64)
+tile_size = Vector2i(32, 32)
 physics_layer_0/collision_layer = 32
 physics_layer_0/collision_mask = 0
 custom_data_layer_0/name = "surface_type"
 custom_data_layer_0/type = 4
-sources/1 = SubResource("TileSetAtlasSource_x6ovr")
-sources/2 = SubResource("TileSetAtlasSource_wit3e")
-sources/3 = SubResource("TileSetAtlasSource_q43t5")
-sources/4 = SubResource("TileSetAtlasSource_wecfj")
+sources/0 = SubResource("TileSetAtlasSource_8811o")
+sources/5 = SubResource("TileSetAtlasSource_23r0g")
+sources/6 = SubResource("TileSetAtlasSource_wecfj")
+sources/7 = SubResource("TileSetAtlasSource_aic3d")

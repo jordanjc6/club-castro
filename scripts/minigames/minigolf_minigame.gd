@@ -9,13 +9,13 @@ extends Node2D
 @onready var exit_game_button: Button = $Screen/MinigolfSidenav/MultiplayerHUD/VBoxContainer/ExitGameButton
 
 # Constants
-const NUM_COURSES_PER_GAME = 1
+const NUM_COURSES_PER_GAME = 3
 const AVAILABLE_COURSES: Array[int] = [1, 2, 3]
 const BALL_COLORS: Array[Color] = [
 	Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE
 ]
-const HOLE_WINNER_NOTIF_TIME = 4  # display course winner notif for 4s
-const GAME_RESULT_NOTIF_TIME = 5.5
+const HOLE_WINNER_NOTIF_TIME = 2.5  # display course winner notif for 4s
+const GAME_RESULT_NOTIF_TIME = 4
 
 enum BallState { PLACING, PLACED, AIMING, MOVING }
 
