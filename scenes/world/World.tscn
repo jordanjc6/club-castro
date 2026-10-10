@@ -189,6 +189,7 @@ properties/0/replication_mode = 1
 
 [node name="MinigolfMinigame" parent="." unique_id=231246832 instance=ExtResource("5_400s5")]
 script = ExtResource("6_0duuj")
+golf_ball_scene = null
 
 [node name="SinglePlayer" parent="." unique_id=1112790412 instance=ExtResource("4_qh0kd")]
 position = Vector2(647, 528)

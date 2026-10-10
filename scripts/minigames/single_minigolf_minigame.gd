@@ -2,14 +2,20 @@ extends Node2D
 
 @export var golf_ball_scene: PackedScene = preload("res://scenes/minigames/minigolf/GolfBall.tscn")
 
-@onready var minigolf_menu: PanelContainer = $"../HUD/MinigamesPopup/MinigolfMenu"
 @onready var course_container: MarginContainer = $Screen/UI/HBoxContainer/Course
 @onready var aim_overlay: Node2D = $Screen/AimOverlay
 @onready var notif_popup: PanelContainer = $Screen/Notification
 @onready var exit_game_button: Button = $Screen/MinigolfSidenav/MultiplayerHUD/VBoxContainer/ExitGameButton
 
+# style constants
+const COLOR_BROWN = Color("3d251e")
+const COLOR_GOLD = Color("ffd700")  
+const COLOR_GREEN = Color("2e7d32")
+const DEFAULT_NAMETAG_COLOR = Color("0000003c")
+const ROULETTE_BORDER_WIDTH = 8
+
 # Constants
-const NUM_COURSES_PER_GAME = 1
+const NUM_COURSES_PER_GAME = 2
 const AVAILABLE_COURSES: Array[int] = [1, 2, 3]
 const BALL_COLORS: Array[Color] = [
 	Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE
@@ -25,9 +31,7 @@ const ACCURACY_THRESHOLD: float = 0.5    # Inaccuracy starts above 50% power
 const MAX_DEVIATION_ANGLE: float = 0.35  # Max error angle in radians (~20 deg)
 
 # State Variables
-var minigolf_turn_order: Array[int] = []
 var player_data: Dictionary = {}
-var current_turn_id: int
 var current_course_number: int = 1  # 1, 2, 3 out of 3 courses played each game
 var played_courses: Array[int] = []
 var dragged_ball_preview: Node2D = null
@@ -47,8 +51,134 @@ func _ready() -> void:
 	exit_game_button.pressed.connect(exit_game_button_pressed)
 	enable_minigame_processing(false)
 
+func set_minigolf_ui() -> void:
+	var sidenav: Node = $"../HUD/SideNav"
+	sidenav.hide()
+	var single_minigolf_menu: Node = $"../HUD/SingleplayerMinigamesPopup/MinigolfMenu"
+	single_minigolf_menu.hide()
+	for player in get_tree().get_nodes_in_group("player"):
+		player.hide()
+
+func teleport_player_to_minigolf() -> void:
+	var new_zone_offset = Vector2(0, 950)
+	var target_position = Vector2(250, 1200)
+	for player in get_tree().get_nodes_in_group("player"):
+		player.update_zone_offset(player.player_id, new_zone_offset)
+		player.global_position = target_position
+		player.hide()
+
+func disable_player_movement():
+	for player in get_tree().get_nodes_in_group("player"):
+		player.set_movement_disabled(true)
+
 func start_singleplayer_game():
 	print("start minigolf!")
+	set_minigolf_ui()
+	teleport_player_to_minigolf()
+	await get_tree().create_timer(5).timeout
+	disable_player_movement()
+	
+	enable_minigame_processing(true)
+	played_courses.clear()
+	var first_course_id = AVAILABLE_COURSES.pick_random()
+	played_courses.append(first_course_id)
+	
+	exit_game_button.disabled = false
+	current_course_number = 1
+	
+	player_data.clear()
+	player_data[0] = {
+		"id": 1,
+		"name": "SinglePlayer",
+		"color": BALL_COLORS.pick_random(),
+		"total_strokes": 0,
+		"current_strokes": 0,
+		"ball_node": null,
+		"finished_hole": false
+	}
+	
+	load_course(first_course_id)
+	update_game_info(current_course_number)
+	update_player_grid(player_data)
+	if is_instance_valid(notif_popup):
+		notif_popup.hide()
+
+func update_game_info(course_num: int):
+	var info_node = get_minigolf_game_info_node()
+	if not is_instance_valid(info_node):
+		return
+		
+	var courseLabel = info_node.get_node("CourseLabel")
+	var turnLabel = info_node.get_node("TurnLabel")
+	
+	courseLabel.text = "Course %s/3" % course_num
+	turnLabel.text = "Your turn!"
+
+func get_minigolf_game_info_node() -> HBoxContainer:
+	return get_node_or_null("Screen/UI/HBoxContainer/HUD/RotationWrapper/VBoxContainer/GameInfo")
+
+func update_player_grid(player_data: Dictionary = {}) -> void:
+	var grid_node = get_minigolf_player_grid_node()
+	if not is_instance_valid(grid_node):
+		return
+
+	var label_nodes = grid_node.get_children()
+	
+	for i in range(label_nodes.size()):
+		var label = label_nodes[i] as Label
+		if not label:
+			continue
+			
+		if i < 1:
+			var peer_id = 1
+			var player_name = "SinglePlayer"
+			
+			var current_strokes = 0
+			var total_strokes = 0
+			var p_color = Color.WHITE
+			
+			if player_data.has(peer_id):
+				current_strokes = player_data[peer_id].get("current_strokes", 0)
+				total_strokes = player_data[peer_id].get("total_strokes", 0)
+				p_color = player_data[peer_id].get("color", Color.WHITE)
+			
+			label.text = "%d. %s: %d (%d)" % [i + 1, player_name, current_strokes, total_strokes]
+			label.show()
+			
+			var is_turn = true
+			apply_player_label_style(label, is_turn, p_color)
+		else:
+			label.hide()
+
+func get_minigolf_player_grid_node() -> GridContainer:
+	return get_node_or_null("Screen/UI/HBoxContainer/HUD/RotationWrapper/VBoxContainer/PlayerGrid")
+
+func apply_player_label_style(label: Label, is_current_turn: bool = false, ball_color: Color = Color.WHITE) -> void:
+	var style = StyleBoxFlat.new()
+	
+	if is_current_turn:
+		style.bg_color = COLOR_GREEN
+		style.border_color = ball_color
+		style.set_border_width_all(3)
+	else:
+		style.bg_color = Color(0.1, 0.1, 0.1, 0.6)
+		style.border_color = Color(0.3, 0.3, 0.3, 0.8)
+		style.set_border_width_all(1)
+	
+	style.set_corner_radius_all(8)
+	style.content_margin_left = 10
+	style.content_margin_right = 10
+	style.content_margin_top = 4
+	style.content_margin_bottom = 4
+	
+	label.add_theme_stylebox_override("normal", style)
+
+#############################################################################################
+#############################################################################################
+#############################################################################################
+#############################################################################################
+#############################################################################################
+#############################################################################################
 
 # --- Voluntary Exit Button Logic ---
 func exit_game_button_pressed() -> void:

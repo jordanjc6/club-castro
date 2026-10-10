@@ -9,7 +9,7 @@ extends Node2D
 @onready var exit_game_button: Button = $Screen/MinigolfSidenav/MultiplayerHUD/VBoxContainer/ExitGameButton
 
 # Constants
-const NUM_COURSES_PER_GAME = 1
+const NUM_COURSES_PER_GAME = 3
 const AVAILABLE_COURSES: Array[int] = [1, 2, 3]
 const BALL_COLORS: Array[Color] = [
 	Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE
