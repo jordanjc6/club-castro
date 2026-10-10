@@ -15,8 +15,8 @@ const DEFAULT_NAMETAG_COLOR = Color("0000003c")
 const ROULETTE_BORDER_WIDTH = 8
 
 # Constants
-const NUM_COURSES_PER_GAME = 1
-const AVAILABLE_COURSES: Array[int] = [4]
+const NUM_COURSES_PER_GAME = 7
+const AVAILABLE_COURSES: Array[int] = [1, 2, 3, 4, 5, 6, 7]
 const BALL_COLORS: Array[Color] = [
 	Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE
 ]
@@ -26,8 +26,8 @@ const GAME_RESULT_NOTIF_TIME = 4
 enum BallState { PLACING, PLACED, AIMING, MOVING }
 
 const MAX_POWER_DISTANCE: float = 200.0  # Pixels dragged for max power
-const MAX_IMPULSE_FORCE: float = 800.0   # Impulse force applied to RigidBody
-const ACCURACY_THRESHOLD: float = 0.5    # Inaccuracy starts above 50% power
+const MAX_IMPULSE_FORCE: float = 900.0   # Impulse force applied to RigidBody
+const ACCURACY_THRESHOLD: float = 0.60    # Inaccuracy starts above 50% power
 const MAX_DEVIATION_ANGLE: float = 0.35  # Max error angle in radians (~20 deg)
 
 # State Variables
