@@ -547,7 +547,7 @@ func initialize_game_state(turn_order: Array[int]) -> void:
 		player_data[peer_id] = {
 			"id": peer_id,
 			"name": MultiplayerManager.get_player_name(peer_id),
-			"color": BALL_COLORS[i % BALL_COLORS.size()],
+			"color": BALL_COLORS.pick_random(),
 			"total_strokes": 0,
 			"current_strokes": 0,
 			"ball_node": null,

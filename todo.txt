@@ -1,5 +1,5 @@
 Minigolf
-- make minigolf playable in singleplayer
+- delay in game ui when starting singleplayer; teleport after game setup?
 - design more courses
 - add more tile shapes (half/triangle, rounded, smaller/bigger)
 - add sand
