@@ -722,6 +722,12 @@ func _add_player_to_game(id: int, position: Vector2 = Vector2.INF, offset: Vecto
 			var item_id = player_accessories[peer_id]
 			if item_id != "":
 				rpc_id(id, "sync_player_accessory", peer_id, item_id)
+		
+		if is_tag_minigame_started:
+			rpc_id(id, "set_tag_minigame_started", true) # Or whatever function you use to initialize tag for clients
+			
+		if is_minigolf_minigame_started:
+			rpc_id(id, "set_minigolf_started", true)
 	
 	var player_to_add = multiplayer_scene.instantiate()
 	player_to_add.player_id = id
