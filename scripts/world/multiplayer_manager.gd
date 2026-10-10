@@ -734,7 +734,7 @@ func _add_player_to_game(id: int, position: Vector2 = Vector2.INF, offset: Vecto
 	player_to_add.name = str(id)
 	_players_spawn_node.add_child(player_to_add, true)
 	
-	if id == 1:
+	if id == 1:  # host
 		player_to_add.global_position = position
 		player_to_add.current_grid_offset = offset
 		player_to_add.rpc("update_zone_offset", offset)
@@ -744,11 +744,14 @@ func _add_player_to_game(id: int, position: Vector2 = Vector2.INF, offset: Vecto
 		if (x >= THEATRE_X1 and x <= THEATRE_X2 and y >= THEATRE_Y1 and y <= THEATRE_Y2):
 			increment_players_in_theatre()
 	
-	if id != 1:
+	if id != 1:  # joiner
 		var host_player = _players_spawn_node.get_node_or_null("1")
 		if host_player:
 			var target_pos = host_player.global_position
 			var target_grid_offset = host_player.current_grid_offset
+			if is_minigolf_minigame_started:  # ensure player spawns at default instead of in minigolf area
+				target_pos = Vector2(647, 528)
+				target_grid_offset = Vector2.ZERO
 			
 			player_to_add.global_position = target_pos
 			player_to_add.current_grid_offset = target_grid_offset

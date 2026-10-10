@@ -1,5 +1,4 @@
 Minigolf
-- for minigolf: set spawn position of new lobby joiner to fixed spot
 - design more courses
 - add more tile shapes (half/triangle, rounded, smaller/bigger)
 - add sand
