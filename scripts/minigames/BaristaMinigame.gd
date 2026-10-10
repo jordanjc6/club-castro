@@ -224,6 +224,7 @@ func _on_body_entered(body: Node) -> void:
 		hud.get_node("SideNav").visible = false
 		hud.get_node("JoinPopup").visible = false
 		hud.get_node("SideNav/MultiplayerHUD/VBoxContainer/HostButton").disabled = false
+		hud.get_node("SideNav/MultiplayerHUD/VBoxContainer/MinigamesButton").disabled = false
 
 func _on_body_exited(body: Node) -> void:
 	if not is_instance_valid(body) or not body.is_inside_tree():

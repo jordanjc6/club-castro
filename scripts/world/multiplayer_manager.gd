@@ -883,6 +883,9 @@ func _restore_single_player(pos: Vector2, offset: Vector2):
 	print("SUCCESS: SinglePlayer restored at position: ", pos)
 
 	player_disconnected_notif.emit.call_deferred("Disconnected from lobby. Back to single player!")
+	
+	var game_manager = world_scene.get_node_or_null("GameManager")
+	game_manager.swap_minigolf_script(game_manager.SINGLE_MINIGOLF_MINIGAME_SCRIPT_PATH)
 
 @rpc("any_peer", "call_local", "reliable")
 func increment_players_in_theatre():

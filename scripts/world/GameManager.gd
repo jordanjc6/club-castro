@@ -6,6 +6,7 @@ signal minigames_button_pressed(player_id: int)
 @onready var side_nav: HBoxContainer = $"../HUD/SideNav"
 @onready var host_button: Button = $"../HUD/SideNav/MultiplayerHUD/VBoxContainer/HostButton"
 @onready var join_button: Button = $"../HUD/SideNav/MultiplayerHUD/VBoxContainer/JoinButton"
+@onready var singleplayer_minigames_button: Button = $"../HUD/SideNav/MultiplayerHUD/VBoxContainer/MinigamesButton"
 @onready var join_popup: PanelContainer = $"../HUD/JoinPopup"
 @onready var find_button: Button = $"../HUD/JoinPopup/VBoxContainer/FindButton"
 
@@ -21,7 +22,17 @@ signal minigames_button_pressed(player_id: int)
 @onready var tag_nav: HBoxContainer = $"../HUD/TagNav"
 @onready var leave_tag_button: Button = $"../HUD/TagNav/MultiplayerHUD/VBoxContainer/LeaveGameButton"
 
-# minigames popup
+# singleplayer minigames popup
+@onready var single_minigames_popup: Node2D = $"../HUD/SingleplayerMinigamesPopup"
+@onready var single_minigames_mainmenu: PanelContainer = $"../HUD/SingleplayerMinigamesPopup/MainMenu"
+@onready var single_minigolf_button: Button = $"../HUD/SingleplayerMinigamesPopup/MainMenu/MarginContainer/VBoxContainer/HBoxContainer/MinigolfButton"
+
+# singleplayer minigolf menu
+@onready var single_minigolfmenu: PanelContainer = $"../HUD/SingleplayerMinigamesPopup/MinigolfMenu"
+@onready var single_minigolfmenu_close_button: Button = $"../HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Header/HBoxContainer/CloseMinigolfMenuButton"
+@onready var single_minigolfmenu_start_button: Button = $"../HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer/StartGameButton"
+
+# multiplayer minigames popup
 @onready var minigames_popup: Node2D = $"../HUD/MinigamesPopup"
 @onready var minigames_mainmenu: PanelContainer = $"../HUD/MinigamesPopup/MainMenu"
 @onready var tag_button: Button = $"../HUD/MinigamesPopup/MainMenu/MarginContainer/VBoxContainer/HBoxContainer/TagButton"
@@ -57,15 +68,28 @@ var _current_tag_match_id: int = 0
 
 ##############################################################################
 
+const SINGLE_MINIGOLF_MINIGAME_SCRIPT_PATH: String = "res://scripts/minigames/single_minigolf_minigame.gd"
+const MINIGOLF_MINIGAME_SCRIPT_PATH: String = "res://scripts/minigames/minigolf_minigame.gd"
+const MINIGOLF_MINIGAME_SCENE_PATH: String = "res://scenes/minigames/MinigolfMinigame.tscn"
+
+var _cached_single_minigolf: Node2D = null
 
 func _ready() -> void:
 	host_button.pressed.connect(_host_button_pressed)
 	join_button.pressed.connect(_join_button_pressed)
+	singleplayer_minigames_button.pressed.connect(_singleplayer_minigames_button_pressed)
 	lobby_button.pressed.connect(_lobby_button_pressed)
 	minigames_button.pressed.connect(_minigames_button_pressed)
 	exit_button.pressed.connect(_exit_button_pressed)
 	copy_button.pressed.connect(_copy_button_pressed)
 	find_button.pressed.connect(_find_button_pressed)
+	
+	single_minigames_popup.hide()
+	single_minigames_mainmenu.hide()
+	single_minigolfmenu.hide()
+	single_minigolf_button.pressed.connect(_single_minigolf_button_pressed)
+	single_minigolfmenu_close_button.pressed.connect(_close_single_minigolf_menu)
+	single_minigolfmenu_start_button.pressed.connect(_start_single_minigolf_game)
 	
 	lobby_popup.hide()
 	minigames_popup.hide()
@@ -103,21 +127,74 @@ func _host_button_pressed():
 	loading_spinner.show()
 	host_button.disabled = true
 	join_button.disabled = true
+	singleplayer_minigames_button.disabled = true
 	if await MultiplayerManager.become_host(): 
 		side_nav.hide()
 		lobby_nav.show()
 		show_temp_notif("Entered lobby as host!")
+		swap_minigolf_script(MINIGOLF_MINIGAME_SCRIPT_PATH)
 	else:
 		host_button.disabled = false
 		join_button.disabled = false
+		singleplayer_minigames_button.disabled = false
 		show_temp_notif("Failed to create lobby. Check internet connection!")
 	loading_spinner.hide()
 
 func _join_button_pressed():
 	print("join btn")
 	join_popup.visible = !join_popup.visible
-	if join_popup.visible: host_button.disabled = true
-	else: host_button.disabled = false
+	if join_popup.visible: 
+		host_button.disabled = true
+		singleplayer_minigames_button.disabled = true
+	else: 
+		host_button.disabled = false
+		singleplayer_minigames_button.disabled = false
+
+func _singleplayer_minigames_button_pressed():
+	print("singleplayer minigames btn")
+	
+	# Check whether popup is currently hidden
+	var opening = !single_minigames_popup.visible
+	
+	if opening:
+		# Lock side nav buttons while popup is open
+		host_button.disabled = true
+		join_button.disabled = true
+		
+		single_minigames_popup.show()
+		single_minigames_mainmenu.show()
+		single_minigolfmenu.hide()
+	else:
+		# Unlock side nav buttons when popup closes
+		host_button.disabled = false
+		join_button.disabled = false
+		
+		single_minigames_popup.hide()
+		single_minigames_mainmenu.hide()
+		single_minigolfmenu.hide()
+
+func _single_minigolf_button_pressed():
+	print("singleplayer minigolf button pressed")
+	single_minigames_mainmenu.hide()
+	single_minigolfmenu.show()
+
+func _close_single_minigolf_menu():
+	host_button.disabled = false
+	join_button.disabled = false
+	
+	single_minigames_popup.hide()
+	single_minigames_mainmenu.hide()
+	single_minigolfmenu.hide()
+
+func get_minigolf_node() -> Node2D:
+	if not is_instance_valid(_cached_single_minigolf):
+		_cached_single_minigolf = get_node_or_null("../MinigolfMinigame") as Node2D
+	return _cached_single_minigolf
+
+func _start_single_minigolf_game():
+	var minigame = get_minigolf_node()
+	if is_instance_valid(minigame) and minigame.has_method("start_singleplayer_game"):
+		minigame.start_singleplayer_game()
 
 func _find_button_pressed():
 	print("find btn")
@@ -131,6 +208,7 @@ func _find_button_pressed():
 			join_popup.hide()
 			lobby_nav.show()
 			show_temp_notif("Joined lobby!")
+			swap_minigolf_script(MINIGOLF_MINIGAME_SCRIPT_PATH)
 		else:
 			join_button.disabled = false
 			var text = result.message if result.message != "" else "Failed to join lobby. Check internet connection!"
@@ -150,19 +228,6 @@ func has_other_players_in_lobby() -> bool:
 	if multiplayer.multiplayer_peer == null or multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
 		return false
 	return multiplayer.get_peers().size() > 0
-
-#func _tag_invite_pressed():
-	#print("invite to play tag")
-	#if not has_other_players_in_lobby():
-		#show_temp_notif("No other players in the lobby!")
-		#return
-	#
-	## Register host/sender immediately as player 1
-	#MultiplayerManager.rpc("register_tag_player", multiplayer.get_unique_id())
-	#
-	## Send invite notification to all other connected peers
-	#MultiplayerManager.rpc("send_minigame_invite_notif", "A player", "Tag")
-	#show_temp_notif("Sent invites to players in lobby!")
 
 func has_unjoined_players_in_lobby() -> bool:
 	if multiplayer.multiplayer_peer == null or multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
@@ -206,15 +271,6 @@ func _join_tag_pressed():
 	minigames_mainmenu.hide()
 	minigames_tagmenu.show()
 	lobby_popup.hide()
-
-#func _update_tag_player_grid(joined_peers: Array[int]):
-	#var labels = tag_players_grid.get_children()
-	#for i in range(labels.size()):
-		#if i < joined_peers.size():
-			#var peer_id = joined_peers[i]
-			#labels[i].text = MultiplayerManager.get_player_name(peer_id)
-		#else:
-			#labels[i].text = "Awaiting Player..."
 
 func _update_tag_player_grid(joined_peers: Array[int]):
 	var labels = tag_players_grid.get_children()
@@ -335,6 +391,7 @@ func on_player_disconnected(message: String):
 	
 	host_button.disabled = false
 	join_button.disabled = false
+	singleplayer_minigames_button.disabled = false
 	lobby_button.disabled = false
 	minigames_button.disabled = false
 	exit_button.disabled = false
@@ -369,7 +426,7 @@ func on_player_reconnecting(message: String):
 	show_perm_notif(message)
 
 func show_perm_notif(text: String):
-	var label_node: Label = game_notif.get_node("Label")
+	var label_node: Label = game_notif.get_node("MarginContainer/VBoxContainer/Label")
 	if is_instance_valid(label_node):
 		label_node.text = text
 	game_notif.show()
@@ -801,3 +858,25 @@ func return_participants_to_tag_menu(participants: Array[int], loser_id: int) ->
 	
 	# 6. Re-render player grid so all remaining participants keep their Brown tags
 	_update_tag_player_grid(MultiplayerManager.joined_tag_peers)
+
+func swap_minigolf_script(new_script_path: String) -> void:
+	var old_node = $"../MinigolfMinigame"
+	var parent_world = old_node.get_parent()
+	var original_index = old_node.get_index()
+	
+	# 1. Remove and free old node instance
+	parent_world.remove_child(old_node)
+	old_node.queue_free()
+	
+	# 2. Instantiate the full minigame scene from file
+	var scene_resource = load(MINIGOLF_MINIGAME_SCENE_PATH) as PackedScene
+	var new_node = scene_resource.instantiate()
+	new_node.name = "MinigolfMinigame"
+	
+	# 3. Swap the root script on the fresh instance
+	var new_script = load(new_script_path) as Script
+	new_node.set_script(new_script)
+	
+	# 4. Add back to world hierarchy at exact original index
+	parent_world.add_child(new_node)
+	parent_world.move_child(new_node, original_index)

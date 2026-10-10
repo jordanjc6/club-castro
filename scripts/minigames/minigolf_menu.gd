@@ -25,7 +25,7 @@ extends PanelContainer
 @onready var minigolf_start_button: Button = $"MarginContainer/VBoxContainer/Footer/StartGameButton"
 @onready var minigolf_players_grid: GridContainer = $"MarginContainer/VBoxContainer/Players"
 
-# MinigolfMinigame
+# MinigolfMinigame (Re-fetched dynamically to prevent freed instance crashes)
 @onready var minigolf_minigame: Node2D = $"../../../MinigolfMinigame"
 @onready var minigolf_minigame_game_info: HBoxContainer = $"../../../MinigolfMinigame/Screen/UI/HBoxContainer/HUD/RotationWrapper/VBoxContainer/GameInfo"
 @onready var minigolf_minigame_player_grid: GridContainer = $"../../../MinigolfMinigame/Screen/UI/HBoxContainer/HUD/RotationWrapper/VBoxContainer/PlayerGrid"
@@ -87,8 +87,9 @@ func remove_minigolf_player(id: int) -> void:
 
 		# IF GAME IS ACTIVE: Tell minigame to handle mid-game departure
 		if MultiplayerManager.is_minigolf_minigame_started:
-			if is_instance_valid(minigolf_minigame) and minigolf_minigame.has_method("handle_midgame_player_disconnect"):
-				minigolf_minigame.handle_midgame_player_disconnect(id)
+			var mg = get_minigolf_minigame_node()
+			if is_instance_valid(mg) and mg.has_method("handle_midgame_player_disconnect"):
+				mg.handle_midgame_player_disconnect(id)
 
 		check_remaining_players()
 
@@ -104,8 +105,9 @@ func reset_minigolf_state():
 		rpc("sync_minigolf_lobby_ui", minigolf_players)
 		
 		# Force teardown of active minigame entities if room becomes empty
-		if is_instance_valid(minigolf_minigame) and minigolf_minigame.has_method("end_minigolf_game"):
-			minigolf_minigame.rpc("end_minigolf_game")
+		var mg = get_minigolf_minigame_node()
+		if is_instance_valid(mg) and mg.has_method("end_minigolf_game"):
+			mg.rpc("end_minigolf_game")
 
 func reset_state_for_single_player_return(msg: String):
 	minigolf_menu.hide()
@@ -254,7 +256,9 @@ func request_start_minigolf() -> void:
 			rpc("notify_not_enough_players")
 			return
 		minigolf_players.shuffle()
-		minigolf_minigame.rpc("start_minigolf", minigolf_players)
+		var minigame = get_minigolf_minigame_node()
+		if is_instance_valid(minigame):
+			minigame.rpc("start_minigolf", minigolf_players)
 		rpc("set_minigolf_ui")
 		teleport_players_to_minigolf()
 		await get_tree().create_timer(5).timeout
@@ -282,8 +286,12 @@ func set_minigolf_ui() -> void:
 		player.hide()
 
 func update_game_info(course_num: int, turn_id: int):
-	var courseLabel = minigolf_minigame_game_info.get_node("CourseLabel")
-	var turnLabel = minigolf_minigame_game_info.get_node("TurnLabel")
+	var info_node = get_minigolf_game_info_node()
+	if not is_instance_valid(info_node):
+		return
+		
+	var courseLabel = info_node.get_node("CourseLabel")
+	var turnLabel = info_node.get_node("TurnLabel")
 	
 	courseLabel.text = "Course %s/3" % course_num
 	
@@ -294,7 +302,11 @@ func update_game_info(course_num: int, turn_id: int):
 		turnLabel.text = "%s's turn" % MultiplayerManager.get_player_name(turn_id)
 
 func update_player_grid(players: Array, curr_turn_id: int, player_data: Dictionary = {}) -> void:
-	var label_nodes = minigolf_minigame_player_grid.get_children()
+	var grid_node = get_minigolf_player_grid_node()
+	if not is_instance_valid(grid_node):
+		return
+
+	var label_nodes = grid_node.get_children()
 	
 	for i in range(label_nodes.size()):
 		var label = label_nodes[i] as Label
@@ -509,3 +521,19 @@ func teleport_local_client_player(target_pos: Vector2) -> void:
 					player.velocity = Vector2.ZERO
 				player.global_position = target_pos
 				print("[CLIENT %d] Successfully restored overworld player state at %s" % [my_id, target_pos])
+
+# --- DYNAMIC HELPER GETTERS FOR SWAPPED MINIGOLF NODES ---
+func get_minigolf_minigame_node() -> Node2D:
+	if not is_instance_valid(minigolf_minigame):
+		minigolf_minigame = get_node_or_null("../../../MinigolfMinigame")
+	return minigolf_minigame
+
+func get_minigolf_game_info_node() -> HBoxContainer:
+	if not is_instance_valid(minigolf_minigame_game_info):
+		minigolf_minigame_game_info = get_node_or_null("../../../MinigolfMinigame/Screen/UI/HBoxContainer/HUD/RotationWrapper/VBoxContainer/GameInfo")
+	return minigolf_minigame_game_info
+
+func get_minigolf_player_grid_node() -> GridContainer:
+	if not is_instance_valid(minigolf_minigame_player_grid):
+		minigolf_minigame_player_grid = get_node_or_null("../../../MinigolfMinigame/Screen/UI/HBoxContainer/HUD/RotationWrapper/VBoxContainer/PlayerGrid")
+	return minigolf_minigame_player_grid
