@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://ct1q1g67erghh" path="res://assets/textures/bricks32.png" id="1_wecfj"]
 [ext_resource type="Texture2D" uid="uid://dwott7xspujpm" path="res://assets/textures/sand32.jpg" id="2_wecfj"]
 [ext_resource type="Texture2D" uid="uid://b8bcupe13j7v0" path="res://assets/textures/blackhole32.png" id="3_wecfj"]
+[ext_resource type="Texture2D" uid="uid://db28focjuqr0h" path="res://assets/textures/ice32.jpg" id="4_8811o"]
 [ext_resource type="Texture2D" uid="uid://5hc0exl42xnh" path="res://assets/textures/turf32.jpg" id="4_wecfj"]
 [ext_resource type="Texture2D" uid="uid://bea5naftetcae" path="res://assets/textures/checkered-start32.png" id="6_8811o"]
 
@@ -24,6 +25,12 @@ texture = ExtResource("3_wecfj")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
 0:0/0/custom_data_0 = "blackhole"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2iuru"]
+texture = ExtResource("4_8811o")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/custom_data_0 = "ice"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_23r0g"]
 texture = ExtResource("6_8811o")
@@ -48,3 +55,4 @@ sources/5 = SubResource("TileSetAtlasSource_23r0g")
 sources/7 = SubResource("TileSetAtlasSource_aic3d")
 sources/1 = SubResource("TileSetAtlasSource_truch")
 sources/2 = SubResource("TileSetAtlasSource_hqod5")
+sources/3 = SubResource("TileSetAtlasSource_2iuru")

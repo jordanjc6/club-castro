@@ -6,6 +6,7 @@ extends RigidBody2D
 const STOP_THRESHOLD: float = 5.0 # Speed below which the ball is considered stopped
 const NORMAL_DAMP: float = 1.3
 const SAND_DAMP: float = 8.0
+const ICE_DAMP: float = 0.2
 
 # Local state flag for when the ball is moving
 var is_preview: bool = false
@@ -63,6 +64,8 @@ func _physics_process(_delta: float) -> void:
 				var surface = center_tile_data.get_custom_data("surface_type")
 				if surface == "sand":
 					linear_damp = SAND_DAMP
+				elif surface == "ice":
+					linear_damp = ICE_DAMP
 				else:
 					linear_damp = NORMAL_DAMP
 			else:
