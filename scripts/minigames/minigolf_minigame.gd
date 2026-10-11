@@ -20,8 +20,8 @@ const GAME_RESULT_NOTIF_TIME = 4
 enum BallState { PLACING, PLACED, AIMING, MOVING }
 
 const MAX_POWER_DISTANCE: float = 200.0  # Pixels dragged for max power
-const MAX_IMPULSE_FORCE: float = 900.0   # Impulse force applied to RigidBody
-const ACCURACY_THRESHOLD: float = 0.60   # Inaccuracy starts above 50% power
+const MAX_IMPULSE_FORCE: float = 1000.0   # Impulse force applied to RigidBody
+const ACCURACY_THRESHOLD: float = 0.70   # Inaccuracy starts above 50% power
 const MAX_DEVIATION_ANGLE: float = 0.35  # Max error angle in radians (~20 deg)
 
 # State Variables
