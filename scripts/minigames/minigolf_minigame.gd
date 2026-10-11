@@ -9,12 +9,12 @@ extends Node2D
 @onready var exit_game_button: Button = $Screen/MinigolfSidenav/MultiplayerHUD/VBoxContainer/ExitGameButton
 
 # Constants
-const NUM_COURSES_PER_GAME = 3
-const AVAILABLE_COURSES: Array[int] = [
-	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
-]
-#const NUM_COURSES_PER_GAME = 1
-#const AVAILABLE_COURSES: Array[int] = [14]
+#const NUM_COURSES_PER_GAME = 3
+#const AVAILABLE_COURSES: Array[int] = [
+	#1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+#]
+const NUM_COURSES_PER_GAME = 1
+const AVAILABLE_COURSES: Array[int] = [16]
 
 const BALL_COLORS: Array[Color] = [
 	Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE
@@ -243,7 +243,10 @@ func _on_tee_button_pressed(touch_pos: Vector2) -> void:
 		return
 
 	var my_id = multiplayer.get_unique_id()
-	if player_data.has(my_id) and player_data[my_id]["current_strokes"] > 0:
+	
+	# Allow placement if state is explicitly PLACING (e.g. after a blackhole reset)
+	# Otherwise, block if they've already taken a stroke and are in a different state
+	if player_data.has(my_id) and player_data[my_id]["current_strokes"] > 0 and current_ball_state != BallState.PLACING:
 		print("  -> REJECTED: Cannot place ball after taking a stroke!")
 		return
 
@@ -258,6 +261,29 @@ func _on_tee_button_pressed(touch_pos: Vector2) -> void:
 		rpc("remove_player_ball", my_id)
 
 	rpc("sync_drag_preview_start", my_id, local_pos)
+
+#func _on_tee_button_pressed(touch_pos: Vector2) -> void:
+	#print("\n--- [DEBUG] TEE BUTTON PRESSED ---")
+	#if multiplayer.get_unique_id() != current_turn_id:
+		#print("  -> REJECTED: Not my turn!")
+		#return
+#
+	#var my_id = multiplayer.get_unique_id()
+	#if player_data.has(my_id) and player_data[my_id]["current_strokes"] > 0:
+		#print("  -> REJECTED: Cannot place ball after taking a stroke!")
+		#return
+#
+	#var active_course = course_container.get_child(0) if course_container.get_child_count() > 0 else null
+	#if active_course == null:
+		#return
+#
+	#var local_pos = active_course.make_canvas_position_local(touch_pos)
+#
+	#var raw_ball = player_data[my_id].get("ball_node") if player_data.has(my_id) else null
+	#if is_instance_valid(raw_ball) and not raw_ball.is_queued_for_deletion():
+		#rpc("remove_player_ball", my_id)
+#
+	#rpc("sync_drag_preview_start", my_id, local_pos)
 
 func _check_drop_and_confirm(peer_id: int) -> void:
 	if course_container.get_child_count() == 0 or not is_instance_valid(dragged_ball_preview):
@@ -900,3 +926,36 @@ func end_minigolf_game() -> void:
 	print("return to overworld ui and teleport players back")
 	if is_instance_valid(minigolf_menu) and minigolf_menu.has_method("on_minigolf_game_ended"):
 		minigolf_menu.on_minigolf_game_ended(active_participants)
+
+@rpc("any_peer", "call_local", "reliable")
+func handle_ball_blackholed(peer_id: int) -> void:
+	if not multiplayer.is_server():
+		return
+
+	print("[SERVER] Ball fell into blackhole for Peer: ", peer_id)
+	
+	# 1. Cleanly delete the ball node across all clients
+	rpc("remove_player_ball", peer_id)
+
+	# 2. Clear ball reference (keep current_strokes intact)
+	if player_data.has(peer_id):
+		player_data[peer_id]["ball_node"] = null
+
+	# 3. Sync state update to all clients
+	rpc("sync_ball_blackholed", peer_id)
+	
+	# 4. Advance turn if all other balls are finished/stopped
+	if _are_all_balls_stopped():
+		advance_to_next_turn()
+
+@rpc("authority", "call_local", "reliable")
+func sync_ball_blackholed(peer_id: int) -> void:
+	if player_data.has(peer_id):
+		player_data[peer_id]["ball_node"] = null
+		
+	var my_id = multiplayer.get_unique_id()
+	if my_id == peer_id:
+		current_ball_state = BallState.PLACING
+		show_notification("Fell into a blackhole! Place ball at the tee.", HOLE_WINNER_NOTIF_TIME)
+		
+	refresh_minigolf_hud()
