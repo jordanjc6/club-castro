@@ -17,10 +17,10 @@ const ROULETTE_BORDER_WIDTH = 8
 # Constants
 #const NUM_COURSES_PER_GAME = 3
 #const AVAILABLE_COURSES: Array[int] = [
-	#1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+	#1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 #]
 const NUM_COURSES_PER_GAME = 1
-const AVAILABLE_COURSES: Array[int] = [15]
+const AVAILABLE_COURSES: Array[int] = [16]
 
 const BALL_COLORS: Array[Color] = [
 	Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE
@@ -383,7 +383,7 @@ func _input(event: InputEvent) -> void:
 func _on_tee_button_pressed(touch_pos: Vector2) -> void:
 	print("\n--- [DEBUG] TEE BUTTON PRESSED ---")
 	var my_id = 1
-	if player_data.has(my_id) and player_data[my_id]["current_strokes"] > 0:
+	if player_data.has(my_id) and player_data[my_id]["current_strokes"] > 0 and current_ball_state != BallState.PLACING:
 		print("  -> REJECTED: Cannot place ball after taking a stroke!")
 		return
 
@@ -551,7 +551,7 @@ func _on_ball_sunk(sunk_ball: RigidBody2D) -> void:
 		
 		if _are_all_balls_stopped():
 			print("  -> Sunk ball finished sequence and no other balls moving. Advancing turn...")
-			advance_to_next_turn()
+			advance_to_next_turn(BallState.PLACING)
 
 func sync_player_finished_hole(peer_id: int) -> void:
 	if player_data.has(peer_id):
@@ -564,7 +564,7 @@ func on_ball_stopped(_ball: RigidBody2D) -> void:
 	print("\n--- [DEBUG] A BALL HAS STOPPED ---")
 	if _are_all_balls_stopped():
 		print("  -> All active balls have stopped. Advancing turn...")
-		advance_to_next_turn()
+		advance_to_next_turn(BallState.PLACED)
 
 func _refresh_aim_draw() -> void:
 	if is_instance_valid(aim_overlay):
@@ -630,7 +630,7 @@ func _on_course_child_entered(node: Node) -> void:
 	if node is RigidBody2D and player_data.has(1):
 		player_data[1]["ball_node"] = node
 
-func advance_to_next_turn() -> void:
+func advance_to_next_turn(ball_state: BallState) -> void:
 	var all_finished = true
 	for p_id in player_data:
 		if not player_data[p_id].get("finished_hole", false):
@@ -644,7 +644,7 @@ func advance_to_next_turn() -> void:
 		advance_to_next_course()
 		return
 	
-	current_ball_state = BallState.PLACED
+	current_ball_state = ball_state
 	refresh_minigolf_hud(current_course_number, player_data)
 
 func announce_course_winner() -> void:
@@ -713,3 +713,25 @@ func _are_all_balls_stopped() -> bool:
 			if is_instance_valid(ball) and not ball.sleeping and ball.linear_velocity.length_squared() > 1.0:
 				return false
 	return true
+
+func handle_ball_blackholed(peer_id: int) -> void:
+	if not multiplayer.is_server():
+		return
+
+	print("Ball fell into blackhole for Peer: ", peer_id)
+	
+	# Cleanly delete the ball node across all clients
+	remove_player_ball(peer_id)
+
+	# Clear ball reference (keep current_strokes intact)
+	if player_data.has(peer_id):
+		player_data[peer_id]["ball_node"] = null
+		
+	current_ball_state = BallState.PLACING
+	show_notification("Fell into a blackhole! Place ball at the tee on your next turn.", HOLE_WINNER_NOTIF_TIME)
+
+	refresh_minigolf_hud(current_course_number, player_data)
+	
+	# Advance turn if all other balls are finished/stopped
+	if _are_all_balls_stopped():
+		advance_to_next_turn(current_ball_state)

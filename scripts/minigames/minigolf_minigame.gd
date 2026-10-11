@@ -11,7 +11,7 @@ extends Node2D
 # Constants
 #const NUM_COURSES_PER_GAME = 3
 #const AVAILABLE_COURSES: Array[int] = [
-	#1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+	#1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 #]
 const NUM_COURSES_PER_GAME = 1
 const AVAILABLE_COURSES: Array[int] = [16]
@@ -956,6 +956,6 @@ func sync_ball_blackholed(peer_id: int) -> void:
 	var my_id = multiplayer.get_unique_id()
 	if my_id == peer_id:
 		current_ball_state = BallState.PLACING
-		show_notification("Fell into a blackhole! Place ball at the tee.", HOLE_WINNER_NOTIF_TIME)
+		show_notification("Fell into a blackhole! Place ball at the tee on your next turn.", HOLE_WINNER_NOTIF_TIME)
 		
 	refresh_minigolf_hud()

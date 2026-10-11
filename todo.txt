@@ -4,5 +4,4 @@ Minigolf
 - design more courses
 - add more tile shapes (half/triangle, rounded, smaller/bigger)
 - add water
-- add blackhole
 - add arrow boosts
