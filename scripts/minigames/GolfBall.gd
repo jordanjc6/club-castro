@@ -2,12 +2,16 @@ extends RigidBody2D
 
 @onready var ball_area: Area2D = $GolfBallArea
 
+# constants
+const STOP_THRESHOLD: float = 5.0 # Speed below which the ball is considered stopped
+const NORMAL_DAMP: float = 1.3
+const SAND_DAMP: float = 8.0
+
 # Local state flag for when the ball is moving
 var is_preview: bool = false
 var is_dragging: bool = false
 var is_moving: bool = false
 var is_overlapping_ball: bool = false
-const STOP_THRESHOLD: float = 5.0 # Speed below which the ball is considered stopped
 
 func _ready() -> void:
 	add_to_group("golf_ball")
@@ -42,6 +46,30 @@ func _physics_process(_delta: float) -> void:
 		if is_moving:
 			is_moving = false
 		return
+	
+	# --- DYNAMIC SURFACE FRICTION CHECK ---
+	# Since the ball is instantiated inside the active course, get_parent() is the course scene.
+	var course_node = get_parent()
+	if is_instance_valid(course_node):
+		print("course valid")
+		var tile_map = course_node.find_child("TileMapLayer", true, false)
+		if is_instance_valid(tile_map):
+			print("tile map found")
+			var local_pos = tile_map.to_local(global_position)
+			var map_pos = tile_map.local_to_map(local_pos)
+			var tile_data = tile_map.get_cell_tile_data(map_pos)
+			
+			if tile_data:
+				var surface = tile_data.get_custom_data("surface_type")
+				if surface == "sand":
+					print("on sand damp")
+					linear_damp = SAND_DAMP
+				else:
+					print("normal damp")
+					linear_damp = NORMAL_DAMP
+			else:
+				print("tile_data not found")
+				linear_damp = NORMAL_DAMP
 
 	var current_speed = linear_velocity.length()
 

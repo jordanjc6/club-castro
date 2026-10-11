@@ -15,12 +15,12 @@ const DEFAULT_NAMETAG_COLOR = Color("0000003c")
 const ROULETTE_BORDER_WIDTH = 8
 
 # Constants
-const NUM_COURSES_PER_GAME = 3
-const AVAILABLE_COURSES: Array[int] = [
-	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
-]
-#const NUM_COURSES_PER_GAME = 1
-#const AVAILABLE_COURSES: Array[int] = [14]
+#const NUM_COURSES_PER_GAME = 3
+#const AVAILABLE_COURSES: Array[int] = [
+	#1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+#]
+const NUM_COURSES_PER_GAME = 1
+const AVAILABLE_COURSES: Array[int] = [15]
 
 const BALL_COLORS: Array[Color] = [
 	Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE

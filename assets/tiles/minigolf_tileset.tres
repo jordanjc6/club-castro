@@ -1,6 +1,7 @@
 [gd_resource type="TileSet" format=3 uid="uid://7tj23bt4wta7"]
 
 [ext_resource type="Texture2D" uid="uid://ct1q1g67erghh" path="res://assets/textures/bricks32.png" id="1_wecfj"]
+[ext_resource type="Texture2D" uid="uid://dwott7xspujpm" path="res://assets/textures/sand32.jpg" id="2_wecfj"]
 [ext_resource type="Texture2D" uid="uid://qlha1v44je7" path="res://assets/textures/space32.png" id="4_q43t5"]
 [ext_resource type="Texture2D" uid="uid://5hc0exl42xnh" path="res://assets/textures/turf32.jpg" id="4_wecfj"]
 [ext_resource type="Texture2D" uid="uid://bea5naftetcae" path="res://assets/textures/checkered-start32.png" id="6_8811o"]
@@ -11,6 +12,12 @@ texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
 0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
 0:0/0/custom_data_0 = "brick"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_truch"]
+texture = ExtResource("2_wecfj")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/custom_data_0 = "sand"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_23r0g"]
 texture = ExtResource("6_8811o")
@@ -40,3 +47,4 @@ sources/0 = SubResource("TileSetAtlasSource_8811o")
 sources/5 = SubResource("TileSetAtlasSource_23r0g")
 sources/6 = SubResource("TileSetAtlasSource_wecfj")
 sources/7 = SubResource("TileSetAtlasSource_aic3d")
+sources/1 = SubResource("TileSetAtlasSource_truch")
