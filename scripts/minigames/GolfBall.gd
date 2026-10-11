@@ -15,6 +15,7 @@ var is_dragging: bool = false
 var is_moving: bool = false
 var is_overlapping_ball: bool = false
 var is_blackholed: bool = false
+var is_watered: bool = false
 
 func _ready() -> void:
 	add_to_group("golf_ball")
@@ -85,7 +86,7 @@ func _physics_process(_delta: float) -> void:
 			else:
 				linear_damp = NORMAL_DAMP
 
-			# Check 5 points around the ball to see if >= 50% is on a blackhole tile
+			# Check 5 points around the ball to see if >= 50% is on a hazard tile (Water or Blackhole)
 			if is_multiplayer_authority():
 				var ball_radius = 12.0 # Adjust this to match your ball's actual pixel radius
 				var sample_points = [
@@ -96,16 +97,25 @@ func _physics_process(_delta: float) -> void:
 					global_position + Vector2(0, -ball_radius)     # Up
 				]
 				
+				var water_points_hit = 0
 				var blackhole_points_hit = 0
 				for pt in sample_points:
 					var local_pt = tile_map.to_local(pt)
 					var map_pt = tile_map.local_to_map(local_pt)
 					var tile_data = tile_map.get_cell_tile_data(map_pt)
-					if tile_data and tile_data.get_custom_data("surface_type") == "blackhole":
-						blackhole_points_hit += 1
+					if tile_data:
+						var surf = tile_data.get_custom_data("surface_type")
+						if surf == "water":
+							water_points_hit += 1
+						elif surf == "blackhole":
+							blackhole_points_hit += 1
 				
 				# If 3 or more points hit (>= 60%, satisfying >= 50% overlap)
-				if blackhole_points_hit >= 3:
+				if water_points_hit >= 3:
+					is_watered = true
+					_trigger_water()
+					return
+				elif blackhole_points_hit >= 3:
 					is_blackholed = true
 					_trigger_blackhole()
 					return
@@ -188,4 +198,20 @@ func _trigger_blackhole() -> void:
 					controller.handle_ball_blackholed(p_id)
 				else:
 					controller.rpc_id(1, "handle_ball_blackholed", p_id)
+				break
+
+func _trigger_water() -> void:
+	freeze = true
+	linear_velocity = Vector2.ZERO
+	angular_velocity = 0.0
+	
+	var controller = get_tree().get_first_node_in_group("minigolf_controller")
+	if is_instance_valid(controller):
+		# Find which peer owns this ball and call the server handler
+		for p_id in controller.player_data:
+			if controller.player_data[p_id].get("ball_node") == self:
+				if multiplayer.is_server():
+					controller.handle_ball_watered(p_id)
+				else:
+					controller.rpc_id(1, "handle_ball_watered", p_id)
 				break

@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://dwott7xspujpm" path="res://assets/textures/sand32.jpg" id="2_wecfj"]
 [ext_resource type="Texture2D" uid="uid://b8bcupe13j7v0" path="res://assets/textures/blackhole32.png" id="3_wecfj"]
 [ext_resource type="Texture2D" uid="uid://db28focjuqr0h" path="res://assets/textures/ice32.jpg" id="4_8811o"]
+[ext_resource type="Texture2D" uid="uid://dswl5nke2sk1l" path="res://assets/textures/water32.png" id="4_truch"]
 [ext_resource type="Texture2D" uid="uid://5hc0exl42xnh" path="res://assets/textures/turf32.jpg" id="4_wecfj"]
 [ext_resource type="Texture2D" uid="uid://dboxp0qgoun7s" path="res://assets/textures/horiz-arrow32.png" id="6_23r0g"]
 [ext_resource type="Texture2D" uid="uid://bea5naftetcae" path="res://assets/textures/checkered-start32.png" id="6_8811o"]
@@ -31,6 +32,12 @@ texture_region_size = Vector2i(32, 32)
 0:0/1 = 1
 0:0/1/flip_v = true
 0:0/1/custom_data_0 = "arrow-down"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fxpnn"]
+texture = ExtResource("4_truch")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/custom_data_0 = "water"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_hqod5"]
 texture = ExtResource("3_wecfj")
@@ -80,3 +87,4 @@ sources/2 = SubResource("TileSetAtlasSource_hqod5")
 sources/3 = SubResource("TileSetAtlasSource_2iuru")
 sources/9 = SubResource("TileSetAtlasSource_1nwlc")
 sources/10 = SubResource("TileSetAtlasSource_a3bnn")
+sources/11 = SubResource("TileSetAtlasSource_fxpnn")

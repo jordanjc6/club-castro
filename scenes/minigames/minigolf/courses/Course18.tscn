@@ -1,4 +1,4 @@
-[gd_scene format=4 uid="uid://4fge1cwlbgjo"]
+[gd_scene format=4 uid="uid://0w7bi5pch5xu"]
 
 [ext_resource type="Script" uid="uid://co6qjdi4ybhfn" path="res://scripts/minigames/GolfCourse.gd" id="1_geito"]
 [ext_resource type="TileSet" uid="uid://7tj23bt4wta7" path="res://assets/tiles/minigolf_tileset.tres" id="2_8etx0"]

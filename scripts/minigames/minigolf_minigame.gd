@@ -11,10 +11,10 @@ extends Node2D
 # Constants
 #const NUM_COURSES_PER_GAME = 3
 #const AVAILABLE_COURSES: Array[int] = [
-	#1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+	#1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19
 #]
 const NUM_COURSES_PER_GAME = 1
-const AVAILABLE_COURSES: Array[int] = [16]
+const AVAILABLE_COURSES: Array[int] = [19]
 
 const BALL_COLORS: Array[Color] = [
 	Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE
@@ -358,9 +358,31 @@ func confirm_ball_placement(peer_id: int, pos: Vector2) -> void:
 
 	if player_data.has(peer_id):
 		player_data[peer_id]["ball_node"] = dragged_ball_preview
+		player_data[peer_id]["previous_shot_pos"] = pos # <-- SET HERE UPON TEE PLACEMENT
 
 	dragged_ball_preview = null
 	current_ball_state = BallState.PLACED
+
+#@rpc("any_peer", "call_local", "reliable")
+#func confirm_ball_placement(peer_id: int, pos: Vector2) -> void:
+	#if not is_instance_valid(dragged_ball_preview):
+		#return
+#
+	#dragged_ball_preview.is_dragging = false
+	#dragged_ball_preview.global_position = pos
+	#dragged_ball_preview.name = "GolfBall_%d" % peer_id
+#
+	#if dragged_ball_preview.has_method("confirm_as_playable"):
+		#dragged_ball_preview.confirm_as_playable()
+	#else:
+		#dragged_ball_preview.freeze = false
+		#dragged_ball_preview.modulate.a = 1.0
+#
+	#if player_data.has(peer_id):
+		#player_data[peer_id]["ball_node"] = dragged_ball_preview
+#
+	#dragged_ball_preview = null
+	#current_ball_state = BallState.PLACED
 
 @rpc("any_peer", "call_local", "reliable")
 func cancel_drag_preview(peer_id: int) -> void:
@@ -466,9 +488,24 @@ func on_ball_stopped(_ball: RigidBody2D) -> void:
 	if not multiplayer.is_server():
 		return
 
+	# <-- SET HERE UPON SUCCESSFUL SHOT STOP
+	for p_id in player_data:
+		if player_data[p_id].get("ball_node") == _ball:
+			player_data[p_id]["previous_shot_pos"] = _ball.global_position
+			break
+
 	if _are_all_balls_stopped():
 		print("  -> All active balls have stopped. Advancing turn...")
 		advance_to_next_turn()
+
+#func on_ball_stopped(_ball: RigidBody2D) -> void:
+	#print("\n--- [DEBUG] A BALL HAS STOPPED ---")
+	#if not multiplayer.is_server():
+		#return
+#
+	#if _are_all_balls_stopped():
+		#print("  -> All active balls have stopped. Advancing turn...")
+		#advance_to_next_turn()
 
 func _refresh_aim_draw() -> void:
 	if is_instance_valid(aim_overlay):
@@ -597,7 +634,8 @@ func initialize_game_state(turn_order: Array[int], assigned_colors: Dictionary) 
 			"total_strokes": 0,
 			"current_strokes": 0,
 			"ball_node": null,
-			"finished_hole": false
+			"finished_hole": false,
+			"previous_shot_pos": null
 		}
 
 func load_course(course_num: int) -> void:
@@ -657,7 +695,6 @@ func advance_to_next_turn() -> void:
 
 	current_turn_id = next_id
 	print("[DEBUG] Server advancing turn to Peer: ", current_turn_id)
-
 	broadcast_minigolf_state(minigolf_turn_order, current_turn_id, current_course_number)
 
 	# FOR SINGLE PLAYER SURVIVAL: Force turn un-freeze if only 1 player remains
@@ -957,5 +994,60 @@ func sync_ball_blackholed(peer_id: int) -> void:
 	if my_id == peer_id:
 		current_ball_state = BallState.PLACING
 		show_notification("Fell into a blackhole! Place ball at the tee on your next turn.", HOLE_WINNER_NOTIF_TIME)
+		
+	refresh_minigolf_hud()
+
+@rpc("any_peer", "call_local", "reliable")
+func handle_ball_watered(peer_id: int) -> void:
+	if not multiplayer.is_server():
+		return
+
+	print("[SERVER] Ball fell into water for Peer: ", peer_id)
+
+	# Safely fetch previous position and handle null initialization
+	var prev_pos = player_data[peer_id].get("previous_shot_pos") if player_data.has(peer_id) else null
+	if prev_pos == null:
+		prev_pos = Vector2.ZERO # Fallback if no valid previous shot exists yet
+	
+	# Check if another player's ball is blocking the previous shot position
+	var is_position_blocked = false
+	for p_id in player_data:
+		if p_id == peer_id:
+			continue
+		var other_ball = player_data[p_id].get("ball_node")
+		if is_instance_valid(other_ball) and not other_ball.is_queued_for_deletion():
+			if other_ball.global_position.distance_to(prev_pos) < 24.0:
+				is_position_blocked = true
+				break
+
+	if is_position_blocked:
+		print("[SERVER] Previous shot position blocked by another ball. Forcing back to tee!")
+		rpc("remove_player_ball", peer_id)
+		if player_data.has(peer_id):
+			player_data[peer_id]["ball_node"] = null
+		rpc("sync_ball_blackholed", peer_id)
+	else:
+		rpc("sync_ball_water_respawn", peer_id, prev_pos)
+
+	if _are_all_balls_stopped():
+		print("ball watered, advance to next turn: %s" % current_turn_id)
+		advance_to_next_turn()
+
+@rpc("authority", "call_local", "reliable")
+func sync_ball_water_respawn(peer_id: int, respawn_pos: Vector2) -> void:
+	if player_data.has(peer_id):
+		var ball = player_data[peer_id].get("ball_node")
+		if is_instance_valid(ball):
+			# Stop momentum and move the existing ball back to the previous position
+			ball.linear_velocity = Vector2.ZERO
+			ball.angular_velocity = 0.0
+			ball.global_position = respawn_pos
+			ball.sleeping = false
+			ball.freeze = false
+	
+	var my_id = multiplayer.get_unique_id()
+	if my_id == peer_id:
+		current_ball_state = BallState.PLACED
+		show_notification("Ball in the water! Returned to previous position.", HOLE_WINNER_NOTIF_TIME)
 		
 	refresh_minigolf_hud()
