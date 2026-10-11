@@ -7,6 +7,7 @@ const STOP_THRESHOLD: float = 5.0 # Speed below which the ball is considered sto
 const NORMAL_DAMP: float = 1.3
 const SAND_DAMP: float = 8.0
 const ICE_DAMP: float = 0.2
+const ARROW_PUSH_STRENGTH: float = 200
 
 # Local state flag for when the ball is moving
 var is_preview: bool = false
@@ -55,23 +56,36 @@ func _physics_process(_delta: float) -> void:
 		var tile_map = course_node.find_child("TileMapLayer", true, false)
 		if is_instance_valid(tile_map):
 			
-			# 1. Check surface type for friction (Sand vs Normal)
+			# Check surface type for friction (Sand vs Normal)
 			var center_local = tile_map.to_local(global_position)
 			var center_map = tile_map.local_to_map(center_local)
 			var center_tile_data = tile_map.get_cell_tile_data(center_map)
 			
 			if center_tile_data:
 				var surface = center_tile_data.get_custom_data("surface_type")
-				if surface == "sand":
-					linear_damp = SAND_DAMP
-				elif surface == "ice":
-					linear_damp = ICE_DAMP
-				else:
-					linear_damp = NORMAL_DAMP
+				match surface:
+					"sand":
+						linear_damp = SAND_DAMP
+					"ice":
+						linear_damp = ICE_DAMP
+					"arrow-right":
+						linear_damp = NORMAL_DAMP
+						apply_central_force(Vector2.RIGHT * ARROW_PUSH_STRENGTH)
+					"arrow-left":
+						linear_damp = NORMAL_DAMP
+						apply_central_force(Vector2.LEFT * ARROW_PUSH_STRENGTH)
+					"arrow-up":
+						linear_damp = NORMAL_DAMP
+						apply_central_force(Vector2.UP * ARROW_PUSH_STRENGTH)
+					"arrow-down":
+						linear_damp = NORMAL_DAMP
+						apply_central_force(Vector2.DOWN * ARROW_PUSH_STRENGTH)
+					_:
+						linear_damp = NORMAL_DAMP
 			else:
 				linear_damp = NORMAL_DAMP
 
-			# 2. Check 5 points around the ball to see if >= 50% is on a blackhole tile
+			# Check 5 points around the ball to see if >= 50% is on a blackhole tile
 			if is_multiplayer_authority():
 				var ball_radius = 12.0 # Adjust this to match your ball's actual pixel radius
 				var sample_points = [
