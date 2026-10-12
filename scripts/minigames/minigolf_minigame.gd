@@ -986,14 +986,17 @@ func handle_ball_blackholed(peer_id: int) -> void:
 		advance_to_next_turn()
 
 @rpc("authority", "call_local", "reliable")
-func sync_ball_blackholed(peer_id: int) -> void:
+func sync_ball_blackholed(peer_id: int, water_kill: bool = false) -> void:
 	if player_data.has(peer_id):
 		player_data[peer_id]["ball_node"] = null
 		
 	var my_id = multiplayer.get_unique_id()
 	if my_id == peer_id:
 		current_ball_state = BallState.PLACING
-		show_notification("Fell into a blackhole! Place ball at the tee on your next turn.", HOLE_WINNER_NOTIF_TIME)
+		if water_kill:
+			show_notification("Ball in the water! \n\nPrevious position blocked, start at tee next time.. oof!", HOLE_WINNER_NOTIF_TIME)
+		else:
+			show_notification("Fell into a blackhole! Place ball at the tee on your next turn.", HOLE_WINNER_NOTIF_TIME)
 		
 	refresh_minigolf_hud()
 
@@ -1026,12 +1029,11 @@ func handle_ball_watered(peer_id: int) -> void:
 		if player_data.has(peer_id):
 			player_data[peer_id]["ball_node"] = null
 		rpc("sync_ball_blackholed", peer_id)
+		if _are_all_balls_stopped():
+			print("ball watered, advance to next turn: %s" % current_turn_id)
+			advance_to_next_turn()
 	else:
 		rpc("sync_ball_water_respawn", peer_id, prev_pos)
-
-	if _are_all_balls_stopped():
-		print("ball watered, advance to next turn: %s" % current_turn_id)
-		advance_to_next_turn()
 
 @rpc("authority", "call_local", "reliable")
 func sync_ball_water_respawn(peer_id: int, respawn_pos: Vector2) -> void:
@@ -1048,6 +1050,6 @@ func sync_ball_water_respawn(peer_id: int, respawn_pos: Vector2) -> void:
 	var my_id = multiplayer.get_unique_id()
 	if my_id == peer_id:
 		current_ball_state = BallState.PLACED
-		show_notification("Ball in the water! Returned to previous position.", HOLE_WINNER_NOTIF_TIME)
+		show_notification("Ball in the water! \n\nReturned to previous position.", HOLE_WINNER_NOTIF_TIME)
 		
 	refresh_minigolf_hud()
