@@ -888,7 +888,7 @@ func setup_grid_container() -> void:
 	# Configure Grid properties via code
 	courses_grid.columns = 2
 	# 0 horizontal separation so two 275px buttons perfectly fill the 550px container width
-	courses_grid.add_theme_constant_override("h_separation", 0)
+	courses_grid.add_theme_constant_override("h_separation", 5)
 	courses_grid.add_theme_constant_override("v_separation", 10)
 
 func populate_course_grid() -> void:
@@ -901,10 +901,11 @@ func populate_course_grid() -> void:
 	for course in singleMinigolfMinigame.all_available_courses:
 		var btn = Button.new()
 		btn.text = course["name"]
+		btn.add_theme_font_size_override("font_size", 24)
 		btn.toggle_mode = true
 		
 		# Set exact button dimensions (275 width to fill 550 total width, 70 height)
-		btn.custom_minimum_size = Vector2(275, 70)
+		btn.custom_minimum_size = Vector2(270, 70)
 		
 		# Connect toggle logic
 		btn.toggled.connect(func(toggled_on: bool): _on_course_toggled(course["id"], btn))
