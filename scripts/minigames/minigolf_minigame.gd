@@ -1034,7 +1034,7 @@ func handle_ball_watered(peer_id: int) -> void:
 			continue
 		var other_ball = player_data[p_id].get("ball_node")
 		if is_instance_valid(other_ball) and not other_ball.is_queued_for_deletion():
-			if other_ball.global_position.distance_to(prev_pos) < 22.5:
+			if other_ball.global_position.distance_to(prev_pos) < 19:
 				is_position_blocked = true
 				break
 
