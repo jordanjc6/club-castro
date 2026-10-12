@@ -1003,7 +1003,7 @@ custom_minimum_size = Vector2(1, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 29
-text = "Tap the tee area to place your ball. Drag anywhere else on the screen to hit. You'll play 3 courses, try to complete each course with the least amount of strokes!"
+text = "Tap the tee area to place your ball. Drag anywhere else on the screen to hit. Either choose or play 3 random courses, try to complete each course with the least amount of strokes!"
 autowrap_mode = 2
 
 [node name="Spacer" type="Control" parent="HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer" unique_id=1651933239]
@@ -1020,7 +1020,8 @@ text = "Choose courses:"
 layout_mode = 2
 
 [node name="ScrollContainer" type="ScrollContainer" parent="HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer/HBoxContainer" unique_id=311425265]
-custom_minimum_size = Vector2(550, 0)
+custom_minimum_size = Vector2(550, 260)
+custom_maximum_size = Vector2(-1, 260)
 layout_mode = 2
 
 [node name="GridContainer" type="GridContainer" parent="HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer/HBoxContainer/ScrollContainer" unique_id=1775427309]
@@ -1037,7 +1038,7 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="Spacer" type="Control" parent="HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer/HBoxContainer/VBoxContainer" unique_id=812726205]
-custom_minimum_size = Vector2(0, 210)
+custom_minimum_size = Vector2(0, 170)
 layout_mode = 2
 
 [node name="StartGameButton" type="Button" parent="HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer/HBoxContainer/VBoxContainer" unique_id=1075330550]

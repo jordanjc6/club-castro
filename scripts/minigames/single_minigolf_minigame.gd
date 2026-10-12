@@ -45,6 +45,8 @@ var all_available_courses = [
 	{"id": 18, "name": "Volcanic Valley 2"},
 	{"id": 19, "name": "Volcanic Valley 2"},
 ]
+var course_ids_to_play: Array[int] = []
+var num_courses_to_play: int = -1
 
 const BALL_COLORS: Array[Color] = [
 	Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE
@@ -110,13 +112,21 @@ func disable_player_movement():
 	for player in get_tree().get_nodes_in_group("player"):
 		player.set_movement_disabled(true)
 
-func start_singleplayer_game():
+func start_singleplayer_game(chosen_courses: Array[int]):
 	print("start minigolf!")
 	set_minigolf_ui()
 	
 	enable_minigame_processing(true)
 	played_courses.clear()
-	var first_course_id = AVAILABLE_COURSES.pick_random()
+	var first_course_id
+	if chosen_courses.is_empty():
+		first_course_id = AVAILABLE_COURSES.pick_random()
+		course_ids_to_play = AVAILABLE_COURSES
+		num_courses_to_play = NUM_COURSES_PER_GAME
+	else:
+		first_course_id = chosen_courses[0]
+		course_ids_to_play = chosen_courses
+		num_courses_to_play = chosen_courses.size()
 	played_courses.append(first_course_id)
 	
 	exit_game_button.disabled = false
@@ -172,7 +182,7 @@ func update_game_info(course_num: int):
 	var courseLabel = info_node.get_node("CourseLabel")
 	var turnLabel = info_node.get_node("TurnLabel")
 	
-	courseLabel.text = "Course %s/3" % course_num
+	courseLabel.text = "Course %s/%s" % [course_num, num_courses_to_play]
 	turnLabel.text = "Your turn!"
 
 func get_minigolf_game_info_node() -> HBoxContainer:
@@ -681,7 +691,7 @@ func announce_course_winner() -> void:
 	var strokes = player_data[1].get("current_strokes", 0)
 	var msg = "You completed the course in %d strokes!\n\n" % strokes
 
-	if current_course_number < NUM_COURSES_PER_GAME:
+	if current_course_number < num_courses_to_play:
 		msg += "Advancing to next course.."
 	else:
 		exit_game_button.disabled = true
@@ -695,7 +705,7 @@ func announce_game_result() -> void:
 	show_notification(msg, GAME_RESULT_NOTIF_TIME)
 
 func advance_to_next_course() -> void:
-	if current_course_number >= NUM_COURSES_PER_GAME:
+	if current_course_number >= num_courses_to_play:
 		print("[SERVER] Minigolf game complete!")
 		announce_game_result()
 		await get_tree().create_timer(GAME_RESULT_NOTIF_TIME).timeout
@@ -703,7 +713,7 @@ func advance_to_next_course() -> void:
 		return
 
 	var unplayed_courses: Array[int] = []
-	for course_id in AVAILABLE_COURSES:
+	for course_id in course_ids_to_play:
 		if not played_courses.has(course_id):
 			unplayed_courses.append(course_id)
 
@@ -711,7 +721,8 @@ func advance_to_next_course() -> void:
 	if not unplayed_courses.is_empty():
 		next_course_id = unplayed_courses.pick_random()
 	else:
-		next_course_id = AVAILABLE_COURSES.pick_random()
+		next_course_id = course_ids_to_play.pick_random()
+		#next_course_id = AVAILABLE_COURSES.pick_random()
 
 	played_courses.append(next_course_id)
 	current_course_number += 1

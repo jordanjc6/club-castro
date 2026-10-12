@@ -196,7 +196,7 @@ func get_minigolf_node() -> Node2D:
 func _start_single_minigolf_game():
 	var minigame = get_minigolf_node()
 	if is_instance_valid(minigame) and minigame.has_method("start_singleplayer_game"):
-		minigame.start_singleplayer_game()
+		minigame.start_singleplayer_game(selected_course_ids)
 
 func _find_button_pressed():
 	print("find btn")
