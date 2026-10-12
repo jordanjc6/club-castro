@@ -142,6 +142,20 @@ corner_radius_top_right = 20
 corner_radius_bottom_right = 20
 corner_radius_bottom_left = 20
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6mhxi"]
+bg_color = Color(0.43529412, 0.30588236, 0.21568628, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xclow"]
+bg_color = Color(0.43529412, 0.30588236, 0.21568628, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8xm5o"]
 bg_color = Color(0, 0, 0, 1)
 corner_radius_top_left = 40
@@ -432,7 +446,6 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_ckp8c")
 text = "Copy Code"
 
 [node name="MinigamesPopup" type="Node2D" parent="HUD" unique_id=1504986407]
-visible = false
 
 [node name="MainMenu" type="PanelContainer" parent="HUD/MinigamesPopup" unique_id=272566831]
 anchors_preset = -1
@@ -677,7 +690,6 @@ text = "Start Game"
 autowrap_mode = 2
 
 [node name="MinigolfMenu" type="PanelContainer" parent="HUD/MinigamesPopup" unique_id=440867349]
-visible = false
 anchors_preset = -1
 anchor_left = 0.07300001
 anchor_top = 0.16100001
@@ -847,10 +859,27 @@ custom_minimum_size = Vector2(1, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 29
-text = "One player is randomly selected to putt first. Players take turns, the goal is to sink your ball in the hole first. 3 random course are chosen to be played. The player with the most points after the 3 courses wins!"
+text = "One player is randomly selected to putt first. Players take turns, the goal is to sink your ball in the hole first. 3 random courses are chosen and the player with the least strokes at the end wins!"
 autowrap_mode = 2
 
-[node name="StartGameButton" type="Button" parent="HUD/MinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer" unique_id=1523618669]
+[node name="VBoxContainer2" type="VBoxContainer" parent="HUD/MinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer" unique_id=1939171757]
+layout_mode = 2
+
+[node name="CourseSelectButton" type="Button" parent="HUD/MinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer/VBoxContainer2" unique_id=2010115486]
+custom_minimum_size = Vector2(150, 150)
+custom_maximum_size = Vector2(150, 150)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_6mhxi")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_6mhxi")
+theme_override_styles/hover = SubResource("StyleBoxFlat_6mhxi")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_xclow")
+theme_override_styles/focus = SubResource("StyleBoxFlat_xclow")
+text = "Course Select"
+autowrap_mode = 2
+
+[node name="StartGameButton" type="Button" parent="HUD/MinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer/VBoxContainer2" unique_id=1523618669]
 custom_minimum_size = Vector2(150, 150)
 custom_maximum_size = Vector2(150, 150)
 layout_mode = 2
@@ -863,7 +892,13 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_umbuh")
 text = "Start Game"
 autowrap_mode = 2
 
+[node name="PopupMenu" type="PopupMenu" parent="HUD/MinigamesPopup/MinigolfMenu" unique_id=149690426]
+oversampling_override = 1.0
+hide_on_item_selection = false
+hide_on_checkable_item_selection = false
+
 [node name="SingleplayerMinigamesPopup" type="Node2D" parent="HUD" unique_id=931259875]
+visible = false
 
 [node name="MainMenu" type="PanelContainer" parent="HUD/SingleplayerMinigamesPopup" unique_id=825723377]
 anchors_preset = -1

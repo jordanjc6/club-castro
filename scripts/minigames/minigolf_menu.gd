@@ -22,8 +22,10 @@ extends PanelContainer
 @onready var minigolf_menu: PanelContainer = self
 @onready var minigolf_invite_button: Button = $"MarginContainer/VBoxContainer/Header/HBoxContainer/InviteButton"
 @onready var minigolf_menu_close_button: Button = $"MarginContainer/VBoxContainer/Header/HBoxContainer/CloseMinigolfMenuButton"
-@onready var minigolf_start_button: Button = $"MarginContainer/VBoxContainer/Footer/StartGameButton"
+@onready var minigolf_course_select_button: Button = $"MarginContainer/VBoxContainer/Footer/VBoxContainer2/CourseSelectButton"
+@onready var minigolf_start_button: Button = $"MarginContainer/VBoxContainer/Footer/VBoxContainer2/StartGameButton"
 @onready var minigolf_players_grid: GridContainer = $"MarginContainer/VBoxContainer/Players"
+@onready var course_popup_menu: PopupMenu = $PopupMenu
 
 # MinigolfMinigame (Re-fetched dynamically to prevent freed instance crashes)
 @onready var minigolf_minigame: Node2D = $"../../../MinigolfMinigame"
@@ -47,6 +49,7 @@ const ROULETTE_BORDER_WIDTH = 8
 # minigolf minigame 
 var minigolf_players: Array[int] = []  # store participants and turn order
 const PLAYER_TAG_BG_COLOR: Color = COLOR_BROWN
+var synced_selected_courses: Array[int] = []
 
 func _ready() -> void:
 	game_manager.minigames_button_pressed.connect(on_minigames_button_pressed)
@@ -57,6 +60,8 @@ func _ready() -> void:
 	minigolf_menu_close_button.pressed.connect(minigolf_close_pressed)
 	minigolf_invite_button.pressed.connect(minigolf_invite_pressed)
 	join_minigolf_button.pressed.connect(accept_minigolf_invite)
+	minigolf_course_select_button.pressed.connect(open_course_select)
+	setup_popup_menu()
 	minigolf_start_button.pressed.connect(minigolf_start_pressed)
 
 func on_minigames_button_pressed(by_player_id: int):
@@ -263,6 +268,10 @@ func request_start_minigolf() -> void:
 		teleport_players_to_minigolf()
 		await get_tree().create_timer(5).timeout
 		disable_player_movement()
+
+func open_course_select():
+	course_popup_menu.position = minigolf_course_select_button.global_position + Vector2(0, minigolf_course_select_button.size.y)
+	course_popup_menu.popup()
 
 @rpc("authority", "call_local", "reliable")
 func notify_not_enough_players() -> void:
@@ -537,3 +546,53 @@ func get_minigolf_player_grid_node() -> GridContainer:
 	if not is_instance_valid(minigolf_minigame_player_grid):
 		minigolf_minigame_player_grid = get_node_or_null("../../../MinigolfMinigame/Screen/UI/HBoxContainer/HUD/RotationWrapper/VBoxContainer/PlayerGrid")
 	return minigolf_minigame_player_grid
+
+func setup_popup_menu() -> void:
+	var minigolf_minigame = get_node("../../../MinigolfMinigame")
+	var available_courses = minigolf_minigame.all_available_courses
+	course_popup_menu.clear()
+	course_popup_menu.add_theme_font_size_override("font_size", 24)
+	# Allow multiple items to be checked/toggled independently
+	#course_popup_menu.hide_on_item_selection = false 
+	
+	for i in range(available_courses.size()):
+		var course = available_courses[i]
+		# Add item with a unique ID (we use index i here) and set it as checkable
+		course_popup_menu.add_check_item(course["name"], i)
+		
+		# Set initial check state if already selected
+		if synced_selected_courses.has(course["id"]):
+			course_popup_menu.set_item_checked(course_popup_menu.get_item_index(i), true)
+			
+	# Connect selection signal
+	if not course_popup_menu.id_pressed.is_connected(_on_popup_item_pressed):
+		course_popup_menu.id_pressed.connect(_on_popup_item_pressed)
+
+func _on_popup_item_pressed(id: int) -> void:
+	var minigolf_minigame = get_node("../../../MinigolfMinigame")
+	var available_courses = minigolf_minigame.all_available_courses
+	var course = available_courses[id]
+	var course_id = course["id"]
+	
+	# Determine current checked state and invert it
+	var item_index = course_popup_menu.get_item_index(id)
+	var is_currently_checked = course_popup_menu.is_item_checked(item_index)
+	var new_state = not is_currently_checked
+	
+	# Trigger your multiplayer RPC to sync this change to everyone
+	rpc("sync_toggle_popup_course", course_id, new_state, id)
+
+@rpc("any_peer", "call_local", "reliable")
+func sync_toggle_popup_course(course_id: int, selected: bool, item_id: int) -> void:
+	if selected:
+		if not synced_selected_courses.has(course_id):
+			synced_selected_courses.append(course_id)
+	else:
+		synced_selected_courses.erase(course_id)
+		
+	# Update the UI checkmark if the menu exists on this machine
+	var item_index = course_popup_menu.get_item_index(item_id)
+	if item_index != -1:
+		course_popup_menu.set_item_checked(item_index, selected)
+		
+	print("Synced multiplayer courses: ", synced_selected_courses)
