@@ -163,6 +163,9 @@ var active_lures: Dictionary = {}
 
 #################################
 
+# Minigolf ######################
+var synced_selected_courses: Array[int] = []
+
 func _ready():
 	_setup_ping_request()
 	_setup_heartbeat_timer()
@@ -729,7 +732,7 @@ func _add_player_to_game(id: int, position: Vector2 = Vector2.INF, offset: Vecto
 		if is_minigolf_minigame_started:
 			rpc_id(id, "set_minigolf_started", true)
 		
-		#rpc_id(id, "receive_full_course_sync", synced_selected_courses)
+		rpc_id(id, "receive_full_course_sync", MultiplayerManager.synced_selected_courses)
 	
 	var player_to_add = multiplayer_scene.instantiate()
 	player_to_add.player_id = id
@@ -1620,18 +1623,6 @@ func sync_player_accessory(peer_id: int, item_id: String) -> void:
 				node.set_head_accessory_equipped(item_id != "")
 			break
 
-#@rpc("authority", "call_remote", "reliable")
-#func receive_full_course_sync(server_selected_courses: Array[String]) -> void:
-	#synced_selected_courses = server_selected_courses
-	#
-	## Refresh the UI to reflect what the server sent
-	#for i in range(single_minigolf.all_available_courses.size()):
-		#var course = single_minigolf.all_available_courses[i]
-		#var course_id = course["id"]
-		#var item_index = course_popup_menu.get_item_index(i)
-		#
-		#if item_index != -1:
-			#var is_selected = synced_selected_courses.has(course_id)
-			#course_popup_menu.set_item_checked(item_index, is_selected)
-			#
-	#print("Synced initial course selections from server: ", synced_selected_courses)
+@rpc("authority", "call_local", "reliable")
+func receive_full_course_sync(server_selected_courses: Array[int]) -> void:
+	synced_selected_courses = server_selected_courses

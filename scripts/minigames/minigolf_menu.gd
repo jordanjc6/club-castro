@@ -49,7 +49,7 @@ const ROULETTE_BORDER_WIDTH = 8
 # minigolf minigame 
 var minigolf_players: Array[int] = []  # store participants and turn order
 const PLAYER_TAG_BG_COLOR: Color = COLOR_BROWN
-var synced_selected_courses: Array[int] = []
+#var synced_selected_courses: Array[int] = []
 
 func _ready() -> void:
 	game_manager.minigames_button_pressed.connect(on_minigames_button_pressed)
@@ -62,6 +62,7 @@ func _ready() -> void:
 	join_minigolf_button.pressed.connect(accept_minigolf_invite)
 	minigolf_course_select_button.pressed.connect(open_course_select)
 	setup_popup_menu()
+	course_popup_menu.about_to_popup.connect(setup_popup_menu)
 	minigolf_start_button.pressed.connect(minigolf_start_pressed)
 
 func on_minigames_button_pressed(by_player_id: int):
@@ -551,22 +552,44 @@ func setup_popup_menu() -> void:
 	var minigolf_minigame = get_node("../../../MinigolfMinigame")
 	var available_courses = minigolf_minigame.all_available_courses
 	course_popup_menu.clear()
-	course_popup_menu.add_theme_font_size_override("font_size", 24)
-	# Allow multiple items to be checked/toggled independently
-	#course_popup_menu.hide_on_item_selection = false 
+	
+	course_popup_menu.add_theme_font_size_override("font_size", 20)
+	course_popup_menu.hide_on_item_selection = false 
 	
 	for i in range(available_courses.size()):
 		var course = available_courses[i]
-		# Add item with a unique ID (we use index i here) and set it as checkable
 		course_popup_menu.add_check_item(course["name"], i)
 		
-		# Set initial check state if already selected
-		if synced_selected_courses.has(course["id"]):
+		# Simply read the source of truth directly from the Autoload whenever the menu opens!
+		if MultiplayerManager.synced_selected_courses.has(course["id"]):
 			course_popup_menu.set_item_checked(course_popup_menu.get_item_index(i), true)
 			
-	# Connect selection signal
 	if not course_popup_menu.id_pressed.is_connected(_on_popup_item_pressed):
 		course_popup_menu.id_pressed.connect(_on_popup_item_pressed)
+
+#func setup_popup_menu() -> void:
+	#var minigolf_minigame = get_node("../../../MinigolfMinigame")
+	#var available_courses = minigolf_minigame.all_available_courses
+	#course_popup_menu.clear()
+	#course_popup_menu.add_theme_font_size_override("font_size", 24)
+	## Allow multiple items to be checked/toggled independently
+	##course_popup_menu.hide_on_item_selection = false 
+	#
+	#for i in range(available_courses.size()):
+		#var course = available_courses[i]
+		## Add item with a unique ID (we use index i here) and set it as checkable
+		#course_popup_menu.add_check_item(course["name"], i)
+		#
+		## Set initial check state if already selected
+		##if synced_selected_courses.has(course["id"]):
+			##course_popup_menu.set_item_checked(course_popup_menu.get_item_index(i), true)
+		## Read from the global Autoload to set initial state
+		#if MultiplayerManager.synced_selected_courses.has(course["id"]):
+			#course_popup_menu.set_item_checked(course_popup_menu.get_item_index(i), true)
+			#
+	## Connect selection signal
+	#if not course_popup_menu.id_pressed.is_connected(_on_popup_item_pressed):
+		#course_popup_menu.id_pressed.connect(_on_popup_item_pressed)
 
 func _on_popup_item_pressed(id: int) -> void:
 	var minigolf_minigame = get_node("../../../MinigolfMinigame")
@@ -580,19 +603,55 @@ func _on_popup_item_pressed(id: int) -> void:
 	var new_state = not is_currently_checked
 	
 	# Trigger your multiplayer RPC to sync this change to everyone
-	rpc("sync_toggle_popup_course", course_id, new_state, id)
+	#rpc("sync_toggle_popup_course", course_id, new_state, id)
+	
+	# Instead of changing it locally first, request the server to handle it!
+	rpc("request_toggle_course", course_id, new_state, id)
 
+#@rpc("any_peer", "call_local", "reliable")
+#func sync_toggle_popup_course(course_id: int, selected: bool, item_id: int) -> void:
+	#if selected:
+		#if not synced_selected_courses.has(course_id):
+			#synced_selected_courses.append(course_id)
+	#else:
+		#synced_selected_courses.erase(course_id)
+		#
+	## Update the UI checkmark if the menu exists on this machine
+	#var item_index = course_popup_menu.get_item_index(item_id)
+	#if item_index != -1:
+		#course_popup_menu.set_item_checked(item_index, selected)
+		#
+	#print("Synced multiplayer courses: ", synced_selected_courses)
+
+# 1. Client sends request to the Server
 @rpc("any_peer", "call_local", "reliable")
-func sync_toggle_popup_course(course_id: int, selected: bool, item_id: int) -> void:
-	if selected:
-		if not synced_selected_courses.has(course_id):
-			synced_selected_courses.append(course_id)
-	else:
-		synced_selected_courses.erase(course_id)
+func request_toggle_course(course_id: int, selected: bool, item_id: int) -> void:
+	# Only the server should process authoritative state changes
+	if not multiplayer.is_server():
+		return
 		
-	# Update the UI checkmark if the menu exists on this machine
+	# Server modifies the global autoload state
+	if selected:
+		if not MultiplayerManager.synced_selected_courses.has(course_id):
+			MultiplayerManager.synced_selected_courses.append(course_id)
+	else:
+		MultiplayerManager.synced_selected_courses.erase(course_id)
+		
+	# Server tells all clients (including itself via call_local) to update their UI
+	rpc("update_course_selection_ui", course_id, selected, item_id)
+
+# 2. Broadcasted back to everyone to update their visual menu checkmarks
+@rpc("authority", "call_local", "reliable")
+func update_course_selection_ui(course_id: int, selected: bool, item_id: int) -> void:
+	# Ensure autoload is kept in sync on clients too
+	if selected:
+		if not MultiplayerManager.synced_selected_courses.has(course_id):
+			MultiplayerManager.synced_selected_courses.append(course_id)
+	else:
+		MultiplayerManager.synced_selected_courses.erase(course_id)
+		
 	var item_index = course_popup_menu.get_item_index(item_id)
 	if item_index != -1:
 		course_popup_menu.set_item_checked(item_index, selected)
 		
-	print("Synced multiplayer courses: ", synced_selected_courses)
+	print("Current lobby playlist (MultiplayerManager): ", MultiplayerManager.synced_selected_courses)
