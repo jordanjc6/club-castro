@@ -947,7 +947,7 @@ layout_mode = 2
 theme_override_constants/separation = 15
 
 [node name="Header" type="Control" parent="HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer" unique_id=1542124844]
-custom_minimum_size = Vector2(0, 100)
+custom_minimum_size = Vector2(0, 75)
 layout_mode = 2
 
 [node name="Label" type="Label" parent="HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Header" unique_id=759541418]
@@ -996,7 +996,7 @@ layout_mode = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 36
-text = "How to Play:"
+text = "How to play:"
 
 [node name="Text" type="Label" parent="HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer" unique_id=50876324]
 custom_minimum_size = Vector2(1, 0)
@@ -1007,11 +1007,41 @@ text = "Tap the tee area to place your ball. Drag anywhere else on the screen to
 autowrap_mode = 2
 
 [node name="Spacer" type="Control" parent="HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer" unique_id=1651933239]
-custom_minimum_size = Vector2(0, 100)
+custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 
-[node name="StartGameButton" type="Button" parent="HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer" unique_id=1075330550]
-custom_minimum_size = Vector2(300, 150)
+[node name="CourseSelectHeading" type="Label" parent="HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer" unique_id=1295479486]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 36
+text = "Choose courses:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer" unique_id=2022920981]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer/HBoxContainer" unique_id=311425265]
+custom_minimum_size = Vector2(550, 0)
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer/HBoxContainer/ScrollContainer" unique_id=1775427309]
+custom_minimum_size = Vector2(550, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 2
+
+[node name="Spacer" type="Control" parent="HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer/HBoxContainer" unique_id=117439126]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer/HBoxContainer" unique_id=116154894]
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer/HBoxContainer/VBoxContainer" unique_id=812726205]
+custom_minimum_size = Vector2(0, 210)
+layout_mode = 2
+
+[node name="StartGameButton" type="Button" parent="HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer/HBoxContainer/VBoxContainer" unique_id=1075330550]
+custom_minimum_size = Vector2(230, 90)
 custom_maximum_size = Vector2(300, 150)
 layout_mode = 2
 size_flags_horizontal = 4

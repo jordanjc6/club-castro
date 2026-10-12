@@ -24,6 +24,27 @@ const AVAILABLE_COURSES: Array[int] = [
 ]
 #const NUM_COURSES_PER_GAME = 1
 #const AVAILABLE_COURSES: Array[int] = [19]
+var all_available_courses = [
+	{"id": 1, "name": "Campfire Pond"},
+	{"id": 2, "name": "Windmill Greens"},
+	{"id": 3, "name": "Desert Dunes"},
+	{"id": 4, "name": "Neon Arcade"},
+	{"id": 5, "name": "Volcanic Valley"},
+	{"id": 6, "name": "Volcanic Valley 2"},
+	{"id": 7, "name": "Volcanic Valley 2"},
+	{"id": 8, "name": "Volcanic Valley 2"},
+	{"id": 9, "name": "Volcanic Valley 2"},
+	{"id": 10, "name": "Volcanic Valley 2"},
+	{"id": 11, "name": "Volcanic Valley 2"},
+	{"id": 12, "name": "Volcanic Valley 2"},
+	{"id": 13, "name": "Volcanic Valley 2"},
+	{"id": 14, "name": "Volcanic Valley 2"},
+	{"id": 15, "name": "Volcanic Valley 2"},
+	{"id": 16, "name": "Volcanic Valley 2"},
+	{"id": 17, "name": "Volcanic Valley 2"},
+	{"id": 18, "name": "Volcanic Valley 2"},
+	{"id": 19, "name": "Volcanic Valley 2"},
+]
 
 const BALL_COLORS: Array[Color] = [
 	Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE

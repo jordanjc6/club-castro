@@ -30,7 +30,7 @@ signal minigames_button_pressed(player_id: int)
 # singleplayer minigolf menu
 @onready var single_minigolfmenu: PanelContainer = $"../HUD/SingleplayerMinigamesPopup/MinigolfMenu"
 @onready var single_minigolfmenu_close_button: Button = $"../HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Header/HBoxContainer/CloseMinigolfMenuButton"
-@onready var single_minigolfmenu_start_button: Button = $"../HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer/StartGameButton"
+@onready var single_minigolfmenu_start_button: Button = $"../HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer/HBoxContainer/VBoxContainer/StartGameButton"
 
 # multiplayer minigames popup
 @onready var minigames_popup: Node2D = $"../HUD/MinigamesPopup"
@@ -71,8 +71,8 @@ var _current_tag_match_id: int = 0
 const SINGLE_MINIGOLF_MINIGAME_SCRIPT_PATH: String = "res://scripts/minigames/single_minigolf_minigame.gd"
 const MINIGOLF_MINIGAME_SCRIPT_PATH: String = "res://scripts/minigames/minigolf_minigame.gd"
 const MINIGOLF_MINIGAME_SCENE_PATH: String = "res://scenes/minigames/MinigolfMinigame.tscn"
-
 var _cached_single_minigolf: Node2D = null
+var selected_course_ids: Array[int] = []
 
 func _ready() -> void:
 	host_button.pressed.connect(_host_button_pressed)
@@ -90,6 +90,8 @@ func _ready() -> void:
 	single_minigolf_button.pressed.connect(_single_minigolf_button_pressed)
 	single_minigolfmenu_close_button.pressed.connect(_close_single_minigolf_menu)
 	single_minigolfmenu_start_button.pressed.connect(_start_single_minigolf_game)
+	setup_grid_container()
+	populate_course_grid()
 	
 	lobby_popup.hide()
 	minigames_popup.hide()
@@ -880,3 +882,42 @@ func swap_minigolf_script(new_script_path: String) -> void:
 	# 4. Add back to world hierarchy at exact original index
 	parent_world.add_child(new_node)
 	parent_world.move_child(new_node, original_index)
+
+func setup_grid_container() -> void:
+	var courses_grid = get_node("../HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer/HBoxContainer/ScrollContainer/GridContainer")
+	# Configure Grid properties via code
+	courses_grid.columns = 2
+	# 0 horizontal separation so two 275px buttons perfectly fill the 550px container width
+	courses_grid.add_theme_constant_override("h_separation", 0)
+	courses_grid.add_theme_constant_override("v_separation", 10)
+
+func populate_course_grid() -> void:
+	var courses_grid = get_node("../HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer/HBoxContainer/ScrollContainer/GridContainer")
+	# Clear out any placeholder children
+	for child in courses_grid.get_children():
+		child.queue_free()
+	
+	var singleMinigolfMinigame = get_node("../MinigolfMinigame")
+	for course in singleMinigolfMinigame.all_available_courses:
+		var btn = Button.new()
+		btn.text = course["name"]
+		btn.toggle_mode = true
+		
+		# Set exact button dimensions (275 width to fill 550 total width, 70 height)
+		btn.custom_minimum_size = Vector2(275, 70)
+		
+		# Connect toggle logic
+		btn.toggled.connect(func(toggled_on: bool): _on_course_toggled(course["id"], btn))
+		
+		courses_grid.add_child(btn)
+
+func _on_course_toggled(course_id: int, button: Button) -> void:
+	if button.button_pressed:
+		if not selected_course_ids.has(course_id):
+			selected_course_ids.append(course_id)
+		button.modulate = Color(0.7, 1.2, 0.7) # Selection tint
+	else:
+		selected_course_ids.erase(course_id)
+		button.modulate = Color(1.0, 1.0, 1.0)
+		
+	print("Selected playlist sequence: ", selected_course_ids)
