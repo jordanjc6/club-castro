@@ -106,7 +106,8 @@ func start_singleplayer_game():
 		"total_strokes": 0,
 		"current_strokes": 0,
 		"ball_node": null,
-		"finished_hole": false
+		"finished_hole": false,
+		"previous_shot_pos": null
 	}
 	
 	load_course(first_course_id)
@@ -468,6 +469,7 @@ func confirm_ball_placement(peer_id: int, pos: Vector2) -> void:
 
 	if player_data.has(peer_id):
 		player_data[peer_id]["ball_node"] = dragged_ball_preview
+		player_data[peer_id]["previous_shot_pos"] = pos
 
 	dragged_ball_preview = null
 	current_ball_state = BallState.PLACED
@@ -562,6 +564,10 @@ func sync_player_finished_hole(peer_id: int) -> void:
 
 func on_ball_stopped(_ball: RigidBody2D) -> void:
 	print("\n--- [DEBUG] A BALL HAS STOPPED ---")
+	for p_id in player_data:
+		if player_data[p_id].get("ball_node") == _ball:
+			player_data[p_id]["previous_shot_pos"] = _ball.global_position
+			break
 	if _are_all_balls_stopped():
 		print("  -> All active balls have stopped. Advancing turn...")
 		advance_to_next_turn(BallState.PLACED)
@@ -735,3 +741,31 @@ func handle_ball_blackholed(peer_id: int) -> void:
 	# Advance turn if all other balls are finished/stopped
 	if _are_all_balls_stopped():
 		advance_to_next_turn(current_ball_state)
+
+func handle_ball_watered(peer_id: int) -> void:
+	if not multiplayer.is_server():
+		return
+
+	print("[SERVER] Ball fell into water for Peer: ", peer_id)
+
+	# Safely fetch previous position and handle null initialization
+	var prev_pos = player_data[peer_id].get("previous_shot_pos") if player_data.has(peer_id) else null
+	if prev_pos == null:
+		prev_pos = Vector2.ZERO # Fallback if no valid previous shot exists yet
+	
+	if player_data.has(peer_id):
+		var ball = player_data[peer_id].get("ball_node")
+		if is_instance_valid(ball):
+			# Stop momentum and move the existing ball back to the previous position
+			ball.linear_velocity = Vector2.ZERO
+			ball.angular_velocity = 0.0
+			ball.global_position = prev_pos
+			ball.sleeping = false
+			ball.freeze = false
+	
+	var my_id = multiplayer.get_unique_id()
+	if my_id == peer_id:
+		current_ball_state = BallState.PLACED
+		show_notification("Ball in the water! \n\nReturned to previous position.", HOLE_WINNER_NOTIF_TIME)
+		
+	refresh_minigolf_hud(current_course_number, player_data)

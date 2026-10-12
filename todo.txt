@@ -1,5 +1,4 @@
 Minigolf
-- implement water for singleplayer
 - singleplayer: can either choose an individual course or play 3 random
 - multiplayer: can either choose an individual course or play 3 random
 - design more courses
