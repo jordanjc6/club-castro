@@ -1,5 +1,4 @@
 Minigolf
-- update player name grid (when names too long and three players, it cuts off at the right side)
 - singleplayer: can either choose an individual course or play 3 random
 - multiplayer: can either choose an individual course or play 3 random
 - design more courses
