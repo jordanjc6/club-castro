@@ -1,6 +1,8 @@
 extends Node2D
 
 var water_splash_effect = preload("res://scripts/minigames/WaterSplashEffect.gd")
+var black_hole_explosion_effect = preload("res://scripts/minigames/BlackHoleExplosionEffect.gd")
+var water_steal_explosion_effect = preload("res://scripts/minigames/WaterStealExplosionEffect.gd")
 
 @export var golf_ball_scene: PackedScene = preload("res://scenes/minigames/minigolf/GolfBall.tscn")
 
@@ -973,6 +975,12 @@ func handle_ball_blackholed(peer_id: int) -> void:
 
 	print("[SERVER] Ball fell into blackhole for Peer: ", peer_id)
 	
+	# Capture ball position for the explosion effect before removing it
+	var ball = player_data[peer_id].get("ball_node") if player_data.has(peer_id) else null
+	if is_instance_valid(ball):
+		# Broadcast the explosion effect to all clients instantly
+		rpc("play_blackhole_explosion", ball.global_position)
+	
 	# 1. Cleanly delete the ball node across all clients
 	rpc("remove_player_ball", peer_id)
 
@@ -1026,13 +1034,15 @@ func handle_ball_watered(peer_id: int) -> void:
 			continue
 		var other_ball = player_data[p_id].get("ball_node")
 		if is_instance_valid(other_ball) and not other_ball.is_queued_for_deletion():
-			if other_ball.global_position.distance_to(prev_pos) < 24.0:
+			if other_ball.global_position.distance_to(prev_pos) < 22.5:
 				is_position_blocked = true
 				break
 
 	if is_position_blocked:
 		print("[SERVER] Previous shot position blocked by another ball. Forcing back to tee!")
 		rpc("remove_player_ball", peer_id)
+		if is_instance_valid(ball):
+			rpc("play_watersteal_explosion", prev_pos)
 		if player_data.has(peer_id):
 			player_data[peer_id]["ball_node"] = null
 		rpc("sync_ball_blackholed", peer_id)
@@ -1073,3 +1083,32 @@ func play_water_splash(pos: Vector2) -> void:
 	var splash = water_splash_effect.WaterSplashEffect.new()
 	active_course.add_child(splash)
 	splash.global_position = pos
+
+# --- Reusable Procedural Blackhole Explosion ---
+@rpc("authority", "call_local", "reliable")
+func play_blackhole_explosion(pos: Vector2) -> void:
+	if not is_instance_valid(course_container) or course_container.get_child_count() == 0:
+		return
+	
+	var active_course = course_container.get_child(0)
+	if not is_instance_valid(active_course):
+		return
+		
+	# Instantiate and attach to the active course layer
+	var explosion = black_hole_explosion_effect.BlackHoleExplosionEffect.new()
+	active_course.add_child(explosion)
+	explosion.global_position = pos
+
+@rpc("authority", "call_local", "reliable")
+func play_watersteal_explosion(pos: Vector2) -> void:
+	if not is_instance_valid(course_container) or course_container.get_child_count() == 0:
+		return
+	
+	var active_course = course_container.get_child(0)
+	if not is_instance_valid(active_course):
+		return
+		
+	# Instantiate and attach to the active course layer
+	var explosion = water_steal_explosion_effect.WaterStealExplosionEffect.new()
+	active_course.add_child(explosion)
+	explosion.global_position = pos

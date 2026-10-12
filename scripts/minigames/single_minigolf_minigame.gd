@@ -1,6 +1,7 @@
 extends Node2D
 
 var water_splash_effect = preload("res://scripts/minigames/WaterSplashEffect.gd")
+var black_hole_explosion_effect = preload("res://scripts/minigames/BlackHoleExplosionEffect.gd")
 
 @export var golf_ball_scene: PackedScene = preload("res://scenes/minigames/minigolf/GolfBall.tscn")
 
@@ -17,12 +18,12 @@ const DEFAULT_NAMETAG_COLOR = Color("0000003c")
 const ROULETTE_BORDER_WIDTH = 8
 
 # Constants
-#const NUM_COURSES_PER_GAME = 3
-#const AVAILABLE_COURSES: Array[int] = [
-	#1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19
-#]
-const NUM_COURSES_PER_GAME = 1
-const AVAILABLE_COURSES: Array[int] = [19]
+const NUM_COURSES_PER_GAME = 3
+const AVAILABLE_COURSES: Array[int] = [
+	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19
+]
+#const NUM_COURSES_PER_GAME = 1
+#const AVAILABLE_COURSES: Array[int] = [19]
 
 const BALL_COLORS: Array[Color] = [
 	Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE
@@ -728,6 +729,12 @@ func handle_ball_blackholed(peer_id: int) -> void:
 
 	print("Ball fell into blackhole for Peer: ", peer_id)
 	
+	# Capture ball position for the explosion effect before removing it
+	var ball = player_data[peer_id].get("ball_node") if player_data.has(peer_id) else null
+	if is_instance_valid(ball):
+		# Broadcast the explosion effect to all clients instantly
+		play_blackhole_explosion(ball.global_position)
+	
 	# Cleanly delete the ball node across all clients
 	remove_player_ball(peer_id)
 
@@ -792,3 +799,16 @@ func play_water_splash(pos: Vector2) -> void:
 	var splash = water_splash_effect.WaterSplashEffect.new()
 	active_course.add_child(splash)
 	splash.global_position = pos
+
+func play_blackhole_explosion(pos: Vector2) -> void:
+	if not is_instance_valid(course_container) or course_container.get_child_count() == 0:
+		return
+	
+	var active_course = course_container.get_child(0)
+	if not is_instance_valid(active_course):
+		return
+		
+	# Instantiate and attach to the active course layer
+	var explosion = black_hole_explosion_effect.BlackHoleExplosionEffect.new()
+	active_course.add_child(explosion)
+	explosion.global_position = pos
