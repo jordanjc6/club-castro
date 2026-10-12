@@ -1,5 +1,7 @@
 extends Node2D
 
+var water_splash_effect = preload("res://scripts/minigames/WaterSplashEffect.gd")
+
 @export var golf_ball_scene: PackedScene = preload("res://scenes/minigames/minigolf/GolfBall.tscn")
 
 @onready var minigolf_menu: PanelContainer = $"../HUD/MinigamesPopup/MinigolfMenu"
@@ -1006,6 +1008,11 @@ func handle_ball_watered(peer_id: int) -> void:
 		return
 
 	print("[SERVER] Ball fell into water for Peer: ", peer_id)
+	
+	# Capture ball position for the splash effect before moving it back
+	var ball = player_data[peer_id].get("ball_node") if player_data.has(peer_id) else null
+	if is_instance_valid(ball):
+		rpc("play_water_splash", ball.global_position)
 
 	# Safely fetch previous position and handle null initialization
 	var prev_pos = player_data[peer_id].get("previous_shot_pos") if player_data.has(peer_id) else null
@@ -1053,3 +1060,16 @@ func sync_ball_water_respawn(peer_id: int, respawn_pos: Vector2) -> void:
 		show_notification("Ball in the water! \n\nReturned to previous position.", HOLE_WINNER_NOTIF_TIME)
 		
 	refresh_minigolf_hud()
+
+@rpc("authority", "call_local", "reliable")
+func play_water_splash(pos: Vector2) -> void:
+	if not is_instance_valid(course_container) or course_container.get_child_count() == 0:
+		return
+	
+	var active_course = course_container.get_child(0)
+	if not is_instance_valid(active_course):
+		return
+		
+	var splash = water_splash_effect.WaterSplashEffect.new()
+	active_course.add_child(splash)
+	splash.global_position = pos

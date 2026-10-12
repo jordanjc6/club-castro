@@ -1,5 +1,7 @@
 extends Node2D
 
+var water_splash_effect = preload("res://scripts/minigames/WaterSplashEffect.gd")
+
 @export var golf_ball_scene: PackedScene = preload("res://scenes/minigames/minigolf/GolfBall.tscn")
 
 @onready var course_container: MarginContainer = $Screen/UI/HBoxContainer/Course
@@ -747,6 +749,14 @@ func handle_ball_watered(peer_id: int) -> void:
 		return
 
 	print("[SERVER] Ball fell into water for Peer: ", peer_id)
+	
+	# Capture ball position for the splash effect before moving it back
+	var ball = player_data[peer_id].get("ball_node") if player_data.has(peer_id) else null
+	if is_instance_valid(ball):
+		print("splash")
+		play_water_splash(ball.global_position)
+	else:
+		print("ball not valid: %s" % ball)
 
 	# Safely fetch previous position and handle null initialization
 	var prev_pos = player_data[peer_id].get("previous_shot_pos") if player_data.has(peer_id) else null
@@ -754,7 +764,6 @@ func handle_ball_watered(peer_id: int) -> void:
 		prev_pos = Vector2.ZERO # Fallback if no valid previous shot exists yet
 	
 	if player_data.has(peer_id):
-		var ball = player_data[peer_id].get("ball_node")
 		if is_instance_valid(ball):
 			# Stop momentum and move the existing ball back to the previous position
 			ball.linear_velocity = Vector2.ZERO
@@ -769,3 +778,17 @@ func handle_ball_watered(peer_id: int) -> void:
 		show_notification("Ball in the water! \n\nReturned to previous position.", HOLE_WINNER_NOTIF_TIME)
 		
 	refresh_minigolf_hud(current_course_number, player_data)
+
+func play_water_splash(pos: Vector2) -> void:
+	if not is_instance_valid(course_container) or course_container.get_child_count() == 0:
+		print("splash failed")
+		return
+	
+	var active_course = course_container.get_child(0)
+	if not is_instance_valid(active_course):
+		print("no active course for splash")
+		return
+		
+	var splash = water_splash_effect.WaterSplashEffect.new()
+	active_course.add_child(splash)
+	splash.global_position = pos

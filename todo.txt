@@ -3,5 +3,4 @@ Minigolf
 - multiplayer: can either choose an individual course or play 3 random
 - design more courses
 - add more tile shapes (half/triangle, rounded)
-- animate water hazard
 - animate water/blackhole kill
