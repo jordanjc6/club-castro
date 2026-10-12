@@ -721,8 +721,8 @@ func advance_to_next_course() -> void:
 	if not unplayed_courses.is_empty():
 		next_course_id = unplayed_courses.pick_random()
 	else:
-		next_course_id = course_ids_to_play.pick_random()
-		#next_course_id = AVAILABLE_COURSES.pick_random()
+		#next_course_id = course_ids_to_play.pick_random()
+		next_course_id = AVAILABLE_COURSES.pick_random()
 
 	played_courses.append(next_course_id)
 	current_course_number += 1

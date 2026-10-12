@@ -1,4 +1,3 @@
 Minigolf
-- multiplayer: can either choose courses or play 3 random
 - design more courses
 - add more tile shapes (half/triangle, rounded)

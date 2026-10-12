@@ -13,12 +13,12 @@ var water_steal_explosion_effect = preload("res://scripts/minigames/WaterStealEx
 @onready var exit_game_button: Button = $Screen/MinigolfSidenav/MultiplayerHUD/VBoxContainer/ExitGameButton
 
 # Constants
-#const NUM_COURSES_PER_GAME = 3
-#const AVAILABLE_COURSES: Array[int] = [
-	#1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19
-#]
-const NUM_COURSES_PER_GAME = 1
-const AVAILABLE_COURSES: Array[int] = [19]
+const NUM_COURSES_PER_GAME = 3
+const AVAILABLE_COURSES: Array[int] = [
+	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19
+]
+#const NUM_COURSES_PER_GAME = 1
+#const AVAILABLE_COURSES: Array[int] = [19]
 
 var all_available_courses = [
 	{"id": 1, "name": "Straight"},
@@ -602,12 +602,23 @@ func _on_course_child_entered(node: Node) -> void:
 		player_data[current_turn_id]["ball_node"] = node
 
 @rpc("authority", "call_local", "reliable")
-func start_minigolf(turn_order: Array[int]) -> void:
+func start_minigolf(turn_order: Array[int], chosen_courses: Array[int]) -> void:
 	if multiplayer.is_server():
 		MultiplayerManager.rpc("set_minigolf_started", true)
 		
+		#played_courses.clear()
+		#var first_course_id = AVAILABLE_COURSES.pick_random()
+		#played_courses.append(first_course_id)
 		played_courses.clear()
-		var first_course_id = AVAILABLE_COURSES.pick_random()
+		var first_course_id
+		if chosen_courses.is_empty():
+			first_course_id = AVAILABLE_COURSES.pick_random()
+			course_ids_to_play = AVAILABLE_COURSES
+			num_courses_to_play = NUM_COURSES_PER_GAME
+		else:
+			first_course_id = chosen_courses[0]
+			course_ids_to_play = chosen_courses
+			num_courses_to_play = chosen_courses.size()
 		played_courses.append(first_course_id)
 		
 		# Server picks unique colors for everyone
@@ -625,12 +636,14 @@ func start_minigolf(turn_order: Array[int]) -> void:
 				assigned_colors[peer_id] = BALL_COLORS.pick_random()
 		
 		enable_minigame_processing(true)
-		rpc("sync_game_start", turn_order, first_course_id, assigned_colors)
+		rpc("sync_game_start", turn_order, first_course_id, assigned_colors, course_ids_to_play, num_courses_to_play)
 
 @rpc("authority", "call_local", "reliable")
-func sync_game_start(turn_order: Array[int], starting_course_id: int, assigned_colors: Dictionary) -> void:
+func sync_game_start(turn_order: Array[int], starting_course_id: int, assigned_colors: Dictionary, courses: Array[int], num_courses: int) -> void:
 	exit_game_button.disabled = false
 	current_course_number = 1
+	num_courses_to_play = num_courses
+	course_ids_to_play = courses
 	current_turn_id = turn_order[0]
 	initialize_game_state(turn_order, assigned_colors) # Pass colors here
 	load_course(starting_course_id)
@@ -754,7 +767,7 @@ func announce_course_winner() -> void:
 	else:
 		winner_msg = "Tie for the hole! (%s) with %d strokes!" % [", ".join(winners), lowest_strokes]
 	
-	if current_course_number < NUM_COURSES_PER_GAME:
+	if current_course_number < num_courses_to_play:
 		winner_msg += " Advancing to next course.."
 	else:
 		winner_msg += " Game over!"
@@ -856,7 +869,7 @@ func sync_minigolf_state(turn_order: Array[int], active_turn_id: int, current_co
 @rpc("authority", "call_local", "reliable")
 func refresh_minigolf_hud() -> void:
 	if is_instance_valid(minigolf_menu):
-		minigolf_menu.update_game_info(current_course_number, current_turn_id)
+		minigolf_menu.update_game_info(current_course_number, current_turn_id, num_courses_to_play)
 		minigolf_menu.update_player_grid(minigolf_turn_order, current_turn_id, player_data)
 
 func advance_to_next_course() -> void:
@@ -867,7 +880,7 @@ func advance_to_next_course() -> void:
 		rpc("end_minigolf_game")
 		return
 
-	if current_course_number >= NUM_COURSES_PER_GAME:
+	if current_course_number >= num_courses_to_play:
 		print("[SERVER] Minigolf game complete!")
 		announce_game_result()
 		await get_tree().create_timer(GAME_RESULT_NOTIF_TIME).timeout
@@ -875,7 +888,7 @@ func advance_to_next_course() -> void:
 		return
 
 	var unplayed_courses: Array[int] = []
-	for course_id in AVAILABLE_COURSES:
+	for course_id in course_ids_to_play:
 		if not played_courses.has(course_id):
 			unplayed_courses.append(course_id)
 

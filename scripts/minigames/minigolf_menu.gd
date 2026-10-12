@@ -250,10 +250,10 @@ func accept_minigolf_invite():
 		game_manager.reset_tag_player_colors
 
 func minigolf_start_pressed():
-	rpc("request_start_minigolf")
+	rpc("request_start_minigolf", MultiplayerManager.synced_selected_courses)
 
 @rpc("any_peer", "call_local", "reliable")
-func request_start_minigolf() -> void:
+func request_start_minigolf(courses: Array[int]) -> void:
 	if multiplayer.is_server():
 		if !minigolf_players.has(1):
 			rpc("notify_need_host_to_start")
@@ -264,7 +264,7 @@ func request_start_minigolf() -> void:
 		minigolf_players.shuffle()
 		var minigame = get_minigolf_minigame_node()
 		if is_instance_valid(minigame):
-			minigame.rpc("start_minigolf", minigolf_players)
+			minigame.rpc("start_minigolf", minigolf_players, courses)
 		rpc("set_minigolf_ui")
 		teleport_players_to_minigolf()
 		await get_tree().create_timer(5).timeout
@@ -295,7 +295,7 @@ func set_minigolf_ui() -> void:
 	for player in get_tree().get_nodes_in_group("player"):
 		player.hide()
 
-func update_game_info(course_num: int, turn_id: int):
+func update_game_info(course_num: int, turn_id: int, total_courses: int):
 	var info_node = get_minigolf_game_info_node()
 	if not is_instance_valid(info_node):
 		return
@@ -303,7 +303,7 @@ func update_game_info(course_num: int, turn_id: int):
 	var courseLabel = info_node.get_node("CourseLabel")
 	var turnLabel = info_node.get_node("TurnLabel")
 	
-	courseLabel.text = "Course %s/3" % course_num
+	courseLabel.text = "Course %s/%s" % [course_num, total_courses]
 	
 	var my_id = multiplayer.get_unique_id()
 	if turn_id == my_id:
