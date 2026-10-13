@@ -7,9 +7,12 @@
 [ext_resource type="Texture2D" uid="uid://dswl5nke2sk1l" path="res://assets/textures/water32.png" id="4_truch"]
 [ext_resource type="Texture2D" uid="uid://5hc0exl42xnh" path="res://assets/textures/turf32.jpg" id="4_wecfj"]
 [ext_resource type="Texture2D" uid="uid://jb81rsaxuxwq" path="res://assets/textures/half-brick-sand32.png" id="5_a3bnn"]
+[ext_resource type="Texture2D" uid="uid://vysm2b780na8" path="res://assets/textures/round-brick-ice32.png" id="6_1nwlc"]
 [ext_resource type="Texture2D" uid="uid://dboxp0qgoun7s" path="res://assets/textures/horiz-arrow32.png" id="6_23r0g"]
 [ext_resource type="Texture2D" uid="uid://bea5naftetcae" path="res://assets/textures/checkered-start32.png" id="6_8811o"]
+[ext_resource type="Texture2D" uid="uid://x2b4cqt341sr" path="res://assets/textures/round-brick-sand32.png" id="7_fxpnn"]
 [ext_resource type="Texture2D" uid="uid://c0a6xlgfynx3o" path="res://assets/textures/vert-arrow32.png" id="8_aic3d"]
+[ext_resource type="Texture2D" uid="uid://br5jdti6gcjw1" path="res://assets/textures/round-brick-turf32.png" id="8_d0g14"]
 [ext_resource type="Texture2D" uid="uid://cem48vyrj0he1" path="res://assets/textures/half-brick-turf32.png" id="8_hqod5"]
 [ext_resource type="Texture2D" uid="uid://jhqodqsbrua4" path="res://assets/textures/half-brick-ice32.png" id="11_1nwlc"]
 
@@ -65,6 +68,70 @@ texture_region_size = Vector2i(32, 32)
 0:0/3/flip_v = true
 0:0/3/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, -16, 16, -16, 16)
 0:0/3/custom_data_0 = "sand"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1s3fr"]
+texture = ExtResource("6_1nwlc")
+texture_region_size = Vector2i(32, 32)
+0:0/next_alternative_id = 5
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-7.1977177, -6.4955025, -2.9844189, -10.533246, 2.457758, -13.342113, 9.369438, -15.410627, 16, -16, 16, 16, -16, 16, -15.466562, 9.033815, -14.044329, 3.159975, -10.884354, -2.1066494)
+0:0/0/custom_data_0 = "ice"
+0:0/1 = 1
+0:0/1/flip_h = true
+0:0/1/physics_layer_0/polygon_0/points = PackedVector2Array(8.08289, -6.1250954, 4.0377445, -9.655476, -1.7060776, -13.005339, -8.810066, -15.35469, -16, -16, -16, 16, 16, 16, 15.298752, 10.320364, 14.012203, 3.6079311, 11.586571, -1.228878)
+0:0/1/custom_data_0 = "ice"
+0:0/3 = 3
+0:0/3/flip_v = true
+0:0/3/physics_layer_0/polygon_0/points = PackedVector2Array(-8.026949, 5.7335367, -3.7757416, 9.760996, 1.2585831, 12.61378, 7.635391, 14.851257, 16, 16, 16, -16, -16, -16, -14.963129, -8.810066, -13.173147, -2.8248138, -11.271292, 1.4823303)
+0:0/3/custom_data_0 = "ice"
+0:0/4 = 4
+0:0/4/flip_h = true
+0:0/4/flip_v = true
+0:0/4/physics_layer_0/polygon_0/points = PackedVector2Array(8.362572, 5.5657263, 3.8316784, 9.705059, -1.314518, 12.61378, -7.635391, 14.963131, -16, 16, -16, -16, 16, -16, 15.130941, -8.306635, 13.229084, -2.9926262, 11.215355, 1.3704548)
+0:0/4/custom_data_0 = "ice"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fpd3m"]
+texture = ExtResource("7_fxpnn")
+texture_region_size = Vector2i(32, 32)
+0:0/next_alternative_id = 4
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-7.971012, -6.0132217, -3.663868, -9.816933, 1.0405083, -12.535606, 7.4675827, -14.7953205, 16, -16, 16, 16, -16, 16, -15.130941, 8.586319, -13.564707, 2.4332561, -11.103481, -2.0416985)
+0:0/0/custom_data_0 = "sand"
+0:0/1 = 1
+0:0/1/flip_h = true
+0:0/1/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, -16, 16, 16, 16, 15.186878, 8.250698, 13.620644, 2.768877, 10.991608, -1.873888, 7.9150753, -5.901347, 3.4960575, -10.040681, -1.8738899, -13.005339, -8.586319, -15.186879)
+0:0/1/custom_data_0 = "sand"
+0:0/2 = 2
+0:0/2/flip_v = true
+0:0/2/physics_layer_0/polygon_0/points = PackedVector2Array(-7.9150753, 6.460717, -3.2163734, 10.208491, 1.7620125, 12.725654, 7.747265, 14.963131, 16, 16, 16, -16, -16, -16, -15.186878, -8.586319, -13.340958, -2.0976353, -11.0475445, 2.433258)
+0:0/2/custom_data_0 = "sand"
+0:0/3 = 3
+0:0/3/flip_h = true
+0:0/3/flip_v = true
+0:0/3/physics_layer_0/polygon_0/points = PackedVector2Array(7.131958, 7.2438335, 2.7129402, 10.60005, -2.2654457, 13.173149, -8.642258, 15.019068, -16, 16, -16, -16, 16, -16, 15.130941, -8.418509, 13.229084, -2.153572, 10.655985, 2.8248158)
+0:0/3/custom_data_0 = "sand"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0peh1"]
+texture = ExtResource("8_d0g14")
+texture_region_size = Vector2i(32, 32)
+0:0/next_alternative_id = 5
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-7.5235176, -6.796338, -2.9366875, -10.60005, 2.489193, -13.173149, 8.754131, -15.130941, 16, -16, 16, 16, -16, 16, -15.130941, 8.082886, -13.50877, 2.8807507, -10.935671, -2.153572)
+0:0/0/custom_data_0 = "grass"
+0:0/1 = 1
+0:0/1/flip_h = true
+0:0/1/physics_layer_0/polygon_0/points = PackedVector2Array(7.8032017, -6.292906, 3.1044998, -10.376303, -1.9857635, -13.229086, -8.754131, -15.298753, -16, -16, -16, 16, 16, 16, 15.019066, 8.026949, 13.340958, 2.4332561, 10.879734, -2.209509)
+0:0/1/custom_data_0 = "grass"
+0:0/2 = 2
+0:0/2/flip_v = true
+0:0/2/physics_layer_0/polygon_0/points = PackedVector2Array(-7.8032017, 6.0691586, -2.9926262, 10.488176, 1.8738899, 13.005339, 8.362572, 15.019068, 16, 16, 16, -16, -16, -16, -14.963129, -7.971012, -13.564707, -2.6570034, -10.935671, 2.209509)
+0:0/2/custom_data_0 = "grass"
+0:0/3 = 3
+0:0/4 = 4
+0:0/4/flip_h = true
+0:0/4/flip_v = true
+0:0/4/physics_layer_0/polygon_0/points = PackedVector2Array(7.2438316, 6.852276, 2.5451317, 10.60005, -2.2654457, 13.117212, -8.754131, 15.522501, -16, 16, -16, -16, 16, -16, 14.851255, -7.355707, 12.893463, -1.7060757, 10.096617, 3.328249)
+0:0/4/custom_data_0 = "grass"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_hqod5"]
 texture = ExtResource("3_wecfj")
@@ -161,3 +228,6 @@ sources/11 = SubResource("TileSetAtlasSource_fxpnn")
 sources/6 = SubResource("TileSetAtlasSource_d0g14")
 sources/8 = SubResource("TileSetAtlasSource_u824c")
 sources/12 = SubResource("TileSetAtlasSource_qsicr")
+sources/13 = SubResource("TileSetAtlasSource_1s3fr")
+sources/14 = SubResource("TileSetAtlasSource_fpd3m")
+sources/15 = SubResource("TileSetAtlasSource_0peh1")
