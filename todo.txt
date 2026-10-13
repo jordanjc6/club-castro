@@ -1,3 +1,2 @@
 Minigolf
-- add rounded brick tiles
 - design more courses

@@ -14,7 +14,22 @@
 [ext_resource type="Texture2D" uid="uid://c0a6xlgfynx3o" path="res://assets/textures/vert-arrow32.png" id="8_aic3d"]
 [ext_resource type="Texture2D" uid="uid://br5jdti6gcjw1" path="res://assets/textures/round-brick-turf32.png" id="8_d0g14"]
 [ext_resource type="Texture2D" uid="uid://cem48vyrj0he1" path="res://assets/textures/half-brick-turf32.png" id="8_hqod5"]
+[ext_resource type="Texture2D" uid="uid://dlxh8bowwgsm0" path="res://assets/textures/spike-brick-turf-vert32.png" id="9_qsicr"]
+[ext_resource type="Texture2D" uid="uid://dfbjmdf7ksv5m" path="res://assets/textures/spike-brick-turf-horiz32.png" id="10_u824c"]
 [ext_resource type="Texture2D" uid="uid://jhqodqsbrua4" path="res://assets/textures/half-brick-ice32.png" id="11_1nwlc"]
+[ext_resource type="Texture2D" uid="uid://cgn064smiifxu" path="res://assets/textures/spike-brick-sand-vert32.png" id="11_1s3fr"]
+[ext_resource type="Texture2D" uid="uid://bqduqkd22356w" path="res://assets/textures/spike-brick-sand-horiz32.png" id="12_fpd3m"]
+[ext_resource type="Texture2D" uid="uid://dpot3pxon8h6d" path="res://assets/textures/spike-brick-ice-vert32.png" id="14_0peh1"]
+[ext_resource type="Texture2D" uid="uid://6nscdxwb17ff" path="res://assets/textures/spike-brick-ice-horiz32.png" id="15_d5pmo"]
+[ext_resource type="Texture2D" uid="uid://s7wt4e67c3hu" path="res://assets/textures/half-circle-brick-turf-vert32.png" id="16_3hnkd"]
+[ext_resource type="Texture2D" uid="uid://d1nmg5b2winkq" path="res://assets/textures/half-circle-brick-turf-horiz32.png" id="17_27ky5"]
+[ext_resource type="Texture2D" uid="uid://d046nfii5jx6b" path="res://assets/textures/half-circle-brick-sand-vert32.png" id="18_g46e2"]
+[ext_resource type="Texture2D" uid="uid://dn5j1lghgcuj4" path="res://assets/textures/half-circle-brick-sand-horiz32.png" id="19_2yr6p"]
+[ext_resource type="Texture2D" uid="uid://fkdtx4tlbl0e" path="res://assets/textures/half-circle-brick-ice-vert32.png" id="20_ppfmu"]
+[ext_resource type="Texture2D" uid="uid://ctxgq1nirkjxp" path="res://assets/textures/half-circle-brick-ice-horiz32.png" id="21_ueqed"]
+[ext_resource type="Texture2D" uid="uid://csqr3l8m5aoek" path="res://assets/textures/circle-brick-turf32.png" id="22_cogje"]
+[ext_resource type="Texture2D" uid="uid://c1nanlyjqr802" path="res://assets/textures/circle-brick-sand32.png" id="23_feoke"]
+[ext_resource type="Texture2D" uid="uid://bvl7qtcodkyel" path="res://assets/textures/circle-brick-ice32.png" id="25_ytl26"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_truch"]
 bounce = 0.8
@@ -51,7 +66,7 @@ texture_region_size = Vector2i(32, 32)
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_qsicr"]
 texture = ExtResource("5_a3bnn")
 texture_region_size = Vector2i(32, 32)
-0:0/next_alternative_id = 5
+0:0/next_alternative_id = 6
 0:0/0 = 0
 0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(16, -16, 16, -16, 16, 16, -16, 16)
 0:0/0/custom_data_0 = "sand"
@@ -133,16 +148,181 @@ texture_region_size = Vector2i(32, 32)
 0:0/4/physics_layer_0/polygon_0/points = PackedVector2Array(7.2438316, 6.852276, 2.5451317, 10.60005, -2.2654457, 13.117212, -8.754131, 15.522501, -16, 16, -16, -16, 16, -16, 14.851255, -7.355707, 12.893463, -1.7060757, 10.096617, 3.328249)
 0:0/4/custom_data_0 = "grass"
 
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_d5pmo"]
+texture = ExtResource("9_qsicr")
+texture_region_size = Vector2i(32, 32)
+0:0/next_alternative_id = 2
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-0.31100464, -16, 16, 16, -16, 16)
+0:0/0/custom_data_0 = "grass"
+0:0/1 = 1
+0:0/1/flip_v = true
+0:0/1/physics_layer_0/polygon_0/points = PackedVector2Array(-0.02796936, 15.522501, 16, -16, -16, -16)
+0:0/1/custom_data_0 = "grass"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_3hnkd"]
+texture = ExtResource("10_u824c")
+texture_region_size = Vector2i(32, 32)
+0:0/next_alternative_id = 2
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -0.35110855, -16, 16)
+0:0/0/custom_data_0 = "grass"
+0:0/1 = 1
+0:0/1/flip_h = true
+0:0/1/physics_layer_0/polygon_0/points = PackedVector2Array(16, -16, -16, -0.087776184, 16, 16)
+0:0/1/custom_data_0 = "grass"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_27ky5"]
+texture = ExtResource("11_1s3fr")
+texture_region_size = Vector2i(32, 32)
+0:0/next_alternative_id = 2
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(0, -16, 16, 16, -16, 16)
+0:0/0/custom_data_0 = "sand"
+0:0/1 = 1
+0:0/1/flip_v = true
+0:0/1/physics_layer_0/polygon_0/points = PackedVector2Array(0, 16, 16, -16, -16, -16)
+0:0/1/custom_data_0 = "sand"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_g46e2"]
+texture = ExtResource("12_fpd3m")
+texture_region_size = Vector2i(32, 32)
+0:0/next_alternative_id = 2
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -0.17555428, -16, 16)
+0:0/0/custom_data_0 = "sand"
+0:0/1 = 1
+0:0/1/flip_h = true
+0:0/1/physics_layer_0/polygon_0/points = PackedVector2Array(16, -16, -16, -0.17555428, 16, 16)
+0:0/1/custom_data_0 = "sand"
+
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_hqod5"]
 texture = ExtResource("3_wecfj")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
 0:0/0/custom_data_0 = "blackhole"
 
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2yr6p"]
+texture = ExtResource("14_0peh1")
+texture_region_size = Vector2i(32, 32)
+0:0/next_alternative_id = 2
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-0.35110664, -16, 16, 16, -16, 16)
+0:0/0/custom_data_0 = "ice"
+0:0/1 = 1
+0:0/1/flip_v = true
+0:0/1/physics_layer_0/polygon_0/points = PackedVector2Array(-0.31100464, 16, 16, -16, -16, -16)
+0:0/1/custom_data_0 = "ice"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ppfmu"]
+texture = ExtResource("15_d5pmo")
+texture_region_size = Vector2i(32, 32)
+0:0/next_alternative_id = 2
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, 0, -16, 16)
+0:0/0/custom_data_0 = "ice"
+0:0/1 = 1
+0:0/1/flip_h = true
+0:0/1/physics_layer_0/polygon_0/points = PackedVector2Array(16, -16, -16, -0.31100464, 16, 16)
+0:0/1/custom_data_0 = "ice"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ueqed"]
+texture = ExtResource("16_3hnkd")
+texture_region_size = Vector2i(32, 32)
+0:0/next_alternative_id = 2
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-0.6432724, -0.02796936, 5.2860413, 0.47546387, 10.264427, 3.4960575, 13.620644, 8.194761, 14.795319, 11.495039, 16, 16, -16, 16, -15.242815, 11.495039, -13.788454, 7.5235176, -10.488174, 3.7757416, -6.236967, 0.9229584)
+0:0/0/custom_data_0 = "grass"
+0:0/1 = 1
+0:0/1/flip_v = true
+0:0/1/physics_layer_0/polygon_0/points = PackedVector2Array(-0.6432724, 0.13984299, 5.2301025, -0.6992111, 10.096619, -3.1604366, 13.396896, -7.747265, 14.851257, -11.215355, 16, -16, -16, -16, -15.242815, -11.830662, -14.515635, -8.194761, -11.495039, -4.3910484, -6.6844635, -1.2026424)
+0:0/1/custom_data_0 = "grass"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cogje"]
+texture = ExtResource("17_27ky5")
+texture_region_size = Vector2i(32, 32)
+0:0/next_alternative_id = 2
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, -8.92194, -14.347825, -4.3910484, -10.767861, -1.5382652, -6.9082127, 0.08390808, -0.86702347, -0.755146, 5.062292, -3.1044998, 10.04068, -8.362572, 13.620642, -16, 16)
+0:0/0/custom_data_0 = "grass"
+0:0/1 = 1
+0:0/1/flip_h = true
+0:0/1/physics_layer_0/polygon_0/points = PackedVector2Array(16, -16, 8.586319, -14.459699, 3.9994907, -10.711924, 1.5382652, -6.6285276, -0.30765533, -0.75514984, 0.81108475, 5.341976, 3.384184, 10.320364, 8.754129, 14.124075, 16, 16)
+0:0/1/custom_data_0 = "grass"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_feoke"]
+texture = ExtResource("18_g46e2")
+texture_region_size = Vector2i(32, 32)
+0:0/next_alternative_id = 2
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-0.08390427, -0.36359024, 6.181034, 1.1467056, 10.600052, 3.4960575, 14.068142, 8.642256, 16, 16, -16, 16, -14.683445, 8.810066, -11.495039, 4.1113644, -6.4047775, 1.2026424)
+0:0/0/custom_data_0 = "sand"
+0:0/1 = 1
+0:0/1/flip_v = true
+0:0/1/physics_layer_0/polygon_0/points = PackedVector2Array(0.08390808, 0.08390617, 6.1250954, -1.0907688, 10.991608, -3.943554, 14.068142, -8.698193, 16, -16, -16, -16, -14.739382, -8.698193, -11.495039, -4.502922, -6.292904, -1.0907688)
+0:0/1/custom_data_0 = "sand"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ytl26"]
+texture = ExtResource("19_2yr6p")
+texture_region_size = Vector2i(32, 32)
+0:0/next_alternative_id = 2
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, -8.866003, -14.403762, -4.4469852, -10.991609, -1.4263916, -6.516654, 0.13984299, -0.47546387, -0.9229584, 5.5097866, -3.5519943, 10.991608, -8.810066, 14.515635, -16, 16)
+0:0/0/custom_data_0 = "sand"
+0:0/1 = 1
+0:0/1/flip_h = true
+0:0/1/physics_layer_0/polygon_0/points = PackedVector2Array(16, -16, 9.313499, -14.851257, 4.782608, -11.439104, 1.314518, -7.2438335, -0.19578171, -0.9788971, 0.9788971, 5.677599, 1.7060776, 7.8591385, 3.7198048, 10.879734, 9.089752, 14.403761, 16, 16)
+0:0/1/custom_data_0 = "sand"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_v47an"]
+texture = ExtResource("20_ppfmu")
+texture_region_size = Vector2i(32, 32)
+0:0/next_alternative_id = 2
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(0.19578171, -0.1957798, 6.4607162, 0.81108475, 11.383167, 4.167301, 14.459698, 9.64912, 16, 16, -16, 16, -14.795319, 9.257563, -11.942535, 4.558859, -6.57259, 0.9229584)
+0:0/0/custom_data_0 = "ice"
+0:0/1 = 1
+0:0/1/flip_v = true
+0:0/1/physics_layer_0/polygon_0/points = PackedVector2Array(0.13984299, 0.36359024, 6.181034, -1.0907688, 11.215355, -3.9994907, 13.956268, -9.369436, 16, -16, -16, -16, -14.347824, -8.810066, -11.383165, -3.8316803, -6.01322, -0.86702156)
+0:0/1/custom_data_0 = "ice"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_w7b0j"]
+texture = ExtResource("21_ueqed")
+texture_region_size = Vector2i(32, 32)
+0:0/next_alternative_id = 2
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, -9.201626, -14.459699, -4.1113644, -10.935672, -1.3704529, -6.292906, 0.30765533, -0.1957798, -1.2026443, 6.236967, -4.167301, 11.662851, -9.201626, 14.459696, -16, 16)
+0:0/0/custom_data_0 = "ice"
+0:0/1 = 1
+0:0/1/flip_h = true
+0:0/1/physics_layer_0/polygon_0/points = PackedVector2Array(16, -16, 8.866003, -14.5156355, 3.8316784, -10.767861, 1.4263916, -6.181032, -0.36359024, -0.6432762, 1.0907707, 5.8454094, 3.4960575, 10.935671, 8.977877, 14.235949, 16, 16)
+0:0/1/custom_data_0 = "ice"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_6apjq"]
+texture = ExtResource("22_cogje")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-12.110346, -11.32723, -7.2438316, -14.347825, -0.5313988, -16, 6.3488426, -14.291887, 12.390034, -11.271294, 14.459698, -5.957285, 16, -0.36359024, 14.62751, 6.0691566, 12.390034, 11.215355, 7.8591385, 14.291887, 0.36359024, 16, -6.7404003, 14.180014, -11.774725, 11.383165, -14.571571, 6.01322, -16, -0.41952705, -14.739382, -6.236969)
+0:0/0/custom_data_0 = "grass"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1d4b0"]
+texture = ExtResource("23_feoke")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-12.222219, -11.383167, -6.852274, -14.459699, -0.6432724, -16, 6.516655, -14.459699, 12.445969, -11.103482, 14.459698, -6.0132217, 16, -0.36359024, 14.515636, 6.292904, 11.6069145, 11.606913, 6.740402, 14.291887, -0.02796936, 16, -6.6285267, 14.347822, -11.830662, 11.495039, -14.795319, 5.677599, -16, -0.699213, -14.739382, -6.6285276)
+0:0/0/custom_data_0 = "sand"
+
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2iuru"]
 texture = ExtResource("4_8811o")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
+0:0/0/custom_data_0 = "ice"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_6knfh"]
+texture = ExtResource("25_ytl26")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-12.334093, -10.991609, -6.9641476, -14.291887, -0.6432724, -16, 6.852276, -14.62751, 12.390034, -10.935672, 14.739384, -6.0132217, 16, -0.5314026, 14.795319, 5.45385, 12.445969, 10.488174, 7.131962, 14.012201, 0.5873375, 16, -6.4607162, 14.515635, -11.998472, 11.942535, -14.739382, 6.3488407, -16, -1.1467075, -14.515635, -7.076023)
 0:0/0/custom_data_0 = "ice"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_23r0g"]
@@ -231,3 +411,18 @@ sources/12 = SubResource("TileSetAtlasSource_qsicr")
 sources/13 = SubResource("TileSetAtlasSource_1s3fr")
 sources/14 = SubResource("TileSetAtlasSource_fpd3m")
 sources/15 = SubResource("TileSetAtlasSource_0peh1")
+sources/16 = SubResource("TileSetAtlasSource_d5pmo")
+sources/17 = SubResource("TileSetAtlasSource_3hnkd")
+sources/18 = SubResource("TileSetAtlasSource_27ky5")
+sources/19 = SubResource("TileSetAtlasSource_g46e2")
+sources/20 = SubResource("TileSetAtlasSource_2yr6p")
+sources/21 = SubResource("TileSetAtlasSource_ppfmu")
+sources/22 = SubResource("TileSetAtlasSource_ueqed")
+sources/23 = SubResource("TileSetAtlasSource_cogje")
+sources/24 = SubResource("TileSetAtlasSource_feoke")
+sources/25 = SubResource("TileSetAtlasSource_ytl26")
+sources/26 = SubResource("TileSetAtlasSource_v47an")
+sources/27 = SubResource("TileSetAtlasSource_w7b0j")
+sources/28 = SubResource("TileSetAtlasSource_6apjq")
+sources/29 = SubResource("TileSetAtlasSource_1d4b0")
+sources/30 = SubResource("TileSetAtlasSource_6knfh")
