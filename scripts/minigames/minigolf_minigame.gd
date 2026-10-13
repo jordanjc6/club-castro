@@ -15,7 +15,7 @@ var water_steal_explosion_effect = preload("res://scripts/minigames/WaterStealEx
 # Constants
 const NUM_COURSES_PER_GAME = 3
 const AVAILABLE_COURSES: Array[int] = [
-	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
 ]
 #const NUM_COURSES_PER_GAME = 1
 #const AVAILABLE_COURSES: Array[int] = [19]
@@ -41,6 +41,7 @@ var all_available_courses = [
 	{"id": 18, "name": "18. Boosters"},
 	{"id": 19, "name": "19. Pond"},
 	{"id": 20, "name": "20. Biomes"},
+	{"id": 21, "name": "21. Roly Poly Oly"},
 ]
 var course_ids_to_play: Array[int] = []
 var num_courses_to_play: int = -1
