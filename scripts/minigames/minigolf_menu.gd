@@ -553,7 +553,7 @@ func setup_popup_menu() -> void:
 	var available_courses = minigolf_minigame.all_available_courses
 	course_popup_menu.clear()
 	
-	course_popup_menu.add_theme_font_size_override("font_size", 20)
+	course_popup_menu.add_theme_font_size_override("font_size", 26)
 	course_popup_menu.hide_on_item_selection = false 
 	
 	for i in range(available_courses.size()):

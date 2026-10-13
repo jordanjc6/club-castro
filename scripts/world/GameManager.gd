@@ -901,7 +901,7 @@ func populate_course_grid() -> void:
 	for course in singleMinigolfMinigame.all_available_courses:
 		var btn = Button.new()
 		btn.text = course["name"]
-		btn.add_theme_font_size_override("font_size", 24)
+		btn.add_theme_font_size_override("font_size", 26)
 		btn.toggle_mode = true
 		
 		# Set exact button dimensions (275 width to fill 550 total width, 70 height)
@@ -916,7 +916,7 @@ func _on_course_toggled(course_id: int, button: Button) -> void:
 	if button.button_pressed:
 		if not selected_course_ids.has(course_id):
 			selected_course_ids.append(course_id)
-		button.modulate = Color(0.7, 1.2, 0.7) # Selection tint
+		button.modulate = Color(0.5, 0.5, 0.5) # Selection tint
 	else:
 		selected_course_ids.erase(course_id)
 		button.modulate = Color(1.0, 1.0, 1.0)

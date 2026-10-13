@@ -859,7 +859,7 @@ custom_minimum_size = Vector2(1, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 29
-text = "One player is randomly selected to putt first. Players take turns, the goal is to sink your ball in the hole first. 3 random courses are chosen and the player with the least strokes at the end wins!"
+text = "Choose courses to play or 3 random courses are chosen. Turn order is randomized for each course. The player with the least strokes at the end wins!"
 autowrap_mode = 2
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="HUD/MinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer" unique_id=1939171757]
