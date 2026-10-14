@@ -21,34 +21,8 @@ const ROULETTE_BORDER_WIDTH = 8
 const NUM_COURSES_PER_GAME = 3
 const AVAILABLE_COURSES: Array[int] = [
 	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-	23, 24, 
+	23, 24, 25,
 ]
-#const NUM_COURSES_PER_GAME = 1
-#const AVAILABLE_COURSES: Array[int] = [19]
-#var all_available_courses = [
-	#{"id": 1, "name": "Straight"},
-	#{"id": 2, "name": "One"},
-	#{"id": 3, "name": "Zig Zag"},
-	#{"id": 4, "name": "V"},
-	#{"id": 5, "name": "Reverse V"},
-	#{"id": 6, "name": "Maze"},
-	#{"id": 7, "name": "Either Way"},
-	#{"id": 8, "name": "Spiral"},
-	#{"id": 9, "name": "Map"},
-	#{"id": 10, "name": "Windows"},
-	#{"id": 11, "name": "One Bounce"},
-	#{"id": 12, "name": "Jordan"},
-	#{"id": 13, "name": "Which Way"},
-	#{"id": 14, "name": "Jina"},
-	#{"id": 15, "name": "Sandbox"},
-	#{"id": 16, "name": "Black Hole"},
-	#{"id": 17, "name": "Ice Rink"},
-	#{"id": 18, "name": "Boosters"},
-	#{"id": 19, "name": "Pond"},
-	#{"id": 20, "name": "Biomes"},
-	#{"id": 21, "name": "Roly Poly Oly"},
-	#{"id": 22, "name": "Whimsy"},
-#]
 var all_available_courses: Dictionary = {
 	1: "Straight",
 	2: "One",
@@ -74,6 +48,7 @@ var all_available_courses: Dictionary = {
 	22: "Whimsy",
 	23: "90 Degrees",
 	24: "Desert Oasis",
+	25: "Push Gates",
 }
 var course_ids_to_play: Array[int] = []
 var num_courses_to_play: int = -1
