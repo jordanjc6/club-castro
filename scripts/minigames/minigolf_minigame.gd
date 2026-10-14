@@ -20,36 +20,97 @@ const AVAILABLE_COURSES: Array[int] = [
 #const NUM_COURSES_PER_GAME = 1
 #const AVAILABLE_COURSES: Array[int] = [19]
 
-var all_available_courses = [
-	{"id": 1, "name": "1. Straight"},
-	{"id": 2, "name": "2. One"},
-	{"id": 3, "name": "3. Zig Zag"},
-	{"id": 4, "name": "4. V"},
-	{"id": 5, "name": "5. Reverse V"},
-	{"id": 6, "name": "6. Maze"},
-	{"id": 7, "name": "7. Either Way"},
-	{"id": 8, "name": "8. Spiral"},
-	{"id": 9, "name": "9. Map"},
-	{"id": 10, "name": "10. Windows"},
-	{"id": 11, "name": "11. One Bounce"},
-	{"id": 12, "name": "12. Jordan"},
-	{"id": 13, "name": "13. Which Way"},
-	{"id": 14, "name": "14. Jina"},
-	{"id": 15, "name": "15. Sandbox"},
-	{"id": 16, "name": "16. Black Hole"},
-	{"id": 17, "name": "17. Ice Rink"},
-	{"id": 18, "name": "18. Boosters"},
-	{"id": 19, "name": "19. Pond"},
-	{"id": 20, "name": "20. Biomes"},
-	{"id": 21, "name": "21. Roly Poly Oly"},
-	{"id": 22, "name": "22. Whimsy"},
-]
+#var all_available_courses = [
+	#{"id": 1, "name": "Straight"},
+	#{"id": 2, "name": "One"},
+	#{"id": 3, "name": "Zig Zag"},
+	#{"id": 4, "name": "V"},
+	#{"id": 5, "name": "Reverse V"},
+	#{"id": 6, "name": "Maze"},
+	#{"id": 7, "name": "Either Way"},
+	#{"id": 8, "name": "Spiral"},
+	#{"id": 9, "name": "Map"},
+	#{"id": 10, "name": "Windows"},
+	#{"id": 11, "name": "One Bounce"},
+	#{"id": 12, "name": "Jordan"},
+	#{"id": 13, "name": "Which Way"},
+	#{"id": 14, "name": "Jina"},
+	#{"id": 15, "name": "Sandbox"},
+	#{"id": 16, "name": "Black Hole"},
+	#{"id": 17, "name": "Ice Rink"},
+	#{"id": 18, "name": "Boosters"},
+	#{"id": 19, "name": "Pond"},
+	#{"id": 20, "name": "Biomes"},
+	#{"id": 21, "name": "Roly Poly Oly"},
+	#{"id": 22, "name": "Whimsy"},
+#]
+var all_available_courses: Dictionary = {
+	1: "Straight",
+	2: "One",
+	3: "Zig Zag",
+	4: "V",
+	5: "Reverse V",
+	6: "Maze",
+	7: "Either Way",
+	8: "Spiral",
+	9: "Map",
+	10: "Windows",
+	11: "One Bounce",
+	12: "Jordan",
+	13: "Which Way",
+	14: "Jina",
+	15: "Sandbox",
+	16: "Black Hole",
+	17: "Ice Rink",
+	18: "Boosters",
+	19: "Pond",
+	20: "Biomes",
+	21: "Roly Poly Oly",
+	22: "Whimsy"
+}
 var course_ids_to_play: Array[int] = []
 var num_courses_to_play: int = -1
 
+# Deep High-Contrast Colors
+const COLOR_DEEP_CRIMSON  = Color("8B0000") # Dark Blood Red
+const COLOR_EMERALD_GREEN = Color("005C29") # Dark Forest / Emerald Green
+const COLOR_NAVY_BLUE     = Color("0B2545") # Deep Midnight Navy
+const COLOR_ROYAL_PURPLE  = Color("4A154B") # Rich Deep Violet
+const COLOR_BURNT_ORANGE  = Color("C1440E") # Deep Terracotta / Rust
+const COLOR_DEEP_TEAL     = Color("004D40") # Dark Oceanic Teal
+const COLOR_MAGENTA_WINE  = Color("7209B7") # Dark Plum / Magenta
+const COLOR_CHOCOLATE_BROWN = Color("3D251E") # Dark Espresso Brown
+# Bright / Neon Pop Counterparts
+const COLOR_NEON_RED        = Color("FF0033") # Electric Laser Red
+const COLOR_ELECTRIC_LIME   = Color("39FF14") # Highlighter Lime Green
+const COLOR_CYAN_BLUE       = Color("00E5FF") # Vivid Electric Cyan
+const COLOR_NEON_PURPLE     = Color("D000FF") # Radiant Electric Violet
+const COLOR_BLAZE_ORANGE    = Color("FF6600") # High-Vis Safety Orange
+const COLOR_NEON_MINT       = Color("00FFB7") # Bright Neon Mint
+const COLOR_HOT_PINK        = Color("FF007F") # Ultra Hot Pink
+const COLOR_ELECTRIC_YELLOW = Color("FFE600") # High-Lighter Yellow
 const BALL_COLORS: Array[Color] = [
-	Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE
+	# Deep Tones
+	COLOR_DEEP_CRIMSON,
+	COLOR_EMERALD_GREEN,
+	COLOR_NAVY_BLUE,
+	COLOR_ROYAL_PURPLE,
+	COLOR_BURNT_ORANGE,
+	COLOR_DEEP_TEAL,
+	COLOR_MAGENTA_WINE,
+	COLOR_CHOCOLATE_BROWN,
+	
+	# Neon/Bright Pops
+	COLOR_NEON_RED,
+	COLOR_ELECTRIC_LIME,
+	COLOR_CYAN_BLUE,
+	COLOR_NEON_PURPLE,
+	COLOR_BLAZE_ORANGE,
+	COLOR_NEON_MINT,
+	COLOR_HOT_PINK,
+	COLOR_ELECTRIC_YELLOW
 ]
+
 const HOLE_WINNER_NOTIF_TIME = 2.5  # display course winner notif for 4s
 const GAME_RESULT_NOTIF_TIME = 4
 

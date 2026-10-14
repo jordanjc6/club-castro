@@ -24,36 +24,97 @@ const AVAILABLE_COURSES: Array[int] = [
 ]
 #const NUM_COURSES_PER_GAME = 1
 #const AVAILABLE_COURSES: Array[int] = [19]
-var all_available_courses = [
-	{"id": 1, "name": "1. Straight"},
-	{"id": 2, "name": "2. One"},
-	{"id": 3, "name": "3. Zig Zag"},
-	{"id": 4, "name": "4. V"},
-	{"id": 5, "name": "5. Reverse V"},
-	{"id": 6, "name": "6. Maze"},
-	{"id": 7, "name": "7. Either Way"},
-	{"id": 8, "name": "8. Spiral"},
-	{"id": 9, "name": "9. Map"},
-	{"id": 10, "name": "10. Windows"},
-	{"id": 11, "name": "11. One Bounce"},
-	{"id": 12, "name": "12. Jordan"},
-	{"id": 13, "name": "13. Which Way"},
-	{"id": 14, "name": "14. Jina"},
-	{"id": 15, "name": "15. Sandbox"},
-	{"id": 16, "name": "16. Black Hole"},
-	{"id": 17, "name": "17. Ice Rink"},
-	{"id": 18, "name": "18. Boosters"},
-	{"id": 19, "name": "19. Pond"},
-	{"id": 20, "name": "20. Biomes"},
-	{"id": 21, "name": "21. Roly Poly Oly"},
-	{"id": 22, "name": "22. Whimsy"},
-]
+#var all_available_courses = [
+	#{"id": 1, "name": "Straight"},
+	#{"id": 2, "name": "One"},
+	#{"id": 3, "name": "Zig Zag"},
+	#{"id": 4, "name": "V"},
+	#{"id": 5, "name": "Reverse V"},
+	#{"id": 6, "name": "Maze"},
+	#{"id": 7, "name": "Either Way"},
+	#{"id": 8, "name": "Spiral"},
+	#{"id": 9, "name": "Map"},
+	#{"id": 10, "name": "Windows"},
+	#{"id": 11, "name": "One Bounce"},
+	#{"id": 12, "name": "Jordan"},
+	#{"id": 13, "name": "Which Way"},
+	#{"id": 14, "name": "Jina"},
+	#{"id": 15, "name": "Sandbox"},
+	#{"id": 16, "name": "Black Hole"},
+	#{"id": 17, "name": "Ice Rink"},
+	#{"id": 18, "name": "Boosters"},
+	#{"id": 19, "name": "Pond"},
+	#{"id": 20, "name": "Biomes"},
+	#{"id": 21, "name": "Roly Poly Oly"},
+	#{"id": 22, "name": "Whimsy"},
+#]
+var all_available_courses: Dictionary = {
+	1: "Straight",
+	2: "One",
+	3: "Zig Zag",
+	4: "V",
+	5: "Reverse V",
+	6: "Maze",
+	7: "Either Way",
+	8: "Spiral",
+	9: "Map",
+	10: "Windows",
+	11: "One Bounce",
+	12: "Jordan",
+	13: "Which Way",
+	14: "Jina",
+	15: "Sandbox",
+	16: "Black Hole",
+	17: "Ice Rink",
+	18: "Boosters",
+	19: "Pond",
+	20: "Biomes",
+	21: "Roly Poly Oly",
+	22: "Whimsy"
+}
 var course_ids_to_play: Array[int] = []
 var num_courses_to_play: int = -1
 
+# Deep High-Contrast Colors
+const COLOR_DEEP_CRIMSON  = Color("8B0000") # Dark Blood Red
+const COLOR_EMERALD_GREEN = Color("005C29") # Dark Forest / Emerald Green
+const COLOR_NAVY_BLUE     = Color("0B2545") # Deep Midnight Navy
+const COLOR_ROYAL_PURPLE  = Color("4A154B") # Rich Deep Violet
+const COLOR_BURNT_ORANGE  = Color("C1440E") # Deep Terracotta / Rust
+const COLOR_DEEP_TEAL     = Color("004D40") # Dark Oceanic Teal
+const COLOR_MAGENTA_WINE  = Color("7209B7") # Dark Plum / Magenta
+const COLOR_CHOCOLATE_BROWN = Color("3D251E") # Dark Espresso Brown
+# Bright / Neon Pop Counterparts
+const COLOR_NEON_RED        = Color("FF0033") # Electric Laser Red
+const COLOR_ELECTRIC_LIME   = Color("39FF14") # Highlighter Lime Green
+const COLOR_CYAN_BLUE       = Color("00E5FF") # Vivid Electric Cyan
+const COLOR_NEON_PURPLE     = Color("D000FF") # Radiant Electric Violet
+const COLOR_BLAZE_ORANGE    = Color("FF6600") # High-Vis Safety Orange
+const COLOR_NEON_MINT       = Color("00FFB7") # Bright Neon Mint
+const COLOR_HOT_PINK        = Color("FF007F") # Ultra Hot Pink
+const COLOR_ELECTRIC_YELLOW = Color("FFE600") # High-Lighter Yellow
 const BALL_COLORS: Array[Color] = [
-	Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE
+	# Deep Tones
+	COLOR_DEEP_CRIMSON,
+	COLOR_EMERALD_GREEN,
+	COLOR_NAVY_BLUE,
+	COLOR_ROYAL_PURPLE,
+	COLOR_BURNT_ORANGE,
+	COLOR_DEEP_TEAL,
+	COLOR_MAGENTA_WINE,
+	COLOR_CHOCOLATE_BROWN,
+	
+	# Neon/Bright Pops
+	COLOR_NEON_RED,
+	COLOR_ELECTRIC_LIME,
+	COLOR_CYAN_BLUE,
+	COLOR_NEON_PURPLE,
+	COLOR_BLAZE_ORANGE,
+	COLOR_NEON_MINT,
+	COLOR_HOT_PINK,
+	COLOR_ELECTRIC_YELLOW
 ]
+
 const HOLE_WINNER_NOTIF_TIME = 2.5  # display course winner notif for 4s
 const GAME_RESULT_NOTIF_TIME = 4
 
@@ -68,6 +129,7 @@ const MAX_DEVIATION_ANGLE: float = 0.35  # Max error angle in radians (~20 deg)
 var player_data: Dictionary = {}
 var current_turn_id = 1
 var current_course_number: int = 1  # 1, 2, 3 out of 3 courses played each game
+var current_course_id: int = -1
 var played_courses: Array[int] = []
 var dragged_ball_preview: Node2D = null
 var current_ball_state: BallState = BallState.PLACING
@@ -131,6 +193,7 @@ func start_singleplayer_game(chosen_courses: Array[int]):
 		course_ids_to_play = chosen_courses
 		num_courses_to_play = chosen_courses.size()
 	played_courses.append(first_course_id)
+	current_course_id = first_course_id
 	
 	exit_game_button.disabled = false
 	current_course_number = 1
@@ -148,7 +211,7 @@ func start_singleplayer_game(chosen_courses: Array[int]):
 	}
 	
 	load_course(first_course_id)
-	refresh_minigolf_hud(current_course_number, player_data)
+	refresh_minigolf_hud(current_course_number, first_course_id, player_data)
 	if is_instance_valid(notif_popup):
 		notif_popup.hide()
 	
@@ -173,11 +236,11 @@ func load_course(course_num: int) -> void:
 		if is_instance_valid(hole_node) and hole_node.has_signal("ball_sunk"):
 			hole_node.ball_sunk.connect(_on_ball_sunk)
 
-func refresh_minigolf_hud(current_course: int, player_info: Dictionary = {}) -> void:
-	update_game_info(current_course)
+func refresh_minigolf_hud(current_course: int, course_id: int, player_info: Dictionary = {}) -> void:
+	update_game_info(current_course, course_id)
 	update_player_grid(player_info)
 
-func update_game_info(course_num: int):
+func update_game_info(course_num: int, course_id: int):
 	var info_node = get_minigolf_game_info_node()
 	if not is_instance_valid(info_node):
 		return
@@ -185,7 +248,7 @@ func update_game_info(course_num: int):
 	var courseLabel = info_node.get_node("CourseLabel")
 	var turnLabel = info_node.get_node("TurnLabel")
 	
-	courseLabel.text = "Course %s/%s" % [course_num, num_courses_to_play]
+	courseLabel.text = "Course %s/%s: %s" % [course_num, num_courses_to_play, all_available_courses[course_id]]
 	turnLabel.text = "Your turn!"
 
 func get_minigolf_game_info_node() -> HBoxContainer:
@@ -296,6 +359,7 @@ func end_minigolf_game() -> void:
 	played_courses.clear()
 	player_data.clear()
 	current_course_number = 1
+	current_course_id = -1
 	current_ball_state = BallState.PLACING
 
 	drag_start_pos = Vector2.ZERO
@@ -575,7 +639,7 @@ func sync_ball_stroke(peer_id: int, impulse: Vector2) -> void:
 
 		player_data[peer_id]["current_strokes"] += 1
 		player_data[peer_id]["total_strokes"] += 1
-		refresh_minigolf_hud(current_course_number, player_data)
+		refresh_minigolf_hud(current_course_number, current_course_id, player_data)
 
 func _on_ball_sunk(sunk_ball: RigidBody2D) -> void:
 	var owner_peer_id = 0
@@ -597,7 +661,7 @@ func sync_player_finished_hole(peer_id: int) -> void:
 		player_data[peer_id]["finished_hole"] = true
 		print("[DEBUG] Peer %d marked finished_hole = true" % peer_id)
 	
-	refresh_minigolf_hud(current_course_number, player_data)
+	refresh_minigolf_hud(current_course_number, current_course_id, player_data)
 
 func on_ball_stopped(_ball: RigidBody2D) -> void:
 	print("\n--- [DEBUG] A BALL HAS STOPPED ---")
@@ -688,7 +752,7 @@ func advance_to_next_turn(ball_state: BallState) -> void:
 		return
 	
 	current_ball_state = ball_state
-	refresh_minigolf_hud(current_course_number, player_data)
+	refresh_minigolf_hud(current_course_number, current_course_id, player_data)
 
 func announce_course_winner() -> void:
 	var strokes = player_data[1].get("current_strokes", 0)
@@ -726,6 +790,7 @@ func advance_to_next_course() -> void:
 	else:
 		#next_course_id = course_ids_to_play.pick_random()
 		next_course_id = AVAILABLE_COURSES.pick_random()
+	current_course_id = next_course_id
 
 	played_courses.append(next_course_id)
 	current_course_number += 1
@@ -744,7 +809,7 @@ func refresh_minigolf_course(active_turn_id: int, course_round_num: int, course_
 	
 	load_course(course_id_to_load)
 	current_ball_state = BallState.PLACING
-	refresh_minigolf_hud(current_course_number, player_data)
+	refresh_minigolf_hud(current_course_number, course_id_to_load, player_data)
 
 func _are_all_balls_stopped() -> bool:
 	for peer_id in player_data:
@@ -780,7 +845,7 @@ func handle_ball_blackholed(peer_id: int) -> void:
 	current_ball_state = BallState.PLACING
 	show_notification("Fell into a blackhole! Place ball at the tee on your next turn.", HOLE_WINNER_NOTIF_TIME)
 
-	refresh_minigolf_hud(current_course_number, player_data)
+	refresh_minigolf_hud(current_course_number, current_course_id, player_data)
 	
 	# Advance turn if all other balls are finished/stopped
 	if _are_all_balls_stopped():
@@ -819,7 +884,7 @@ func handle_ball_watered(peer_id: int) -> void:
 		current_ball_state = BallState.PLACED
 		show_notification("Ball in the water! \n\nReturned to previous position.", HOLE_WINNER_NOTIF_TIME)
 		
-	refresh_minigolf_hud(current_course_number, player_data)
+	refresh_minigolf_hud(current_course_number, current_course_id, player_data)
 
 func play_water_splash(pos: Vector2) -> void:
 	if not is_instance_valid(course_container) or course_container.get_child_count() == 0:

@@ -557,11 +557,12 @@ func setup_popup_menu() -> void:
 	course_popup_menu.hide_on_item_selection = false 
 	
 	for i in range(available_courses.size()):
-		var course = available_courses[i]
-		course_popup_menu.add_check_item(course["name"], i)
+		var course_name = available_courses[i + 1]
+		var text = "%d. %s" % [i + 1, course_name]
+		course_popup_menu.add_check_item(text, i)
 		
 		# Simply read the source of truth directly from the Autoload whenever the menu opens!
-		if MultiplayerManager.synced_selected_courses.has(course["id"]):
+		if MultiplayerManager.synced_selected_courses.has(i + 1):
 			course_popup_menu.set_item_checked(course_popup_menu.get_item_index(i), true)
 			
 	if not course_popup_menu.id_pressed.is_connected(_on_popup_item_pressed):
@@ -594,8 +595,8 @@ func setup_popup_menu() -> void:
 func _on_popup_item_pressed(id: int) -> void:
 	var minigolf_minigame = get_node("../../../MinigolfMinigame")
 	var available_courses = minigolf_minigame.all_available_courses
-	var course = available_courses[id]
-	var course_id = course["id"]
+	var course = available_courses[id + 1]
+	var course_id = id + 1
 	
 	# Determine current checked state and invert it
 	var item_index = course_popup_menu.get_item_index(id)

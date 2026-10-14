@@ -120,7 +120,7 @@ text = "Course x/3"
 
 [node name="TurnLabel" type="Label" parent="Screen/UI/HBoxContainer/HUD/RotationWrapper/VBoxContainer/GameInfo" unique_id=1851509636]
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_horizontal = 10
 theme_override_font_sizes/font_size = 30
 text = "Player X's Turn"
 horizontal_alignment = 2

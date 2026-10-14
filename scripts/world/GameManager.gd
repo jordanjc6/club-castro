@@ -898,9 +898,10 @@ func populate_course_grid() -> void:
 		child.queue_free()
 	
 	var singleMinigolfMinigame = get_node("../MinigolfMinigame")
-	for course in singleMinigolfMinigame.all_available_courses:
+	for course_id in singleMinigolfMinigame.all_available_courses:
+		var course_name = singleMinigolfMinigame.all_available_courses[course_id]
 		var btn = Button.new()
-		btn.text = course["name"]
+		btn.text = "%d. %s" % [course_id, course_name]
 		btn.add_theme_font_size_override("font_size", 26)
 		btn.toggle_mode = true
 		
@@ -908,7 +909,7 @@ func populate_course_grid() -> void:
 		btn.custom_minimum_size = Vector2(270, 70)
 		
 		# Connect toggle logic
-		btn.toggled.connect(func(toggled_on: bool): _on_course_toggled(course["id"], btn))
+		btn.toggled.connect(func(toggled_on: bool): _on_course_toggled(course_id, btn))
 		
 		courses_grid.add_child(btn)
 

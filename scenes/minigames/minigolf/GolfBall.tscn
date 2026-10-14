@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cr2gxw5kofcm0"]
 
-[ext_resource type="Texture2D" uid="uid://bt1mw2ppiieyc" path="res://assets/icons/golf-ball.png" id="1_467wi"]
+[ext_resource type="Texture2D" uid="uid://dpv4sdnildg61" path="res://assets/icons/golf-ball.png" id="1_467wi"]
 [ext_resource type="Script" uid="uid://dodhg3uudcwnj" path="res://scripts/minigames/GolfBall.gd" id="1_muokh"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_muokh"]
