@@ -26,7 +26,7 @@ tile_map_data = PackedByteArray("AAAAABYAAAAAAAAAAAAAABUAAAAAAAAAAAAAABQAAAAAAAA
 tile_set = ExtResource("2_njia7")
 
 [node name="GolfHole" parent="." unique_id=1468353498 instance=ExtResource("3_55bqi")]
-position = Vector2(1058, 70)
+position = Vector2(997, 49)
 
 [node name="TeeArea" type="Area2D" parent="." unique_id=2060443125]
 collision_layer = 128

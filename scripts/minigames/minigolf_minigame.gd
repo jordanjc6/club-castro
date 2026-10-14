@@ -126,6 +126,7 @@ var minigolf_turn_order: Array[int] = []
 var player_data: Dictionary = {}
 var current_turn_id: int
 var current_course_number: int = 1  # 1, 2, 3 out of 3 courses played each game
+var current_course_id: int = -1
 var played_courses: Array[int] = []
 var dragged_ball_preview: Node2D = null
 var current_ball_state: BallState = BallState.PLACING
@@ -220,9 +221,9 @@ func process_joiner_manual_exit(quitting_peer_id: int) -> void:
 		current_turn_id = minigolf_turn_order[0] # Usually Host (Peer 1)
 		print("[MINIGAME SERVER] Exiting joiner was active turn owner. Advancing turn to Peer: ", current_turn_id)
 		rpc("force_local_turn_unfreeze", current_turn_id)
-		broadcast_minigolf_state(minigolf_turn_order, current_turn_id, current_course_number)
+		broadcast_minigolf_state(minigolf_turn_order, current_turn_id, current_course_number, current_course_id)
 	else:
-		broadcast_minigolf_state(minigolf_turn_order, current_turn_id, current_course_number)
+		broadcast_minigolf_state(minigolf_turn_order, current_turn_id, current_course_number, current_course_id)
 
 @rpc("authority", "call_local", "reliable")
 func force_local_turn_unfreeze(target_peer_id: int) -> void:
@@ -684,6 +685,7 @@ func start_minigolf(turn_order: Array[int], chosen_courses: Array[int]) -> void:
 			course_ids_to_play = chosen_courses
 			num_courses_to_play = chosen_courses.size()
 		played_courses.append(first_course_id)
+		current_course_id = first_course_id
 		
 		# Server picks unique colors for everyone
 		var assigned_colors: Dictionary = {}
@@ -700,12 +702,13 @@ func start_minigolf(turn_order: Array[int], chosen_courses: Array[int]) -> void:
 				assigned_colors[peer_id] = BALL_COLORS.pick_random()
 		
 		enable_minigame_processing(true)
-		rpc("sync_game_start", turn_order, first_course_id, assigned_colors, course_ids_to_play, num_courses_to_play)
+		rpc("sync_game_start", turn_order, first_course_id, assigned_colors, course_ids_to_play, num_courses_to_play, current_course_id)
 
 @rpc("authority", "call_local", "reliable")
-func sync_game_start(turn_order: Array[int], starting_course_id: int, assigned_colors: Dictionary, courses: Array[int], num_courses: int) -> void:
+func sync_game_start(turn_order: Array[int], starting_course_id: int, assigned_colors: Dictionary, courses: Array[int], num_courses: int, curr_course_id: int) -> void:
 	exit_game_button.disabled = false
 	current_course_number = 1
+	current_course_id = curr_course_id
 	num_courses_to_play = num_courses
 	course_ids_to_play = courses
 	current_turn_id = turn_order[0]
@@ -800,7 +803,7 @@ func advance_to_next_turn() -> void:
 
 	current_turn_id = next_id
 	print("[DEBUG] Server advancing turn to Peer: ", current_turn_id)
-	broadcast_minigolf_state(minigolf_turn_order, current_turn_id, current_course_number)
+	broadcast_minigolf_state(minigolf_turn_order, current_turn_id, current_course_number, current_course_id)
 
 	# FOR SINGLE PLAYER SURVIVAL: Force turn un-freeze if only 1 player remains
 	if minigolf_turn_order.size() == 1:
@@ -908,15 +911,16 @@ func show_notification(message: String, time: float) -> void:
 func disable_exit_game_button():
 	exit_game_button.disabled = true
 
-func broadcast_minigolf_state(turn_order: Array[int], active_turn_id: int, current_course_num: int) -> void:
+func broadcast_minigolf_state(turn_order: Array[int], active_turn_id: int, current_course_num: int, curr_course_id) -> void:
 	if multiplayer.is_server():
-		rpc("sync_minigolf_state", turn_order, active_turn_id, current_course_num)
+		rpc("sync_minigolf_state", turn_order, active_turn_id, current_course_num, curr_course_id)
 
 @rpc("authority", "call_local", "reliable")
-func sync_minigolf_state(turn_order: Array[int], active_turn_id: int, current_course_num: int) -> void:
+func sync_minigolf_state(turn_order: Array[int], active_turn_id: int, current_course_num: int, curr_course_id: int) -> void:
 	minigolf_turn_order = turn_order
 	current_turn_id = active_turn_id
 	current_course_number = current_course_num
+	current_course_id = curr_course_id
 	
 	var my_id = multiplayer.get_unique_id()
 	
@@ -933,7 +937,7 @@ func sync_minigolf_state(turn_order: Array[int], active_turn_id: int, current_co
 @rpc("authority", "call_local", "reliable")
 func refresh_minigolf_hud() -> void:
 	if is_instance_valid(minigolf_menu):
-		minigolf_menu.update_game_info(current_course_number, current_turn_id, num_courses_to_play)
+		minigolf_menu.update_game_info(current_course_number, current_turn_id, num_courses_to_play, all_available_courses[current_course_id])
 		minigolf_menu.update_player_grid(minigolf_turn_order, current_turn_id, player_data)
 
 func advance_to_next_course() -> void:
@@ -961,7 +965,7 @@ func advance_to_next_course() -> void:
 		next_course_id = unplayed_courses.pick_random()
 	else:
 		next_course_id = AVAILABLE_COURSES.pick_random()
-
+	current_course_id = next_course_id
 	played_courses.append(next_course_id)
 	current_course_number += 1
 	
@@ -976,6 +980,7 @@ func refresh_minigolf_course(turn_order: Array[int], active_turn_id: int, course
 	minigolf_turn_order = turn_order
 	current_turn_id = active_turn_id
 	current_course_number = course_round_num
+	current_course_id = course_id_to_load
 	
 	for peer_id in player_data:
 		player_data[peer_id]["finished_hole"] = false
@@ -1026,7 +1031,7 @@ func handle_midgame_player_disconnect(disconnected_peer_id: int) -> void:
 		print("[MINIGAME SERVER] Disconnected player was active turn owner. Advancing turn...")
 		advance_to_next_turn()
 	else:
-		broadcast_minigolf_state(minigolf_turn_order, current_turn_id, current_course_number)
+		broadcast_minigolf_state(minigolf_turn_order, current_turn_id, current_course_number, current_course_id)
 
 @rpc("authority", "call_local", "reliable")
 func end_minigolf_game() -> void:
@@ -1049,6 +1054,7 @@ func end_minigolf_game() -> void:
 	player_data.clear()
 	current_turn_id = 0
 	current_course_number = 1
+	current_course_id = -1
 	current_ball_state = BallState.PLACING
 
 	drag_start_pos = Vector2.ZERO

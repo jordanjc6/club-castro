@@ -295,7 +295,7 @@ func set_minigolf_ui() -> void:
 	for player in get_tree().get_nodes_in_group("player"):
 		player.hide()
 
-func update_game_info(course_num: int, turn_id: int, total_courses: int):
+func update_game_info(course_num: int, turn_id: int, total_courses: int, course_name: String):
 	var info_node = get_minigolf_game_info_node()
 	if not is_instance_valid(info_node):
 		return
@@ -303,7 +303,7 @@ func update_game_info(course_num: int, turn_id: int, total_courses: int):
 	var courseLabel = info_node.get_node("CourseLabel")
 	var turnLabel = info_node.get_node("TurnLabel")
 	
-	courseLabel.text = "Course %s/%s" % [course_num, total_courses]
+	courseLabel.text = "Course %s/%s: %s" % [course_num, total_courses, course_name]
 	
 	var my_id = multiplayer.get_unique_id()
 	if turn_id == my_id:
