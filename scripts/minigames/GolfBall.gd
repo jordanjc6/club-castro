@@ -7,7 +7,7 @@ const STOP_THRESHOLD: float = 5.0 # Speed below which the ball is considered sto
 const NORMAL_DAMP: float = 1.3
 const SAND_DAMP: float = 8.0
 const ICE_DAMP: float = 0.2
-const ARROW_PUSH_STRENGTH: float = 200
+const ARROW_PUSH_STRENGTH: float = 250
 
 # Local state flag for when the ball is moving
 var is_preview: bool = false
