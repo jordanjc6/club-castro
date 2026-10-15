@@ -1,2 +1,3 @@
 Minigolf
+- add bouncy wall tile
 - design more courses
