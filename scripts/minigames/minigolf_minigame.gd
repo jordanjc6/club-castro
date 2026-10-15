@@ -16,7 +16,7 @@ var water_steal_explosion_effect = preload("res://scripts/minigames/WaterStealEx
 const NUM_COURSES_PER_GAME = 3
 const AVAILABLE_COURSES: Array[int] = [
 	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-	23, 24, 25, 26, 27, 28, 29, 
+	23, 24, 25, 26, 27, 28, 29, 30, 31, 
 ]
 var all_available_courses: Dictionary = {
 	1: "Straight",
@@ -48,6 +48,8 @@ var all_available_courses: Dictionary = {
 	27: "Wormholes",
 	28: "Skate",
 	29: "Figure 8",
+	30: "Tightrope",
+	31: "Islands",
 }
 var course_ids_to_play: Array[int] = []
 var num_courses_to_play: int = -1
