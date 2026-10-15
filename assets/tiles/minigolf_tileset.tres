@@ -1,6 +1,6 @@
 [gd_resource type="TileSet" format=3 uid="uid://7tj23bt4wta7"]
 
-[ext_resource type="Texture2D" uid="uid://ct1q1g67erghh" path="res://assets/textures/bricks32.png" id="1_wecfj"]
+[ext_resource type="Texture2D" uid="uid://ddlvxp1f4q5nf" path="res://assets/textures/bricks-outlined32.png" id="1_ytl26"]
 [ext_resource type="Texture2D" uid="uid://dwott7xspujpm" path="res://assets/textures/sand32.jpg" id="2_wecfj"]
 [ext_resource type="Texture2D" uid="uid://b8bcupe13j7v0" path="res://assets/textures/blackhole32.png" id="3_wecfj"]
 [ext_resource type="Texture2D" uid="uid://db28focjuqr0h" path="res://assets/textures/ice32.jpg" id="4_8811o"]
@@ -9,7 +9,6 @@
 [ext_resource type="Texture2D" uid="uid://jb81rsaxuxwq" path="res://assets/textures/half-brick-sand32.png" id="5_a3bnn"]
 [ext_resource type="Texture2D" uid="uid://vysm2b780na8" path="res://assets/textures/round-brick-ice32.png" id="6_1nwlc"]
 [ext_resource type="Texture2D" uid="uid://dboxp0qgoun7s" path="res://assets/textures/horiz-arrow32.png" id="6_23r0g"]
-[ext_resource type="Texture2D" uid="uid://bea5naftetcae" path="res://assets/textures/checkered-start32.png" id="6_8811o"]
 [ext_resource type="Texture2D" uid="uid://x2b4cqt341sr" path="res://assets/textures/round-brick-sand32.png" id="7_fxpnn"]
 [ext_resource type="Texture2D" uid="uid://c0a6xlgfynx3o" path="res://assets/textures/vert-arrow32.png" id="8_aic3d"]
 [ext_resource type="Texture2D" uid="uid://br5jdti6gcjw1" path="res://assets/textures/round-brick-turf32.png" id="8_d0g14"]
@@ -30,12 +29,13 @@
 [ext_resource type="Texture2D" uid="uid://csqr3l8m5aoek" path="res://assets/textures/circle-brick-turf32.png" id="22_cogje"]
 [ext_resource type="Texture2D" uid="uid://c1nanlyjqr802" path="res://assets/textures/circle-brick-sand32.png" id="23_feoke"]
 [ext_resource type="Texture2D" uid="uid://bvl7qtcodkyel" path="res://assets/textures/circle-brick-ice32.png" id="25_ytl26"]
+[ext_resource type="Texture2D" uid="uid://qvcxqw5juypy" path="res://assets/textures/checkerboard-start32.png" id="26_ytl26"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_truch"]
 bounce = 0.8
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_8811o"]
-texture = ExtResource("1_wecfj")
+texture = ExtResource("1_ytl26")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
 0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
@@ -326,7 +326,7 @@ texture_region_size = Vector2i(32, 32)
 0:0/0/custom_data_0 = "ice"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_23r0g"]
-texture = ExtResource("6_8811o")
+texture = ExtResource("26_ytl26")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
 0:0/0/custom_data_0 = "tee"

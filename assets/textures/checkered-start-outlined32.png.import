@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bea5naftetcae"
-path="res://.godot/imported/checkered-start32.png-0cf2aee3c21921843ba2a0d33bb1e7ad.ctex"
+uid="uid://be2scmqb66m13"
+path="res://.godot/imported/checkered-start-outlined32.png-e6833ab5400fe87ffe1abd35794f873e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/checkered-start32.png"
-dest_files=["res://.godot/imported/checkered-start32.png-0cf2aee3c21921843ba2a0d33bb1e7ad.ctex"]
+source_file="res://assets/textures/checkered-start-outlined32.png"
+dest_files=["res://.godot/imported/checkered-start-outlined32.png-e6833ab5400fe87ffe1abd35794f873e.ctex"]
 
 [params]
 
