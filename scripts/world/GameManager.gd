@@ -92,6 +92,8 @@ func _ready() -> void:
 	single_minigolfmenu_start_button.pressed.connect(_start_single_minigolf_game)
 	setup_grid_container()
 	populate_course_grid()
+	# Get the internal vertical scrollbar and make it touch-friendly
+	get_node("../HUD/SingleplayerMinigamesPopup/MinigolfMenu/MarginContainer/VBoxContainer/Footer/HBoxContainer/ScrollContainer").get_v_scroll_bar().custom_minimum_size.x = 30 # Set width in pixels
 	
 	lobby_popup.hide()
 	minigames_popup.hide()

@@ -156,6 +156,11 @@ corner_radius_top_right = 20
 corner_radius_bottom_right = 20
 corner_radius_bottom_left = 20
 
+[sub_resource type="Theme" id="Theme_0duuj"]
+VScrollBar/constants/minimum_size = 30
+VScrollBar/constants/padding_left = 20
+VScrollBar/constants/padding_right = 20
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8xm5o"]
 bg_color = Color(0, 0, 0, 1)
 corner_radius_top_left = 40
@@ -894,8 +899,10 @@ autowrap_mode = 2
 
 [node name="PopupMenu" type="PopupMenu" parent="HUD/MinigamesPopup/MinigolfMenu" unique_id=149690426]
 oversampling_override = 1.0
+theme = SubResource("Theme_0duuj")
 hide_on_item_selection = false
 hide_on_checkable_item_selection = false
+search_bar_enabled = true
 
 [node name="SingleplayerMinigamesPopup" type="Node2D" parent="HUD" unique_id=931259875]
 visible = false
